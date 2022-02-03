@@ -1,0 +1,844 @@
+﻿.canvas-container {
+	height: 30%;
+	display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 1em;
+}
+
+.canvas-containerWeb {
+	height: 20vh;
+}
+@media only screen and (max-width: 1024px) {
+	.canvas-container {
+		height: 20vh;
+		display: block;
+		grid-template-columns: 1fr;
+		grid-gap: 1em;
+	}
+	.canvas-containerINAGraphs {
+		height: 20vh;
+		display: block;
+		grid-template-columns: 1fr;
+		grid-gap: 1em;
+	}
+	
+}
+
+.canvas-containerLeakage {
+	position: relative;
+	display: block;
+	margin-bottom: 20px;
+	/* grid-template-columns: 1fr;
+	grid-gap: 1em;
+	height: 20vh;
+	width: 40vw */
+}
+.canvas-containerLiab {
+	position: relative;
+	display: block;
+	margin-bottom: 20px;
+}
+
+.canvas-containerINAGraphs {
+	height: 400px;
+	display: grid;
+  	grid-template-columns: 1fr 1fr;
+  	grid-gap: 1em;
+	  position: "relative";
+}
+
+
+/* 
+@media only screen and (max-width: 1024px) {
+	.canvas-containerLeakage {
+	
+		width:120vw 
+	}
+}
+*/
+@media only screen and (max-width: 768px) {
+	.canvas-containerLeakage {
+		grid-template-columns: 1fr;
+	grid-gap: 1em;
+	height: 22vh;
+	width: 113vw
+		
+}
+	.canvas-containerLiab {
+		grid-template-columns: 1fr;
+	grid-gap: 1em;
+	height: 28vh;
+	width: 92vw
+		
+}
+.canvas-containerINAGraphs {
+	height: 20%;
+}
+} 
+
+.header {
+	cursor: pointer;
+	padding: 9px;
+	padding-bottom: 5px;
+	padding-left: 15px;
+	padding-right: 22px;
+	background-color: #7399C6;
+	color: #FFF;
+	font-family: 'Trebuchet MS';
+	font-size: 14px;
+	border: 2px solid #7399C6;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	margin-bottom: 1px;
+	margin-top: 5px;
+	height: 18px;
+}
+
+.headerTitle {
+	color: #282e31;
+	margin-bottom: 8px;
+
+}
+@media only screen and (max-width: 600px) {
+	.headerTitle {
+		margin-top: -10px;
+		font-size: 16px;
+	}
+}
+
+
+.content {
+	border-left: solid 1px #f2f2f2;
+	border-right: solid 1px #f2f2f2;
+	border-bottom: solid 1px #f2f2f2;
+	border-radius: 0 0 5px 5px;
+	padding: 0px;
+	font-size: 12px;
+	display: flex;
+	flex-direction: column;
+}
+
+/*@supports (-ms-ime-align:auto) {
+	/* IE Edge 16+ CSS */
+	/*.header {
+		margin: 0px 15px 7px 25px;
+	}
+}*/
+.logo {
+	float: right;
+	margin-top: 22px;
+	margin-right: 2px;
+	width: 30px;
+	font-size: 18px;
+	color: #FFF;
+	border: 2px solid #7399C6;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	font-weight: 700;
+	background-color: #7399C6;
+	border-style: none;
+}
+
+.addRemove {
+	float: right;
+	margin-top: 22px;
+	margin-right: 2px;
+	width: 30px;
+	font-size: 18px;
+	color: #FFF;
+	border: 2px solid #7399C6;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	font-weight: 700;
+	background-color: #7399C6;
+	border-style: none;
+	cursor: pointer;
+}
+.addRemoveDisabled {
+	
+	color: rgb(236, 227, 227);
+}
+.addRemoveDisabledRemove {
+	
+	color: rgb(236, 227, 227);
+	background-color: #becde0;
+
+}
+
+
+.switchClient {
+	float: right;
+	margin-top: 22px;
+	margin-right: 2px;
+	width: 115px;
+	height: 30px;
+	font-size: 14px;
+	color: #FFF;
+	border: 2px solid #7399C6;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	font-weight: 200;
+	background-color: #7399C6;
+	border-style: none;
+	cursor: pointer;
+}
+
+
+.multiButtons {
+	float: left;
+	margin-top: 3px;	
+	margin-bottom: 5px;
+	padding-left: 17px;
+	width: 130px;
+	font-family: 'Trebuchet MS';
+	font-size: 13px;
+	height: 30px;
+	text-align: left;
+	color: #2F4755;/*#63879c; /*#395662;*/
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	background-color: white;
+	border: 1px solid rgb(87, 128, 175);
+ 	margin-left: -1px; 
+	 box-shadow: 0px 1px 3px  #979797;
+	-moz-box-shadow: 0px 1px  3px  #979797;
+	-webkit-box-shadow: 0px 1px  3px  #979797;
+	-o-box-shadow: 0px 1px  3px  #979797;
+	 cursor: pointer;
+}
+.multiButtons:hover {
+
+	box-shadow: 0px 3px 3px  #9aa533;
+	-moz-box-shadow: 0px 3px 3px  #9aa533;
+	-webkit-box-shadow: 0px 3px 3px  #9aa533;
+	-o-box-shadow: 0px 3px 3px  #9aa533;
+}
+
+.multiButtonsAct {
+	box-shadow: 0px 1px 3px  #ffffff;
+	-moz-box-shadow: 0px 1px  3px  #ffffff;
+	-webkit-box-shadow: 0px 1px  3px  #ffffff;
+	-o-box-shadow: 0px 1px  3px  #ffffff;
+	background-color: #2F4755;/*#63879c; /*#395662;*/
+	color: #FFF; /*#e9eef1;*/
+	cursor: default;
+}
+.multiButtonsAct:hover {
+
+	box-shadow: 0px 3px 3px  #ffffff;
+	-moz-box-shadow: 0px 3px 3px  #ffffff;
+	-webkit-box-shadow: 0px 3px 3px  #ffffff;
+	-o-box-shadow: 0px 3px 3px  #ffffff;
+}
+
+
+.multiButtons:focus {
+	outline: none;
+	cursor: pointer;
+
+}
+.multiButtonsAct:focus {
+	outline: none;
+	cursor: default;	
+}
+.singleButton {
+		float: left;
+		margin-top: 20px;	
+		margin-bottom: 5px;
+		padding-left: 12px;
+		padding-top: 7px;
+		width: 205px;
+		font-family: 'Trebuchet MS';
+		font-size: 13px;
+		height: 24px;
+		text-align: left;
+		-moz-border-radius: 2px;
+		border-radius: 2px;
+		border: 1px solid rgb(87, 128, 175);
+		margin-left: -1px;
+		background-color: #2F4755;/*#63879c; /*#395662;*/
+		color: #FFF; /*#e9eef1;*/
+		cursor: pointer;
+
+}
+
+.language {
+	position: absolute;
+	float: right;
+	margin-bottom: 2px;
+	margin-right: 0px;
+	font-size: 14px;
+	font-weight: bold;
+	font-style: italic;
+	border: none;
+	border-style: none;
+	background-color: transparent;
+	color: #455560;
+	font-family: Trebuchet MS;	
+	display: block;
+	margin-left: auto;
+	cursor: pointer;
+}
+
+.dialog {
+	font-family: Trebuchet MS;	
+	color: #1c2225;
+	width: 50px;
+}
+.mainDiv2 {
+	position: relative;
+	font-family: 'Trebuchet MS';
+	margin: 10px 2% 10px 1%;
+	font-size: 14px;
+	float:left;
+	width: 97%;
+	height: 100%;
+	overflow-y: auto;
+	
+}
+.mainDiv {
+	position: relative;
+	font-family: 'Trebuchet MS';
+	margin: 10px 1% 10px .9%;	
+	font-size: 14px;
+	float:left;
+	width: 98.1%;
+	height: 100%;
+	
+}
+
+.mainDivBlocked {
+	position: relative;
+	font-family: 'Trebuchet MS';
+	margin: 10px 1% 10px .9%;	
+	font-size: 14px;
+	float:left;
+	width: 98.1%;
+	height: 100%;
+	pointer-events: none;
+	background-color: #fcfcfd;
+}
+
+/* @media (max-width : 320px) {
+	mainDiv {
+		margin: 10px 1% 10px 2%;
+		width: 97%;
+	}
+} */
+
+
+.inputField {
+	/* Remove First */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+	padding-bottom: 8px;
+	padding-right: 10%;
+	padding-top: 12px;
+	border-radius: 3px;
+	background: none;
+	border: 1px;
+	border: 1px solid #B1CAE6;
+	width: 88.3%;
+	height: 13px;
+	font-size: 12px;
+	text-align: right;
+	background-color: #e9eef1;
+	display: inline-block;
+}
+.inputField:focus{
+	outline-offset: 0px !important;
+	outline: none !important;
+}
+.inputField:hover {
+	background-color: #d6e5ee;
+}
+.inputField::-ms-clear {
+	width : 0;
+	height: 0;
+  }
+
+.inputFieldFrench {
+	width: 107px;
+}
+[class="dropDown dropDown2"] [french=true] {
+	width: 125px;
+}
+.inputFieldFrench:hover {
+	background-color: #d6e5ee;
+}
+
+.inputFieldDisabled {
+	color: grey;
+}
+
+input[type="text"][disabled] {
+	color: grey;
+}
+
+.dropDown {
+	width: 120px;
+	margin-left: 14px;
+	margin-right: 4px;
+	margin-bottom: 18px;
+	margin-top: 2px;
+	font-size: 13px;
+	height: 50px;
+	float:left;
+	display: inline-block;
+	-webkit-user-select: none;
+}
+.inputDiv {
+	width: 96px;
+}
+.inputDivFrench {
+	width: 120px;
+}
+
+.Text {
+	text-align: left;
+	width: 182px;
+	padding-left: 8px;
+	margin-top: 4px;
+}
+.textarea
+{
+	text-align: left;
+	width: 290px;
+	padding-left: 8px;
+	margin-top: 4px;
+	height: 46px;
+	font-family: 'Trebuchet MS';
+	font-size: 14px;
+	
+}
+.textareaAssetName
+{
+	text-align: left;
+	padding-left: 5px;
+}
+
+
+.inputText {
+	width: 210px;
+}
+.inputTextNotes{
+	float:left;
+	clear: both;
+	height: 86px
+}
+
+.dropDown2 {
+	width: 187px;
+}
+@media only screen and (max-width: 768px) {
+	/* For mobile phones: */
+	[class="dropDown dropDown2"] {
+		width: 260px;
+	}
+}
+
+
+@media only screen and (max-width: 768px) {
+	/* For mobile phones: */
+	[class="inputField"] {
+		width: 90%px;
+	}
+	[class="inputField inputFieldDisabled"] {
+		width: 90%px;
+	}
+}
+@media only screen and (max-width: 768px) {
+	/* For mobile phones: */
+	[class="dropDown inputDiv"] {
+		width: 120px;
+	}
+}
+
+
+.controlTitle{
+	width:100%;
+	height:16px;
+	font-size: 11px;
+	color: rgb(88, 88, 88);
+	margin-top: 0px;
+	margin-top: 3px;
+}
+
+
+
+
+
+html {
+	height: 100%;
+	width: 100%;
+	/*//-webkit-overflow-scrolling: touch;*/
+}
+
+
+label.titleButtons input[type="file"] {
+	position: absolute;
+	top: -20px;
+}
+
+.adjImageButton {
+	padding: 2px 18px;
+	float: left;
+	font-size: 14px;
+	font-weight: bold;
+	font-style: italic;
+	background-color: transparent;
+	color: #455560;
+	font-family: Trebuchet MS;
+	display: block;
+	margin-left: auto;
+	cursor: pointer;
+}
+
+.titleButtons {
+	padding: 2px 5px;
+	margin: 0px;
+	float: right;
+	margin-bottom: 4px;
+	margin-right: 0px;
+	font-size: 14px;
+	font-weight: bold;
+	font-style: italic;
+	border: none;
+	border-style: none;
+	background-color: transparent;
+	color: #455560;
+	font-family: Trebuchet MS;
+	display: block;
+	margin-left: auto;
+	/* position: absolute; 
+	top: 38px;*/
+	cursor: pointer;
+}
+.titleButtons:hover, .language:hover, .adjImageButton:hover{
+	background-color: #f0f1f3
+}
+.topCommandLine {
+	margin-right: 0px;
+	margin-top: -16px;
+	float: right;
+} 
+@media only screen and (max-width: 600px) {
+	/* For mobile phones: */
+	.titleButtons {
+		font-size: 12px;
+	}
+	.topCommandLine {
+		margin-top: 0px;
+	} 
+	
+}
+
+
+.headerBar{
+	/* position: fixed; 
+	right:1.6%;
+	left:1.6%;*/	
+	height: 58px;
+	top: 0;
+	z-index:100;
+	background-color: white;
+	border-bottom: 1px solid #B1CAE6;
+/* 	-webkit-sticky: true; */
+	position:sticky;
+}
+
+.headerBarIOS{
+	position: relative;
+	height: 64px;
+	right:1.6%;
+	left:1.6%;
+	top: 0;
+	z-index:100;
+	background-color: white;
+	border-bottom: 1px solid #B1CAE6;
+	
+
+}
+
+.INAPie
+	{
+		float: left; height: 400px; width: 60%;
+	}
+
+.EPGraphDiv1{
+	/* overflow: hidden; */
+	margin-left:10%;
+	float : left;
+	width: 103%;
+}
+.EPGraphDiv{
+	/* overflow: hidden; */
+	margin-left:2%;
+	float : left;
+	width: 103%;
+}
+
+@media only screen and (max-width: 768px) {
+	/* For mobile phones: */
+	body {
+		padding-top: 0px;
+/* 		margin-right: 4%; */
+	}
+	.headerBar {
+	/* 	position: relative; */
+		/* margin-right: 3%; */
+	padding-top: 25px;
+
+	} 
+	.INAPie {
+		height: 200px; width: 100%;
+	}
+}
+
+/*	.titleButtons:hover {
+		color: #7399C6;
+	}
+
+	.titleButtons:active {
+		color: #7399C6;
+	}
+   */
+	.titleButtons :invalid + span {
+		color: #455560;
+		
+	}
+
+.titleButtons :valid + span {
+	color: #455560;
+}
+
+.titleLoad:hover, .titleLoad:active, .titleLoad:focus {	
+	cursor: pointer;
+}
+
+.scrollable * {
+    overflow: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0; 
+}
+
+/*** Styles added to fix the issue with zoom in on iphone ***/
+/* iPhone < 5: */
+@media screen and (device-aspect-ratio: 2/3) {
+	select, textarea, input[type="text"], input[type="password"],
+	input[type="datetime"], input[type="datetime-local"],
+	input[type="date"], input[type="month"], input[type="time"],
+	input[type="week"], input[type="number"], input[type="email"],
+	input[type="url"] {
+		font-size: 16px;
+	}
+}
+
+/* iPhone 5, 5C, 5S, iPod Touch 5g */
+@media screen and (device-aspect-ratio: 40/71) {
+	select, textarea, input[type="text"], input[type="password"],
+	input[type="datetime"], input[type="datetime-local"],
+	input[type="date"], input[type="month"], input[type="time"],
+	input[type="week"], input[type="number"], input[type="email"],
+	input[type="url"] {
+		font-size: 16px;
+	}
+}
+
+/* iPhone 6, iPhone 6s, iPhone 7 portrait/landscape */
+@media screen and (device-aspect-ratio: 375/667) {
+	select, textarea, input[type="text"], input[type="password"],
+	input[type="datetime"], input[type="datetime-local"],
+	input[type="date"], input[type="month"], input[type="time"],
+	input[type="week"], input[type="number"], input[type="email"],
+	input[type="url"] {
+		font-size: 16px;
+	}
+}
+
+/* iPhone 6 Plus, iPhone 6s Plus, iPhone 7 Plus portrait/landscape */
+@media screen and (device-aspect-ratio: 9/16) {
+	select, textarea, input[type="text"], input[type="password"],
+	input[type="datetime"], input[type="datetime-local"],
+	input[type="date"], input[type="month"], input[type="time"],
+	input[type="week"], input[type="number"], input[type="email"],
+	input[type="url"] {
+		font-size: 16px;
+	}
+}
+
+.selectWrapper{
+	border-radius:5px;
+	display:inline-block;
+	overflow:hidden;
+	border:1px solid  #777c80;
+	width: 178px;
+	margin-left: 14px;
+	margin-right: 4px;
+	padding-right: 10px;
+	margin-bottom: 18px;
+	margin-top: 2px;
+	font-size: 12px;
+	height: 38px;
+	float:left;
+	height: 35;
+	background: #b8cbd6;
+	-webkit-user-select: none;
+  }
+  .selectBox{
+	width:178px;
+	height:38px;
+	border:0px;
+	padding-right: 10px;
+	outline:none;
+  }
+
+
+  
+/* The CSS */
+.selectMe {
+    padding:8px;
+    margin: 0;
+  width: 178px;
+	margin-top: 2px;
+	font-size: 14px;
+	height: 35px;
+    -webkit-border-radius:4px;
+    -moz-border-radius:4px;
+    border-radius:4px;
+  font:14px 'Trebuchet MS', monospace;
+  background-color:  #e9eef1;
+    color: #3f484e;
+    outline:none;
+    display: inline-block;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    appearance:none;
+    cursor:pointer;
+  border:1px solid  #777c80;
+
+
+}
+
+.roundedCornerCmd
+{
+	font-family: 'Trebuchet MS';
+	font-size: 13px;
+	text-align: left;
+	padding: 7px 18px 5px 17px;
+	margin-top: 4px;	
+	margin-bottom: 8px;
+	margin-left: auto;
+	border: none;
+	float: left;
+	display: block;
+	cursor: pointer;color: #2F4755;/*#63879c; /*#395662;*/
+	-moz-border-radius: 3px;
+	background-color:  #e2e2e2;
+	box-shadow: 0px 1px 3px  #979797;
+	-moz-box-shadow: 0px 1px  3px  #979797;
+	-webkit-box-shadow: 0px 1px  3px  #979797;
+	-o-box-shadow: 0px 1px  3px  #979797;
+}
+
+.roundedCornerCmd:hover
+{
+	background-color: #d5d5d5;
+}
+
+/* Targetting Webkit browsers only. FF will show the dropdown arrow with so much padding. */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    select {padding-right:22px}
+}
+
+.labelMe {position:relative}
+.labelMe:after {
+    content:'>';
+  	font:18px 'Symbols', monospace;
+	color:lightgrey;
+	font-weight: bold;
+    -webkit-transform:rotate(90deg);
+    -moz-transform:rotate(90deg);
+    -ms-transform:rotate(90deg);
+    transform:rotate(90deg);
+    right:10px; top:2px;
+    padding:10 2 10px;
+    border-bottom:1px solid #ddd;
+    position:absolute;
+    pointer-events:none;
+}
+.labelMe:before {
+    content:' ';
+    right:12px; top:0px;
+    width:20px; height:20px;
+    background: #e9eef1;
+    position:absolute;
+    pointer-events:none;
+    display:block;
+}
+input[type="text"]#percent{
+    -webkit-appearance: none!important;
+	text-align: left;
+	border:'none';
+	width: 10%px;
+	display: 'inline-block';
+	color: #455560;
+	margin-right: 0px;
+  
+}
+.inputRow{
+	width: 100%;
+	float: left;
+	border-top: 1px solid rgb(228, 226, 222);
+	padding-top: 4px;
+}
+/*.inputRowAlt{
+	background-color: rgb(239, 246, 252);
+}*/
+.inputRow:hover {
+	background-color:#F6F4ED; /*#fffde8;*/
+}
+.inputRowAlt:hover {
+	background-color:#F6F4ED; /*#fffde8;*/
+}
+
+/* @media only screen and (max-width: 768px) {
+	[class="percentDiv"] {
+		width: 10px;
+	}
+}
+ */
+.percentField{
+	display: inline-block;
+	border: none;
+	float: left;
+	margin-right: 2px;
+	padding-right: 0px;
+}
+
+.topMargin{
+	padding-top: 10px;
+}
+@media only screen and (max-width: 768px) {
+	.topMargin{
+		padding-top: 2px;
+	}
+}
+
+/* @media only screen and (max-width: 768px) {
+	[class="inputField percentField"] {
+		width: 80%;
+	}
+} */
+

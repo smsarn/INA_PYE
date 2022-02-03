@@ -1,0 +1,77 @@
+{
+  "name": "toolkitdirect",
+  "version": "1.0.15",
+  "buildMode": 0,
+  "comments": {
+    "buildModeGuide": "0 is for local, 1 for test-tkdirect, 2 for production toolkitdirect  1 or 2 both work as proxy takes care",
+    "proxyGuide": "for test-tkdirect use https://test-tkdirectapi.ppi.ca, for production toolkitdirect use https://privateapi.ppi.ca/ToolkitDirect",
+    "proxyReason": "having same URL as the caller of the API via this proxy, makes it same-origin (hence no preflight call). Proxy Server wrapper redirects to the proper API site "
+  },
+  "appletMode": "INA",
+  "comments2": {
+    "INA": "for INA",
+    "EP": "for estate protection"
+  },
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/styles": "^4.10.0",
+    "chart.js": "^2.9.3",
+    "file-saver": "^2.0.2",
+    "isomorphic-fetch": "^2.2.1",
+    "jspdf": "^2.0.0",
+    "lodash.debounce": "^4.0.8",
+    "mui-datatables": "^2.15.0",
+    "prop-types": "^15.7.2",
+    "query-string": "^6.13.1",
+    "react": "^16.13.1",
+    "react-bootstrap": "^1.3.0",
+    "react-chartjs-2": "^2.10.0",
+    "react-data-export": "^0.5.0",
+    "react-dom": "^16.13.1",
+    "react-loader-spinner": "^3.1.14",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "^3.4.2",
+    "react-select": "^3.1.0",
+    "safe-buffer": "^5.2.1",
+    "shortid": "^2.2.15",
+    "validatorjs": "^3.18.1",
+    "xlsx": "^0.15.6"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "debug": "node --nolazy --debug-brk=5858 app.js",
+    "generate-build-version": "node generate-build-version",
+    "prebuild": "npm run generate-build-version",
+    "postbuild": "node iisConfig/copyIISConfig.js"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/preset-react": "^7.0.0",
+    "babel-eslint": "^10.1.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-config-react": "^1.1.7",
+    "eslint-plugin-prettier": "^3.1.4",
+    "prettier": "^2.0.5"
+  }
+}

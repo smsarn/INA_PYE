@@ -1,0 +1,102 @@
+{
+    "lives": [
+        {
+            "Age": 43,
+            "Sex": 0,
+            "Smk":"NS_STD",
+            "Rating": 100,
+               "member": 0,
+            "salary": 100000.0,
+            "CPPeligibility": 1.0,
+            "retirementAge": 65,
+            "avgTaxRate": 0.0
+          },
+        {
+            "member": 1,
+            "salary": 70000.0,
+            "CPPeligibility": 1.0,
+            "retirementAge": 65,
+            "avgTaxRate": 0.0,
+            "Age": 42,
+            "Sex": 1,
+            "Smk": "NS_STD",
+            "Rating": 100
+        }
+    ],
+    "assets": [
+        {
+            "name": "asset1",
+            "ID": 0,
+            "taxMethod": 0,
+            "owner": 0,
+            "ACB": 0.0,
+            "dispositionYr": 0,
+            "dispositionDur": 1,
+            "dispositionYrUlt": 100,
+            "currValue": 0.0,
+            "growthRate": 0.0,
+            "incomeRate": 0.0
+        },
+        {
+            "name": "asset2",
+            "ID": 0,
+            "taxMethod": 0,
+            "owner": 0,
+            "ACB": 0.0,
+            "dispositionYr": 0,
+            "dispositionDur": 1,
+            "dispositionYrUlt": 100,
+            "currValue": 0.0,
+            "growthRate": 0.0,
+            "incomeRate": 0.0
+        }
+    ],
+    "liabilitys": [
+        {
+            "name": "liab1",
+            "ID": 0,
+            "owner": 0,
+            "currValue": 0.0
+        },
+        {
+            "name": "liab2",
+            "ID": 1,
+            "owner": 0,
+            "currValue": 0.0
+        }
+    ],
+    "estateContingiencies": [
+        {
+            "name": "ec1",
+            "ID": 0,
+            "currValue": 0.0
+        },
+        {
+            "name": "ec2",
+            "ID": 1,
+            "currValue": 0.0
+        }
+    ],
+    "liabilitys": {
+        "additionalNeed": [],
+        "incomePercentAfterDeath": 0.6,
+        "upToChildrenOutYrs": 0,
+        "childrenOutToRetirementYrs": 0,
+        "retirementToEndYrs": 0,
+        "growNeedsRate": 0.02
+    },
+    "projectionSettings": {
+        "deathYear": 0,
+        "deathOf": 0,
+        "startYear": 1,
+        "endYear": 100,
+        "returnType": 4
+    },
+    "ratesPack": {
+        "investmentRate": 0.03,
+        "taxRate": 0.45,
+        "dividendTaxRate": 0.33,
+        "capitalGainsInclusion": 0.5,
+        "inflationRate": 0.02
+    }
+}

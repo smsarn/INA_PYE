@@ -1,0 +1,15 @@
+.icon {
+    fill: grey;
+  }.icon:hover {
+    fill: #1f497D;
+  }
+
+.iconMore{
+    fill: grey;
+    padding-top: 20px;
+    padding-left: 5px;
+   
+}
+.iconMore:hover {
+fill: #1f497D;
+}

@@ -1,0 +1,11 @@
+{
+    "appService.showBuildDuringDeployPrompt": false,
+    "appService.defaultWebAppToDeploy": "/subscriptions/9825ed62-7eab-47c7-be1d-64d8724d71cd/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/INA2",
+    "appService.deploySubpath": "",
+    "appService.zipIgnorePattern": [
+        ".vscode{,/**}"
+    ],
+    "[javascript]": {
+      "editor.defaultFormatter": "vscode.typescript-language-features"
+    }
+}

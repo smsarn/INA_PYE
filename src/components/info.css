@@ -1,0 +1,114 @@
+/* Popup container - can be anything you want */
+.popup {
+  /* position: relative; */
+  position: absolute;
+  display: inline-block;
+ /*  z-index: 990; */
+  margin-top: -4px;
+  margin-left: -3px;
+  font-family: 'Trebuchet MS';
+	font-size: 12px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 140px;
+  
+}
+
+.popup2 {
+  /* position: relative; */
+  position: absolute;
+  display: inline-block;
+/*   z-index: 991; */
+  margin-top: -4px;
+  margin-left: -3px;
+  font-family: 'Trebuchet MS';
+	font-size: 12px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 140px;
+  
+}
+
+/* The actual popup */
+/* .popup .popuptext .popuptextBottom{
+  visibility: hidden;
+  width: 160px;
+  background-color: '#f8f8f8';/*  #2F4755;
+  color: '#746b6d';/*  #fff; 
+  text-align: left;
+  border-radius: 4px;
+  border-color:'#2f4755' ;
+  border-width: '2px';
+  padding: 9px;
+  font-family: 'Trebuchet MS light';
+	font-size: 12px;
+  font-weight: lighter;
+  position: absolute;
+  z-index: 1111;
+  top:110%;
+  left: 55%;
+  margin-left: -180px;
+}
+ */
+.popup .popuptextBottom {
+  visibility: hidden;
+  width: 140px;
+  background-color: '#f8f8f8';/*  #2F4755; */
+  color: '#746b6d';/*  #fff; */
+  text-align: left;
+  border-radius: 4px;
+  border-color:'#2f4755' ;
+  border-width: '2px';
+  /* background-color: #2F4755;
+  color: #fff;
+  text-align: left;
+  border-radius: 4px;
+ */  
+  padding: 9px;
+  font-family: 'Trebuchet MS light';
+	font-size: 12px;
+  font-weight: lighter;
+  position: absolute;
+/*   z-index: 1000; */
+  left:  -60px;
+  top:100%;
+  
+}
+
+
+/* Popup arrow */
+.popup .popuptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: 0px;
+  border-width: 0px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Toggle this class - hide and show the popup */
+/* Toggle this class - hide and show the popup */
+.popup .show {
+  visibility: visible;
+  -webkit-animation: fadeIn 1s;
+  animation: fadeIn 1s;
+}
+
+/* Add animation (fade in the popup) */
+@-webkit-keyframes fadeIn {
+  from {opacity: 0;} 
+  to {opacity: 1;}
+}
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity:1 ;}
+}

@@ -1,0 +1,411 @@
+
+{
+  "header": {
+    "reportVersion": 2,
+    "event": "Allocation failed - JavaScript heap out of memory",
+    "trigger": "FatalError",
+    "filename": "report.20210303.154143.23192.0.001.json",
+    "dumpEventTime": "2021-03-03T15:41:43Z",
+    "dumpEventTimeStamp": "1614814903812",
+    "processId": 23192,
+    "threadId": null,
+    "cwd": "C:\\Projects\\PPIToolkitDirect\\INA\\toolkitdirectINA",
+    "commandLine": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Projects\\PPIToolkitDirect\\INA\\toolkitdirectINA\\node_modules\\terser-webpack-plugin\\node_modules\\jest-worker\\build\\workers\\processChild.js"
+    ],
+    "nodejsVersion": "v13.9.0",
+    "wordSize": 64,
+    "arch": "x64",
+    "platform": "win32",
+    "componentVersions": {
+      "node": "13.9.0",
+      "v8": "7.9.317.25-node.28",
+      "uv": "1.34.2",
+      "zlib": "1.2.11",
+      "brotli": "1.0.7",
+      "ares": "1.15.0",
+      "modules": "79",
+      "nghttp2": "1.40.0",
+      "napi": "5",
+      "llhttp": "2.0.4",
+      "openssl": "1.1.1d",
+      "cldr": "36.0",
+      "icu": "65.1",
+      "tz": "2019c",
+      "unicode": "12.1"
+    },
+    "release": {
+      "name": "node",
+      "headersUrl": "https://nodejs.org/download/release/v13.9.0/node-v13.9.0-headers.tar.gz",
+      "sourceUrl": "https://nodejs.org/download/release/v13.9.0/node-v13.9.0.tar.gz",
+      "libUrl": "https://nodejs.org/download/release/v13.9.0/win-x64/node.lib"
+    },
+    "osName": "Windows_NT",
+    "osRelease": "10.0.16299",
+    "osVersion": "Windows 10 Enterprise",
+    "osMachine": "x86_64",
+    "cpus": [
+      {
+        "model": "Intel(R) Core(TM) i7-7600U CPU @ 2.80GHz",
+        "speed": 2904,
+        "user": 14093437,
+        "nice": 0,
+        "sys": 12650578,
+        "idle": 170890093,
+        "irq": 3152453
+      },
+      {
+        "model": "Intel(R) Core(TM) i7-7600U CPU @ 2.80GHz",
+        "speed": 2904,
+        "user": 13684046,
+        "nice": 0,
+        "sys": 8723171,
+        "idle": 175226687,
+        "irq": 145531
+      },
+      {
+        "model": "Intel(R) Core(TM) i7-7600U CPU @ 2.80GHz",
+        "speed": 2904,
+        "user": 14838703,
+        "nice": 0,
+        "sys": 9347937,
+        "idle": 173447250,
+        "irq": 135281
+      },
+      {
+        "model": "Intel(R) Core(TM) i7-7600U CPU @ 2.80GHz",
+        "speed": 2904,
+        "user": 15176718,
+        "nice": 0,
+        "sys": 8232171,
+        "idle": 174225000,
+        "irq": 101640
+      }
+    ],
+    "networkInterfaces": [
+      {
+        "name": "Ethernet 2",
+        "internal": false,
+        "mac": "00:05:9a:3c:7a:00",
+        "address": "fe80::aa:ce25:d419:f057",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 6
+      },
+      {
+        "name": "Ethernet 2",
+        "internal": false,
+        "mac": "00:05:9a:3c:7a:00",
+        "address": "fe80::3955:3e8e:3793:b839",
+        "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:fffc",
+        "family": "IPv6",
+        "scopeid": 6
+      },
+      {
+        "name": "Ethernet 2",
+        "internal": false,
+        "mac": "00:05:9a:3c:7a:00",
+        "address": "10.11.108.33",
+        "netmask": "255.255.252.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "vEthernet (Default Switch)",
+        "internal": false,
+        "mac": "9e:15:ea:55:b2:10",
+        "address": "fe80::fcc7:41e4:caba:aa3f",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 13
+      },
+      {
+        "name": "vEthernet (Default Switch)",
+        "internal": false,
+        "mac": "9e:15:ea:55:b2:10",
+        "address": "172.30.12.65",
+        "netmask": "255.255.255.240",
+        "family": "IPv4"
+      },
+      {
+        "name": "Wi-Fi",
+        "internal": false,
+        "mac": "00:24:d6:eb:1a:45",
+        "address": "2001:569:7011:e00:dc38:65c7:f0b2:7cd8",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "Wi-Fi",
+        "internal": false,
+        "mac": "00:24:d6:eb:1a:45",
+        "address": "2001:569:7011:e00:28ab:afbc:edac:8933",
+        "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "Wi-Fi",
+        "internal": false,
+        "mac": "00:24:d6:eb:1a:45",
+        "address": "2001:569:7011:e00:7d55:7908:11bf:4624",
+        "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "Wi-Fi",
+        "internal": false,
+        "mac": "00:24:d6:eb:1a:45",
+        "address": "2001:569:7011:e00:b9b9:5075:8878:6942",
+        "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "Wi-Fi",
+        "internal": false,
+        "mac": "00:24:d6:eb:1a:45",
+        "address": "fe80::dc38:65c7:f0b2:7cd8",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 16
+      },
+      {
+        "name": "Wi-Fi",
+        "internal": false,
+        "mac": "00:24:d6:eb:1a:45",
+        "address": "192.168.1.66",
+        "netmask": "255.255.255.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "Loopback Pseudo-Interface 1",
+        "internal": true,
+        "mac": "00:00:00:00:00:00",
+        "address": "::1",
+        "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "Loopback Pseudo-Interface 1",
+        "internal": true,
+        "mac": "00:00:00:00:00:00",
+        "address": "127.0.0.1",
+        "netmask": "255.0.0.0",
+        "family": "IPv4"
+      }
+    ],
+    "host": "VANP-MSAMIEI3"
+  },
+  "javascriptStack": {
+    "message": "No stack.",
+    "stack": [
+      "Unavailable."
+    ]
+  },
+  "nativeStack": [
+    {
+      "pc": "0x00007ff61e0c2399",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff61e0c6849",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff61e0c56c8",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff61e1eab12",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff61ea1721e",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff61e9fe971",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff61e8c59cc",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff61e8a1353",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff61e89f7ab",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff61e8cb20d",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff61e8ccfba",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff61e8c2f13",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff61e8c16a4",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff61e8e3774",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff61e63d91f",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff61ee60b6d",
+      "symbol": ""
+    },
+    {
+      "pc": "0x000000fa92d5679c",
+      "symbol": ""
+    }
+  ],
+  "javascriptHeap": {
+    "totalMemory": 653299712,
+    "totalCommittedMemory": 653299712,
+    "usedMemory": 614859496,
+    "availableMemory": 1581527960,
+    "memoryLimit": 2197815296,
+    "heapSpaces": {
+      "read_only_space": {
+        "memorySize": 262144,
+        "committedMemory": 262144,
+        "capacity": 33040,
+        "used": 33040,
+        "available": 0
+      },
+      "new_space": {
+        "memorySize": 33554432,
+        "committedMemory": 33554432,
+        "capacity": 16758784,
+        "used": 1249664,
+        "available": 15509120
+      },
+      "old_space": {
+        "memorySize": 243412992,
+        "committedMemory": 243412992,
+        "capacity": 238136560,
+        "used": 238110680,
+        "available": 25880
+      },
+      "code_space": {
+        "memorySize": 692224,
+        "committedMemory": 692224,
+        "capacity": 472864,
+        "used": 472864,
+        "available": 0
+      },
+      "map_space": {
+        "memorySize": 528384,
+        "committedMemory": 528384,
+        "capacity": 297520,
+        "used": 297520,
+        "available": 0
+      },
+      "large_object_space": {
+        "memorySize": 374800384,
+        "committedMemory": 374800384,
+        "capacity": 374692944,
+        "used": 374692944,
+        "available": 0
+      },
+      "code_large_object_space": {
+        "memorySize": 49152,
+        "committedMemory": 49152,
+        "capacity": 2784,
+        "used": 2784,
+        "available": 0
+      },
+      "new_large_object_space": {
+        "memorySize": 0,
+        "committedMemory": 0,
+        "capacity": 16758784,
+        "used": 0,
+        "available": 16758784
+      }
+    }
+  },
+  "resourceUsage": {
+    "userCpuSeconds": 7.187,
+    "kernelCpuSeconds": 0.812,
+    "cpuConsumptionPercent": 159.98,
+    "maxRss": 772452352,
+    "pageFaults": {
+      "IORequired": 359870,
+      "IONotRequired": 0
+    },
+    "fsActivity": {
+      "reads": 26,
+      "writes": 6
+    }
+  },
+  "libuv": [
+  ],
+  "workers": [
+  ],
+  "environmentVariables": {
+  },
+  "sharedObjects": [
+    "C:\\Program Files\\nodejs\\node.exe",
+    "C:\\WINDOWS\\SYSTEM32\\ntdll.dll",
+    "C:\\WINDOWS\\System32\\KERNEL32.DLL",
+    "C:\\WINDOWS\\System32\\KERNELBASE.dll",
+    "C:\\WINDOWS\\SYSTEM32\\apphelp.dll",
+    "C:\\WINDOWS\\System32\\WS2_32.dll",
+    "C:\\WINDOWS\\System32\\RPCRT4.dll",
+    "C:\\WINDOWS\\SYSTEM32\\dbghelp.dll",
+    "C:\\WINDOWS\\System32\\ucrtbase.dll",
+    "C:\\WINDOWS\\System32\\PSAPI.DLL",
+    "C:\\WINDOWS\\System32\\ADVAPI32.dll",
+    "C:\\WINDOWS\\System32\\msvcrt.dll",
+    "C:\\WINDOWS\\SYSTEM32\\IPHLPAPI.DLL",
+    "C:\\WINDOWS\\System32\\sechost.dll",
+    "C:\\WINDOWS\\System32\\USER32.dll",
+    "C:\\WINDOWS\\System32\\win32u.dll",
+    "C:\\WINDOWS\\SYSTEM32\\USERENV.dll",
+    "C:\\WINDOWS\\System32\\GDI32.dll",
+    "C:\\WINDOWS\\System32\\gdi32full.dll",
+    "C:\\WINDOWS\\System32\\profapi.dll",
+    "C:\\WINDOWS\\System32\\msvcp_win.dll",
+    "C:\\WINDOWS\\System32\\CRYPT32.dll",
+    "C:\\WINDOWS\\System32\\MSASN1.dll",
+    "C:\\WINDOWS\\SYSTEM32\\bcrypt.dll",
+    "C:\\WINDOWS\\SYSTEM32\\WINMM.dll",
+    "C:\\WINDOWS\\SYSTEM32\\winmmbase.dll",
+    "C:\\WINDOWS\\System32\\cfgmgr32.dll",
+    "C:\\WINDOWS\\System32\\IMM32.DLL",
+    "C:\\WINDOWS\\System32\\combase.dll",
+    "C:\\WINDOWS\\System32\\bcryptPrimitives.dll",
+    "C:\\WINDOWS\\System32\\powrprof.dll",
+    "C:\\WINDOWS\\SYSTEM32\\CRYPTBASE.DLL",
+    "C:\\WINDOWS\\system32\\uxtheme.dll",
+    "C:\\WINDOWS\\system32\\mswsock.dll",
+    "C:\\WINDOWS\\System32\\kernel.appcore.dll",
+    "C:\\WINDOWS\\System32\\NSI.dll",
+    "C:\\WINDOWS\\SYSTEM32\\dhcpcsvc6.DLL",
+    "C:\\WINDOWS\\SYSTEM32\\dhcpcsvc.DLL",
+    "C:\\WINDOWS\\system32\\napinsp.dll",
+    "C:\\WINDOWS\\system32\\pnrpnsp.dll",
+    "C:\\WINDOWS\\system32\\NLAapi.dll",
+    "C:\\WINDOWS\\SYSTEM32\\DNSAPI.dll",
+    "C:\\WINDOWS\\System32\\winrnr.dll",
+    "C:\\WINDOWS\\System32\\wshbth.dll",
+    "C:\\Program Files\\Bonjour\\mdnsNSP.dll"
+  ]
+}

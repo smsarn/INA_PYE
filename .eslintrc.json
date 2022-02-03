@@ -1,0 +1,22 @@
+{
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:prettier/recommended"
+    ],
+    "plugins": ["react", "prettier"],
+    "env": {
+        "browser":true,
+        "es6": true
+    },
+    "rules": {
+        "prettier/prettier": ["error", {"endOfLine": "auto"}],
+        "react/prop-types": "off"
+      },  
+      "parser": "babel-eslint",
+      "parserOptions": {
+        "sourceType": "module",
+        "allowImportExportEverywhere": true,
+        "ecmaVersion": 2020
+      }
+}
