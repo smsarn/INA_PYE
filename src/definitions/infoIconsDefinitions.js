@@ -117,6 +117,7 @@ const MESSAGES = {
     infoINA:
       "This amount is based on the present value of shortfalls, discounted at the after tax investment rate. It is adjusted if necessary, to make sure early shortfalls are provided for",
       infoBOYEOY: "BOY stands for Beginning of Year and EOY for End of Year",
+      infoAvgGrowth:  <div>Average Growth = ( <br/>EOY Balance + Sale Proceeds <br/> - BOY Balance <br/>) / BOY Balance </div>,
       infoPDF:
       "INA Graphs and Spreadsheet can be exported to PDF under 'Graphs' tab",  
       probate:
@@ -254,6 +255,7 @@ const MESSAGES = {
     infoINA:
       "Ce montant est basé sur la valeur actualisée des manques à gagner en matière de revenus, actualisée au taux de rendement après impôt. Il est ajusté, si nécessaire, pour s'assurer que des manque à gagner précoces sont prévus",
       infoBOYEOY: "DDA signifie Début d'année et FDA, Fin d'année",
+      infoAvgGrowth:  <div>Croissance moyenne = ( <br/>Valeur FDA + Produits de la vente <br/> - Valeur en début d'année <br/>)/Valeur en début d'année </div>,
       infoPDF:
       "Les graphiques et la feuille de calcul de l'analyse des besoins en matière d'assurance peuvent être exportés en format PDF sous l'onglet 'Graphique'",      
       probate:
@@ -763,6 +765,22 @@ export function getInfoBOYEOY(lang) {
       marginLeft: DEFAULT_MARGIN_LEFT - 70,
       marginTop: DEFAULT_MARGIN_TOP+45,
       width: DEFAULT_WIDTH + 35,
+      height: DEFAULT_HEIGHT,
+    },
+  };
+}
+
+export function getInfoAvgGrowth(lang) {
+  return {
+    infoID: "infoAvgGrowth",
+    infoText: MESSAGES[lang].infoAvgGrowth,
+    iconMode: SHOW_STANDARD_LIGHT_BLUE,
+    popupOpenByProps: false,
+    popupBorderColor: POPUP_BORDER_INFO,
+    position: {
+      marginLeft: DEFAULT_MARGIN_LEFT - 70,
+      marginTop: DEFAULT_MARGIN_TOP+45,
+      width: DEFAULT_WIDTH + 70,
       height: DEFAULT_HEIGHT,
     },
   };

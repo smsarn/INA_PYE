@@ -26,31 +26,26 @@ import {
   ASSETS,
   ASSET_TAX,
   CONTROLTITLE,
-  OWNERSHIP,
   ASSET_OWNERSHIP_ACTION,
-  //  ASSET_OWNERSHIP_ACTION2,
   COLUMN_TITLES,
 } from "../definitions/generalDefinitions";
 import {
   getListItemNameFromKey,
   getListItemKeyFromName,
-  isMobileDevice,
   getListToShowByOrder,
-  arrayFormatMoney,
+
 } from "../utils/helper";
 
-import { ProjectionGrid } from "./ProjectionGrid.js";
 import ProjectionGrid1 from "./ProjectionGrid1.js";
-import DataTable from "./GridExcelComponent/DataTable";
+//import DataTable from "./GridExcelComponent/DataTable";
 import {
   fetchAssetProjection2,
   fetchAssetProjectionAPI,
 } from "../utils/FetchAPIs";
 import {
-  DEFAULT_RRIF_AGE,
   DROPDOWN_WIDE,
 } from "../definitions/generalDefinitions";
-import _ from "lodash";
+import isEqual from "lodash.isequal";
 
 import {
   ASSET_API_OUTPUT_TaxPayable,
@@ -59,16 +54,15 @@ import {
 } from "../definitions/generalDefinitions";
 
 import { GridButton } from "./GridButton";
-import { getAssetGridValues } from "../data/assetGridProjections";
-import debounce from "lodash.debounce";
-import { Language } from "@material-ui/icons";
+//import { getAssetGridValues } from "../data/assetGridProjections";
+//import { Language } from "@material-ui/icons";
 
 const ASSET_DROPDOWN_TYPE = 0;
 // inserted desc here not a dropdown no need for indes
 const ASSET_DROPDOWN_OWNER = 2;
 const ASSET_DROPDOWN_TAXTYPE = 3;
 
-export class Asset extends Component {
+export default class Asset extends Component {
   displayName = Asset.name;
   constructor(props) {
     super(props);
@@ -249,11 +243,11 @@ export class Asset extends Component {
   componentWillReceiveProps(nextProps) {
     //console.log(nextProps.assetCurr, this.props.assetCurr);
     if (
-      !_.isEqual(nextProps.assetCurr, this.props.assetCurr) ||
+      !isEqual(nextProps.assetCurr, this.props.assetCurr) ||
       nextProps.id !== this.props.id ||
       nextProps.assetsNo !== this.props.assetsNo ||
       nextProps.clientsNo !== this.props.clientsNo ||
-      !_.isEqual(nextProps.projection, this.props.projection)
+      !isEqual(nextProps.projection, this.props.projection)
     ) {
       if (
         this.props.assetCurr.assetTypeKey ===
@@ -744,7 +738,7 @@ let i;
       )
     );
     const showIncome =
-      APPLET_INA &&
+    //  APPLET_INA &&
       assetCurr.assetTaxTypeKey === ASSET_TAX.CAPITAL_GAINS_DEFERRED.Key;
     //assetCurr.Tax === ASSET_TAX.CAPITAL_GAINS_DEFERRED.value[language] ||
     /* (APPLET_EP &&
@@ -779,8 +773,8 @@ let i;
       taxCredit
     );
 
-    let showCotribution = //APPLET_EP &&
-      assetCurr.ownerKey !== ASSET_OWNERSHIP_ACTION.CLIENT_LIQUIDATE.Key && //ASSET_OWNERSHIP.CLIENTLIQUIDATE.value[this.props.language]
+    let showContribution = //APPLET_EP &&
+      (APPLET_EP || (APPLET_INA && assetCurr.ownerKey !== ASSET_OWNERSHIP_ACTION.CLIENT_LIQUIDATE.Key)) && //ASSET_OWNERSHIP.CLIENTLIQUIDATE.value[this.props.language]
       (rrsp ||
         assetCurr.assetTypeKey === ASSETS.INTEREST_BEARING.Key || //value[language] ||
         assetCurr.assetTypeKey === ASSETS.STOCKS_BONDS.Key ||
@@ -801,7 +795,7 @@ let i;
       assetCurr.ownerKey === ASSET_OWNERSHIP_ACTION.CLIENT_ROLLOVER.Key &&
       (rrsp || assetCurr.assetTypeKey === ASSETS.TFSA.Key)
     ) {
-      showCotribution = false;
+      showContribution = false;
       showWithdrawal = false;
     }
     
@@ -1000,7 +994,7 @@ let i;
               handleUpdateInput={this.handleUpdateInput}
             />
           )}
-          {(rrsp || this.props.assetCurr.assetTypeKey === ASSETS.TFSA.Key) &&
+          {(rrsp) &&  //|| this.props.assetCurr.assetTypeKey === ASSETS.TFSA.Key) &&
             assetCurr.ownerKey !== //ASSET_OWNERSHIP.CLIENTLIQUIDATE.value[this.props.language]
               ASSET_OWNERSHIP_ACTION.CLIENT_LIQUIDATE.Key && (
               <InputField
@@ -1057,7 +1051,7 @@ let i;
             />
           )}
 
-          {showCotribution && (
+          {showContribution && (
             <div>
               <InputField
                 inputName={CONTROLTITLE[language].contributionAmt}

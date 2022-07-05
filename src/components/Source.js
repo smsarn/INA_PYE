@@ -23,7 +23,7 @@ import {
   getInfoIconInflationGrowth
 } from "../definitions/infoIconsDefinitions";
 
-export class Source extends Component {
+export default class Source extends Component {
   displayName = Source.name;
 
   constructor(props) {
@@ -363,7 +363,7 @@ export class Source extends Component {
           handleDoAdd={this.handleDoAdd}
           handleDoRemove={this.handleDoRemove}
           disabled={this.props.disableAddRemove}
-          disabledRemove={gov}
+          disabledRemove={gov || govOrphan}
         />
         {/* {isMobileDevice() && this.props.sourceCurr.id < this.props.sourcesNo ? (
           <hr className="ppi2" />

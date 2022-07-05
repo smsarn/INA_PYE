@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import DataTable from "./GridExcelComponent/DataTable";
 import Loader from 'react-loader-spinner'
-import _ from 'lodash';
+import isEqual from 'lodash.isequal';
 
 export class ProjectionGrid extends Component {
     constructor(props) {
@@ -14,7 +14,7 @@ export class ProjectionGrid extends Component {
     }
 
     async componentWillReceiveProps(nextProps) {
-        if (!_.isEqual(nextProps.assetProjection, this.props.assetProjection)) {
+        if (!isEqual(nextProps.assetProjection, this.props.assetProjection)) {
            this.setState({ loading: true });
            this.setState({
                projectionGrid: nextProps.assetProjection,
@@ -33,7 +33,8 @@ export class ProjectionGrid extends Component {
         
         const projectionGrid=this.state.projectionGrid
          if (this.state.loading) {// || this.state.projectionGrid===null || this.state.projectionGrid===undefined) {
-            return   <div><Loader type="TailSpin" color="black" height={30} width={30} /></div>;
+            return <div class="loader-container"><div class="loader"></div></div>
+       {/* <div><Loader type="TailSpin" color="black" height={30} width={30} /></div>; */}
         }
         return (
             <div>

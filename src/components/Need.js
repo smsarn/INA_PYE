@@ -20,7 +20,7 @@ import {
   getInfoIconAssetsYr0,
 } from "../definitions/infoIconsDefinitions";
 
-export class Need extends Component {
+export default class Need extends Component {
   displayName = Need.name;
 
   constructor(props) {

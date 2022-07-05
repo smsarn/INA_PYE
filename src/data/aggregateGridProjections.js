@@ -1,7 +1,7 @@
 import { numFormat, cleanFormat, formatMoney2 } from "../utils/helper";
 import { getAssetGridValues } from "./assetGridProjections";
 import { setUIDataToAPI } from "./dataExchange";
-import _ from "lodash";
+//import _ from "lodash";
 
 import {
   COLUMN_TITLES,
@@ -12,7 +12,8 @@ import {
 import {
   getInfoExcelcapFund,
   getInfoExcelAllAfterTax,
-  getInfoBOYEOY
+  getInfoBOYEOY,
+  getInfoAvgGrowth
 } from "../definitions/infoIconsDefinitions";
 
 import {
@@ -23,7 +24,7 @@ import {
   QUOTE_SPOUSE,
   QUOTE_CLIENT,
   ASSET_YEAR_TODAY,
-  FIRST_BENEFICIARY_ID
+  FIRST_BENEFICIARY_ID,
 } from "../definitions/generalDefinitions";
 
 import {
@@ -49,6 +50,8 @@ const COLUMN_SHORTFALL = 8;
 const COLUMN_INSURANCE_NEED = 9;
 const COLUMN_FUND = 10;
 
+const EP_SHEET_HEADERS_AVG_GROWTH = 11;
+
 // INA
 
 function INAFullSpreadsheetData(
@@ -66,8 +69,6 @@ function INAFullSpreadsheetData(
   afterTaxCPP_DB,
   language
 ) {
-
-
   let dataColumns = [];
   let dataColumn = [];
   let noYrs = dataNeed.length;
@@ -85,14 +86,15 @@ function INAFullSpreadsheetData(
     survivors,
     inflation
   );
-  let surivorsCashFlowsFromAllSources=dataPCV;
-  let survivorsNonGovNonAssetLiabIncomeProjection = getSurvivorsNonGovNonAssetLiabIncomeProjections(
-    dataInput,
-    noYrs,
-    //Spouse.avgTaxRate,
-    survivors,
-    inflation
-  );
+  let surivorsCashFlowsFromAllSources = dataPCV;
+  let survivorsNonGovNonAssetLiabIncomeProjection =
+    getSurvivorsNonGovNonAssetLiabIncomeProjections(
+      dataInput,
+      noYrs,
+      //Spouse.avgTaxRate,
+      survivors,
+      inflation
+    );
   //const formatFr = language === "fr" ? true : false;
   const decimalChar = language === "en" ? "." : ",";
   const thousands = language === "en" ? "," : " ";
@@ -101,15 +103,18 @@ function INAFullSpreadsheetData(
   //console.log(Spouse);
 
   // console.log(surivorsSalaryProjection,survivorsNonGovNonAssetLiabIncomeProjection)
-  // for cap fund use first survivor tax rate   
-  let avgTaxRate=0;
-  let beneficiaryAge=0;
-  if(survivors.length>0)
-  {
-    avgTaxRate=survivors.filter((item)=> { return item.id===FIRST_BENEFICIARY_ID})[0].avgTaxRate;
-    beneficiaryAge=survivors.filter((item)=> { return item.id===FIRST_BENEFICIARY_ID})[0].Age;
+  // for cap fund use first survivor tax rate
+  let avgTaxRate = 0;
+  let beneficiaryAge = 0;
+  if (survivors.length > 0) {
+    avgTaxRate = survivors.filter((item) => {
+      return item.id === FIRST_BENEFICIARY_ID;
+    })[0].avgTaxRate;
+    beneficiaryAge = survivors.filter((item) => {
+      return item.id === FIRST_BENEFICIARY_ID;
+    })[0].Age;
   }
-   for (colNo = 0; colNo < cols; colNo++) {
+  for (colNo = 0; colNo < cols; colNo++) {
     dataColumn = [];
     for (yr = 0; yr < noYrs; yr++) {
       if (yr === 0)
@@ -139,19 +144,22 @@ function INAFullSpreadsheetData(
         survivorsIncome = surivorsSalaryProjection[yr];
         dataColumn.push(formatMoney2(survivorsIncome, 0, language, false)); //numFormat(spouseIncome,   language==="en"?false:true, 2, language==="en"?",":" "));
       } else if (colNo === COLUMN_OTHER_INCOME) {
-        let otherIncome = ( //Math.round((dataPCV[yr] - surivorsSalaryProjection[yr]) * 100) / 100
-          Math.round(
-            (parseFloat(survivorsNonGovNonAssetLiabIncomeProjection[yr]) -
-            parseFloat(surivorsSalaryProjection[yr])) *
-              100
-          ) / 100
-        ).toFixed(0);
+        let otherIncome =
+          //Math.round((dataPCV[yr] - surivorsSalaryProjection[yr]) * 100) / 100
+          (
+            Math.round(
+              (parseFloat(survivorsNonGovNonAssetLiabIncomeProjection[yr]) -
+                parseFloat(surivorsSalaryProjection[yr])) *
+                100
+            ) / 100
+          ).toFixed(0);
         if (Math.abs(otherIncome) <= 1) otherIncome = 0;
         dataColumn.push(formatMoney2(otherIncome, 0, language, false)); //numFormat(otherIncome,   language==="en"?false:true, 2, language==="en"?",":" "));
       } else if (colNo === COLUMN_TOTAL_INCOME)
         dataColumn.push(
           formatMoney2(
-            parseFloat(survivorsNonGovNonAssetLiabIncomeProjection[yr]) + parseFloat(dataGov[yr]),
+            parseFloat(survivorsNonGovNonAssetLiabIncomeProjection[yr]) +
+              parseFloat(dataGov[yr]),
             0,
             language,
             false
@@ -162,9 +170,11 @@ function INAFullSpreadsheetData(
         dataColumn.push(
           formatMoney2(
             Math.abs(
-              dataPCV[yr] - (parseFloat(survivorsNonGovNonAssetLiabIncomeProjection[yr]))
+              dataPCV[yr] -
+                parseFloat(survivorsNonGovNonAssetLiabIncomeProjection[yr])
             ) > 1
-              ? dataPCV[yr] - (parseFloat(survivorsNonGovNonAssetLiabIncomeProjection[yr]))
+              ? dataPCV[yr] -
+                  parseFloat(survivorsNonGovNonAssetLiabIncomeProjection[yr])
               : 0,
             0,
             language,
@@ -191,7 +201,7 @@ function INAFullSpreadsheetData(
           formatMoney2(dataColumnCapFund[yr], 0, language, false)
         ); //numFormat(0, false,   language==="en"?false:true, 2, language==="en"?",":" "));
     }
-    
+
     // add CPP DB to other from CPP do this above before formatting
     /* if (colNo === COLUMN_CPP)
       dataColumn[0] = formatMoney2(parseFloat(cleanformat(dataColumn[0])) - parseFloat(afterTaxCPP_DB));
@@ -206,24 +216,19 @@ function INAFullSpreadsheetData(
   return dataColumns;
 }
 
-function getSurivorsSalaryProjection(
-  sources,
-  noYrs,
-  survivors,
-  inflation
-) {
+function getSurivorsSalaryProjection(sources, noYrs, survivors, inflation) {
   let totalIncome = Array(noYrs).fill(0);
   let yr;
   // console.log(sources)
 
-  let avgTaxRate=0;
+  let avgTaxRate = 0;
   sources.forEach((element) => {
     if (element.sourceTypeKey === INCOMESOURCES.SURVIVORS_INCOME.Key) {
       try {
-        avgTaxRate=survivors.filter((item)=> { return item.id===element.ownerID})[0].avgTaxRate
-      } catch (error) {
-        
-      }
+        avgTaxRate = survivors.filter((item) => {
+          return item.id === element.ownerID;
+        })[0].avgTaxRate;
+      } catch (error) {}
       /* console.log(element,survivors,avgTaxRate) */
       for (yr = 0; yr < noYrs; yr++) {
         totalIncome[yr] +=
@@ -253,7 +258,7 @@ function getSurvivorsNonGovNonAssetLiabIncomeProjections(
   let yr;
   // console.log(sources)
 
-  let avgTaxRate=0;
+  let avgTaxRate = 0;
   sources.forEach((element) => {
     if (
       !(
@@ -264,10 +269,10 @@ function getSurvivorsNonGovNonAssetLiabIncomeProjections(
     ) {
       // console.log(element.sourceTypeKey)
       try {
-        avgTaxRate=survivors.filter((item)=> { return item.id===element.ownerID})[0].avgTaxRate
-      } catch (error) {
-        
-      }
+        avgTaxRate = survivors.filter((item) => {
+          return item.id === element.ownerID;
+        })[0].avgTaxRate;
+      } catch (error) {}
       for (yr = 0; yr < noYrs; yr++) {
         totalIncome[yr] +=
           yr >= element.startYear &&
@@ -291,7 +296,7 @@ export function getINAGridData(
   insNeedRet,
   insNeedLE,
   dataPCV,
- // Spouse,
+  // Spouse,
   Survivors,
   dataNeed,
   dataGov,
@@ -318,7 +323,7 @@ export function getINAGridData(
       insNeed,
       Sources,
       dataPCV,
-  //    Spouse,
+      //    Spouse,
       Survivors,
       dataNeed,
       dataGov,
@@ -333,16 +338,15 @@ export function getINAGridData(
     gridIcons = new Array(dataColHeaders.length);
     gridIcons[COLUMN_FUND] = getInfoExcelcapFund(language);
     gridIcons[COLUMN_YEAR] = getInfoExcelAllAfterTax(language);
-    
-    const singleFamily=Survivors.filter(client => client.memberKey ===MEMBER.SPOUSE.Key).length===0
 
+    const singleFamily =
+      Survivors.filter((client) => client.memberKey === MEMBER.SPOUSE.Key)
+        .length === 0;
 
     const decimalChar = language === "en" ? "." : ",";
     const thousands = language === "en" ? "," : " ";
 
-    if(singleFamily) 
-    {
-
+    if (singleFamily) {
       excelDataInfoSection = [
         [
           COLUMN_TITLES[language].intRate,
@@ -351,7 +355,6 @@ export function getINAGridData(
           COLUMN_TITLES[language].blank,
           COLUMN_TITLES[language].additionalCapitalReq,
           COLUMN_TITLES[language].survivorProtection,
-          
         ],
         [
           invRate.toString() + "%",
@@ -362,31 +365,28 @@ export function getINAGridData(
           insNeedRet,
         ],
       ];
-
-    } else
-    {
-
-    excelDataInfoSection = [
-      [
-        COLUMN_TITLES[language].intRate,
-        COLUMN_TITLES[language].infRate,
-        COLUMN_TITLES[language].surplusCapital,
-        COLUMN_TITLES[language].blank,
-        COLUMN_TITLES[language].additionalCapitalReq,
-        COLUMN_TITLES[language].survivor65,
-        COLUMN_TITLES[language].survivorLE,
-      ],
-      [
-        invRate.toString() + "%",
-        inflation.toString() + "%",
-        parseFloat(afterTaxCPP_DB),
-        "",
-        "",
-        insNeedRet,
-        insNeedLE,
-      ],
-    ];
-  }
+    } else {
+      excelDataInfoSection = [
+        [
+          COLUMN_TITLES[language].intRate,
+          COLUMN_TITLES[language].infRate,
+          COLUMN_TITLES[language].surplusCapital,
+          COLUMN_TITLES[language].blank,
+          COLUMN_TITLES[language].additionalCapitalReq,
+          COLUMN_TITLES[language].survivor65,
+          COLUMN_TITLES[language].survivorLE,
+        ],
+        [
+          invRate.toString() + "%",
+          inflation.toString() + "%",
+          parseFloat(afterTaxCPP_DB),
+          "",
+          "",
+          insNeedRet,
+          insNeedLE,
+        ],
+      ];
+    }
   }
   return {
     gridTitle: dataTitle,
@@ -417,7 +417,7 @@ async function EPFullSpreadsheetData(
 ) {
   let noYrs = noProjectYrs;
   const language = input.Presentations[0].language;
- // const formatFr = language === "fr" ? true : false;
+  // const formatFr = language === "fr" ? true : false;
   const decimalChar = language === "en" ? "." : ",";
   const thousands = language === "en" ? "," : " ";
 
@@ -432,11 +432,10 @@ async function EPFullSpreadsheetData(
     const element = input.Assets[i];
     const data = await getAssetGridValues(dataNA, element, language, true);
     count += 1;
-    
+
     for (let col = 0; col < 2; col++) {
       for (let yr = 0; yr < noYrs; yr++) {
         dataColumns[col][yr] = data.dataProjection[col][yr];
-        
       }
     }
     // year 0 is today, change it
@@ -449,10 +448,9 @@ async function EPFullSpreadsheetData(
           parseInt(cleanFormat(data.dataProjection[col][yr], language));
       }
     }
-  //  console.log(dataColumns)
+    //  console.log(dataColumns)
   }
 
-  
   for (let col = 0; col < cols; col++) {
     for (let yr = 0; yr < noYrs; yr++) {
       if (yr === 0)
@@ -464,9 +462,15 @@ async function EPFullSpreadsheetData(
           parseInt(dataColumns[7][yr]);
       else dataColumns[2][yr] = dataColumns[10][yr - 1];
 
-      
-      
-      dataColumns[11][yr] =
+      // average growth
+      const ratio =
+        -1 +
+        (parseFloat(dataColumns[10][yr]) + parseFloat(dataColumns[6][yr])) /
+          parseFloat(dataColumns[2][yr]);
+      dataColumns[EP_SHEET_HEADERS_AVG_GROWTH][yr] =
+        Math.round((ratio + Number.EPSILON) * 10000) / 100;
+
+      /* dataColumns[EP_SHEET_HEADERS_AVG_GROWTH][yr] =
         Math.round(
           10000 *
             (-1 +
@@ -474,12 +478,12 @@ async function EPFullSpreadsheetData(
                 parseInt(dataColumns[2][yr]))
         ).toFixed(2) /
           100 +
-        " %";
+        " %"; */
     }
   }
-  
+
   for (let col = 0; col < cols; col++) {
-    if (col !== 11 && col !== 1) {
+    if (col !== EP_SHEET_HEADERS_AVG_GROWTH && col !== 1) {
       for (let yr = 0; yr < noYrs; yr++) {
         dataColumns[col][yr] = formatMoney2(
           dataColumns[col][yr],
@@ -488,12 +492,10 @@ async function EPFullSpreadsheetData(
           false
         );
       }
-  
     } else
       for (let yr = 0; yr < noYrs; yr++) {
         if (col !== 1 && isNaN(dataColumns[col][yr])) dataColumns[col][yr] = 0;
       }
-  
   }
   // year 0 is today, change it
   dataColumns[0][0] = ASSET_YEAR_TODAY[language].today;
@@ -517,17 +519,22 @@ export async function getEPGridData(noProjectYrs, input) {
 
   dataColumns = await EPFullSpreadsheetData(
     dataColHeaders.length,
-    noProjectYrs+1, // + 1,
+    noProjectYrs + 1, // + 1,
     input
   );
   gridColumnAligns = new Array(dataColHeaders.length).fill(2);
   gridIcons = new Array(dataColHeaders.length);
   dataColHeaders.forEach((item) => {
-    if (item === COLUMN_TITLES.[language].EOYBalance)
-      gridIcons[2] = getInfoBOYEOY(  // boy
+    if (item === COLUMN_TITLES[language].EOYBalance)
+      gridIcons[2] = getInfoBOYEOY(
+        // boy
         language
       );
-      gridIcons[dataColHeaders.length-3]=gridIcons[2] //eoy
+    gridIcons[dataColHeaders.length - 3] = gridIcons[2]; //eoy
+    if (item === COLUMN_TITLES[language].AvgGrowth)
+      gridIcons[dataColHeaders.length-2] = getInfoAvgGrowth(  // boy
+        language
+      );
   });
   const decimalChar = language === "en" ? "." : ",";
   const thousands = language === "en" ? "," : " ";
@@ -557,7 +564,7 @@ export function getAssetLiabProjections(props) {
   const assetProjections = props.assetProjections;
   //console.log(assetProjections)
   const lang = input.Presentations[0].language;
- // const formatFr = lang === "fr" ? true : false;
+  // const formatFr = lang === "fr" ? true : false;
   const clients = input.Clients;
   const startAge =
     clients.length > 1
@@ -890,7 +897,6 @@ export function getAssetLiabProjections(props) {
   //setState({ grids: tmpGrids, loading: false });
 
   const AssetnEstateLiabs = proj;
-  
 
   return {
     EstateLiabsByType,
@@ -908,7 +914,7 @@ function addAssetToProjections(proj, data, assetName, colour) {
   for (let i = 0; i < proj.length; i++) {
     if (proj[i].colour === colour) {
       alreadyThere = true;
-       for (let j = 0; j < 100; j++) proj[i].values[j] += data[j];
+      for (let j = 0; j < 100; j++) proj[i].values[j] += data[j];
     }
   }
   if (alreadyThere === false)

@@ -1,5 +1,5 @@
-﻿import React, { Component } from "react";
-import { Pie, Bar, Line } from "react-chartjs-2";
+﻿import React from "react";
+import { Pie, Bar } from "react-chartjs-2";
 //import "./Output.css";
 import "./Output.css";
 import {
@@ -28,7 +28,7 @@ import { Info } from "./Info";
 import { doSavePdfINAAppendixAction } from "./OutputPDFINAAppendix";
 import { versionDetails } from "../utils/helper";
 
-export class OutputGraphs extends React.Component {
+export default class OutputGraphs extends React.Component {
   constructor(props) {
     super(props);
   }

@@ -20,6 +20,7 @@ import {
   APPLET_EP,
   MAX_ORPHAN_DUR_QC,
   MAX_ORPHAN_DUR_NON_QC,
+  APPLET_INA,
 } from "../definitions/generalDefinitions";
 import {
   cleanFormat,
@@ -35,7 +36,7 @@ import { appletMode } from "../../package.json";
 import { element } from "prop-types";
 
 export function setUIDataToAPI(dataInput, outputInsuranceNeed) {
-// console.log(dataInput)
+  // console.log(dataInput)
   let age = dataInput.Clients[0].Age;
   const taxRate =
     dataInput.length > 1
@@ -50,7 +51,13 @@ export function setUIDataToAPI(dataInput, outputInsuranceNeed) {
   let dataEstateContings = setEstateContings();
   let dataIncomeNeeds = setIncomeNeeds(dataInput);
   let dataRates = setRates(dataInput);
-  let dataProjSettings = setProjSettings(age, dataInput, parseFloat(cleanFormat(outputInsuranceNeed, dataInput.Presentations[0].language)));
+  let dataProjSettings = setProjSettings(
+    age,
+    dataInput,
+    parseFloat(
+      cleanFormat(outputInsuranceNeed, dataInput.Presentations[0].language)
+    )
+  );
   let dataNA = {
     lives: dataLives,
     assets: dataAssets,
@@ -67,7 +74,7 @@ export function setUIDataToAPI(dataInput, outputInsuranceNeed) {
     //ratesPack:  null,
     //projectionSettings:  null
   };
- // console.log(dataNA)
+  // console.log(dataNA)
   return dataNA;
 }
 
@@ -156,8 +163,7 @@ function setAssets(dataInput) {
   for (i = 0; i < dataInput.Assets.length; i++) {
     const asset = dataInput.Assets[i];
     const assetDesc = asset.description;
-    const assetTypeKey =
-      asset.assetTypeKey; /*
+    const assetTypeKey = asset.assetTypeKey; /*
       dataInput,
       asset.assetTypeKey,
       asset.assetTaxTypeKey
@@ -191,7 +197,7 @@ function setAssets(dataInput) {
       withdrawalAmt: asset.withdrawalAmt,
       withdrawalStartYr: asset.withdrawalStartYr,
       withdrawalDur: asset.withdrawalDur,
-      RRIFStartAge: asset.RRIFStartAge,
+      RRIFStartAge: asset.RRIFStartAge - 1, // changed from 70 to 71 so adjust here API uses 70
     });
   }
   return dataE;
@@ -211,7 +217,7 @@ function setLiabs(dataInput) {
         : -dataInput.Liabilitys[i].growth / 100;
     const liabTypeKey = dataInput.Liabilitys[i].liabTypeKey;
     const liabDesc = dataInput.Liabilitys[i].description;
-  
+
     dataE.push({
       name: Object.values(LIABILITIES).filter(
         (obj) => obj.Key === liabTypeKey
@@ -319,7 +325,6 @@ function setProjSettings(age, dataInput, outputInsuranceNeed) {
     (tempDate.getMonth() + 1) +
     "-" +
     tempDate.getDate();
-
   let dataE = {
     deathYear: 0,
     deathOf: 0,
@@ -334,8 +339,11 @@ function setProjSettings(age, dataInput, outputInsuranceNeed) {
     valuationDate: date,
     notes: dataInput.Presentations[0].notes,
     version: versionDetails().version,
-    caller: appletMode,
+    caller: (!APPLET_EP && dataInput.Presentations[0].designedBy === "AMPLIFI") ? "AMPLIFI" : appletMode,
     insuranceAmt: outputInsuranceNeed,
+    overwriteProbate: dataInput.Presentations[0].overwriteProbate,
+    contribsGrowByInflation: dataInput.Presentations[0].contribsGrowByInflation,
+    withdsGrowByInflation: dataInput.Presentations[0].withdsGrowByInflation,
     /*   imageLogo: dataInput.Presentations[0].adviserLogo.image,
     imageLogoSize:dataInput.Presentations[0].adviserLogo.size,
     imageLogoLeft:dataInput.Presentations[0].adviserLogo.left,
@@ -455,7 +463,7 @@ export function loadSavedDataToUI(savedJSon, dataInput) {
       withdrawalStartYr: savedJSon.assets[i].withdrawalStartYr,
       withdrawalDur: savedJSon.assets[i].withdrawalDur,
       incomeRate: savedJSon.assets[i].incomeRate * 100,
-      RRIFStartAge: savedJSon.assets[i].RRIFStartAge,
+      RRIFStartAge: savedJSon.assets[i].RRIFStartAge + 1, // changed from 70 to 71 so adjust here API uses 70
     });
   }
 
@@ -473,7 +481,7 @@ export function loadSavedDataToUI(savedJSon, dataInput) {
         savedJSon.liabilities[i].name
       ),
       description: savedJSon.liabilities[i].desc,
-   
+
       ownerKey: OWNERSHIP.CLIENT.Key,
       currValue: savedJSon.liabilities[i].currValue,
       /* growthDir:
@@ -592,6 +600,10 @@ export function loadSavedDataToUI(savedJSon, dataInput) {
 
     adviserLogo: logo,
     appletImage: appletImage,
+    overwriteProbate: APPLET_INA? savedJSon.projectionSettings.overwriteProbate:false,
+    contribsGrowByInflation:
+      savedJSon.projectionSettings.contribsGrowByInflation,
+    withdsGrowByInflation: savedJSon.projectionSettings.withdsGrowByInflation,
     //imageApplet:savedJSon.projectionSettings.imageApplet,
   });
 
@@ -675,9 +687,13 @@ export function getOutputValues(data) {
 
   output.invRate = input.Presentations[0].invRate;
   output.infRate = input.Presentations[0].inflation;
- 
-  output.insNeedRet = parseFloat(cleanFormat(data.insuranceNeedRet, output.language));
-  output.insNeedLE = parseFloat(cleanFormat(data.insuranceNeedLE, output.language));
+
+  output.insNeedRet = parseFloat(
+    cleanFormat(data.insuranceNeedRet, output.language)
+  );
+  output.insNeedLE = parseFloat(
+    cleanFormat(data.insuranceNeedLE, output.language)
+  );
 
   output.ygChild = 100;
   output.hasChild = false;
@@ -923,7 +939,7 @@ export function getOutputValues(data) {
   // NOTE "this" is not available inside inline functions, hence:
   // or just use arrow functions
   let srcOrphan = INCOMESOURCES.GOV_ORPHANS_BENEFIT.Key; //value[output.language];
- // console.log(input.Sources);
+  // console.log(input.Sources);
   input.Sources.forEach(function (element) {
     /*  let pos = output.sources.indexOf(
 			output.sources.filter(i => i.name === element.Type)[0]
@@ -1041,7 +1057,7 @@ export function getOutputValues(data) {
 
   //		if (data.dataCashFlowGov !== undefined)
   //			var maxYScale = 10000 * Math.ceil(1 + Math.max(Math.max(...data.dataCashFlowGov), Math.max(...data.dataCashFlowNeeds), Math.max(...data.dataShortfall), Math.max(...data.dataCashFlowPersonal)) / 10000);
- // console.log(output);
+  // console.log(output);
 
   return output;
 }

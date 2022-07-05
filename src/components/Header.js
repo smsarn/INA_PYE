@@ -21,7 +21,6 @@ const language=this.props.language
     const set= TITLES[language ].default 
     const clear=TITLES[language ].defaultClear 
     this.defaultButton= localStorage.getItem(storageName) === null?set:clear
- 
   }
 
   hideRecover = () => {

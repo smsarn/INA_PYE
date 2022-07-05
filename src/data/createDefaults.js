@@ -213,6 +213,9 @@ export function createDefaultPres(id, tax) {
     resultsOption: DISPLAY_PRESENTATION,
     adviserLogo: images.adviserLogo,// {image:null, left: 0,size: OUTPUT_WIDTH_PCT, allPages: false, top:true, showDetails:false},
     appletImage:images.appletImage ,//{image:APPLET_INA? require("../images/INA.png"):require("../images/estate.protection.applet.cover.graphic.png"), left: 0,size: OUTPUT_WIDTH_PCT, allPages: false, top:true, showDetails:false},
+    overwriteProbate: false,
+    contribsGrowByInflation: false,
+    withdsGrowByInflation: false,
   };
   return defaultPres;
 }

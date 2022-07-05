@@ -37,7 +37,7 @@ const DISPLAY_INCOME = 1;
 const DISPLAY_TAXLIAB_CLIENT = 1;
 const DISPLAY_TAXLIAB_JLTD = 2;
 
-export class OutputGraphsEP extends React.Component {
+export default class OutputGraphsEP extends React.Component {
   constructor(props) {
     super(props);
     this.state = {

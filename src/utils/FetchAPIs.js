@@ -17,8 +17,7 @@ import {
   ASSET_API_OUTPUT_Withdrawals,
   ASSET_API_OUTPUT_RRIF,
   ASSET_API_OUTPUT_TaxPayableonIncome,
-  ASSET_API_OUTPUT_DispositionAmount,
-  appSiteAPI,
+  ASSET_API_OUTPUT_DispositionAmount,appSiteAPI,
   ASSETS,
   ASSET_TAX,
 } from "../definitions/generalDefinitions";
@@ -78,6 +77,7 @@ function fetchAP(dataNA, assetID) {
     })
     .then((response) => response.json())
     .then((data) => {
+     // console.log(data,JSON.stringify(dataAsset))
       return data;
     })
     .catch((error) => {
@@ -209,7 +209,7 @@ export async function fetchInsuranceNeedsData(dataNA, provincekey) {
 
 export async function handleFetchInsuranceNeeds(dataNA, dataP) {
   try {
-    console.log("Data sent to POST:");
+    //console.log("Data sent to POST:");
     // console.log(dataNA);
 
     let url = appSiteAPI + "/api/NA_InsuranceNeeds/";
@@ -293,7 +293,7 @@ export async function fetchAssetProjection2(dataNA, assetID) {
     });
 
     let data = await dataProj.json();
-    //      console.log(data);
+    //console.log(data, JSON.stringify(dataAsset));
     return data;
   } catch (error) {
     console.log("error, Asset proj API failed", error);
@@ -561,7 +561,7 @@ export async function handleFetchPDF(){
       
       }
 
-      console.log( JSON.stringify(dataNA))
+     // console.log( JSON.stringify(dataNA))
     const url = appSiteAPI + "/api/TKD_PDFGenerator/";
   let fetchData = await fetch(url, {
     method: "POST",
@@ -573,9 +573,49 @@ export async function handleFetchPDF(){
   })
   let data = await fetchData.json();
   if (data !== undefined){
-        console.log(data)
+    //    console.log(data)
         return data;}
  } catch (error) {
     console.log("handleFetchQueryString", error);
+  }
+}
+
+
+export async function fetchValidateTokenGetAgentEmailFromDB(authToken, applet){
+  /* 
+  try {
+    const url = appSiteAPI + "/api/TKD_ValidateJWT?authToken=" + authToken;
+    console.log(url)
+    
+    let agentInfo = {email:"",guid:""} 
+    agentInfo = await fetch(url);
+    
+    
+    return (agentInfo.json());
+  } catch (error) {
+    console.log("error, fetchGetAgentEmailFromDB failed", error);
+  }
+ */
+
+  try {
+    const url = appSiteAPI + "/api/TKD_ValidateJWT";//?authToken=";
+    let jwt = {"authToken": authToken, "applet":applet} 
+
+    let fetchData = await fetch(url, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(jwt)
+  })
+   let data = await fetchData.json();
+  if (data !== undefined)
+  {
+    //console.log(data,JSON.stringify(jwt))
+    return data;
+  }
+ } catch (error) {
+    console.log("fetchValidateTokenGetAgentEmailFromDB", error);
   }
 }

@@ -130,6 +130,20 @@ export async function getAssetGridValues(dataNA, assetCurr, lang, aggregate) {
       lang,
       0
     );
+
+    
+    var sum = data[ASSET_API_OUTPUT_Withdrawals].numericValues.map(function (num, idx) {
+      return num + data[ASSET_API_OUTPUT_RRIF].numericValues[idx];
+    });
+
+    const arrIncome = arrayFormatMoney(
+      sum,
+      lang,
+      0
+    );
+
+
+
     const gridTitleSection =
       appletMode === "INA"
         ? " (" +
@@ -167,7 +181,7 @@ export async function getAssetGridValues(dataNA, assetCurr, lang, aggregate) {
       dataProjection[2] = arrFMV;
       dataProjection[3] = arrFMV;
       dataProjection[4] = arrDeposits;
-      dataProjection[5] = arrRRIF; //+ arrWithdrawals;
+      dataProjection[5] = arrIncome;//arrRRIF; //+ arrWithdrawals;
       dataProjection[6] = arrDispositionAmount;
       dataProjection[7] = arrTaxPayableonIncome;
       dataProjection[8] = arrCapitalGain;
@@ -300,8 +314,8 @@ export async function getAssetGridValues(dataNA, assetCurr, lang, aggregate) {
             title.Age,
             title.FMV,
             title.ACB,
-          //  title.RentalIncome,
-          //  title.Taxonincome,
+            title.RentalIncome,
+            title.Taxonincome,
             title.SaleProceeds,
             title.CapitalGain,
             title.TaxLiability,
@@ -312,11 +326,11 @@ export async function getAssetGridValues(dataNA, assetCurr, lang, aggregate) {
             //arrEOYBalance;
             arrFMV;
           dataProjection[3] = arrACB;
-       //   dataProjection[4] = arrWithdrawals;
-       //   dataProjection[5] = arrTaxPayableonIncome;
-          dataProjection[4] = arrDispositionAmount;
-          dataProjection[5] = arrCapitalGain;
-          dataProjection[6] = arrTaxPayable;
+          dataProjection[4] = arrWithdrawals;
+          dataProjection[5] = arrTaxPayableonIncome;
+          dataProjection[6] = arrDispositionAmount;
+          dataProjection[7] = arrCapitalGain;
+          dataProjection[8] = arrTaxPayable;
         }
       } else if (assetCurr.assetTypeKey === ASSETS.SMALL_BUSINESS_SHARES.Key) {
         if (APPLET_INA) {
@@ -387,6 +401,7 @@ export async function getAssetGridValues(dataNA, assetCurr, lang, aggregate) {
             title.FMV,
             title.AnnualContribution,
             title.Withdrawal,
+            title.Taxonincome,
             title.EOYBalance,
             title.TaxLiability,
           ];
@@ -395,8 +410,9 @@ export async function getAssetGridValues(dataNA, assetCurr, lang, aggregate) {
           dataProjection[2] = arrFMV;
           dataProjection[3] = arrDeposits;
           dataProjection[4] = arrWithdrawals;
-          dataProjection[5] = arrEOYBalance;
-          dataProjection[6] = arrTaxPayable;
+          dataProjection[5] = arrTaxPayableonIncome;
+          dataProjection[6] = arrEOYBalance;
+          dataProjection[7] = arrTaxPayable;
           if (assetCurr.assetTypeKey === ASSETS.STOCKS_BONDS.Key) {
             dataColTitles = [
               title.Year,

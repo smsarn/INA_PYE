@@ -40,7 +40,7 @@ import {
 
 import { getAssetGridValues } from "../data/assetGridProjections";
 import DataTable from "./GridExcelComponent/DataTable";
-import { isEqual } from "lodash";
+//import { isEqual } from "lodash";
 import Loader from "react-loader-spinner";
 import { AddToHomeScreenOutlined } from "@material-ui/icons";
 
@@ -55,7 +55,7 @@ import {
   ASSET_TAX_TYPE_COUNT,
 } from "../definitions/outputDefinitionsEP";
 
-export class OutputPresentationEP extends Component {
+export default class OutputPresentationEP extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -176,7 +176,7 @@ export class OutputPresentationEP extends Component {
     let totalAssets = 0;
     let totalLiabs = 0;
     if (this.AssetLiabProjs.projectionsGrids[0] === undefined) {
-      return <Loader type="TailSpin" color="black" height={30} width={30} />;
+      return <div class="loader-container"><div class="loader"></div></div> //<div><Loader type="TailSpin" color="black" height={30} width={30} /></div>
     }
 
 

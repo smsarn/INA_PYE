@@ -6,7 +6,7 @@ import {
   APPLET_EP,
   APPLET_INA,
 } from "../definitions/generalDefinitions";
-import XLSX from "xlsx";
+// import XLSX from "xlsx";
 import React from "react";
 import { fetchMCCData, fetchAssetProjection2 } from "../utils/FetchAPIs";
 import { readMCCData } from "../data/dataExchangeMCC";
@@ -30,8 +30,13 @@ import {
   TITLES
 } from "../definitions/generalDefinitions";
 import { AdjustibleImage } from "../components/AdjustibleImage";
-import { MAX_LOGO_HEIGHT, PAGE_HEIGHT } from "../components/PDF";
-import { getMessages } from "validatorjs";
+
+
+// copy instead re lazyloading
+//import { MAX_LOGO_HEIGHT, PAGE_HEIGHT } from "../components/PDF";
+const PAGE_HEIGHT = 11;
+const MAX_LOGO_HEIGHT = 0.38;
+
 
 global.langFr =
   (
@@ -389,7 +394,7 @@ export function INAAssetSpreadsheetData(asset, taxRate, Spouse, inflation,langua
   //console.log(dataColumns);
   return dataColumns;
 }
- */
+ *//* 
 export function handleCSVDownload2() {
   var de = document.getElementById("DExcel");
   de.setAttribute("downloadNow", "1");
@@ -404,7 +409,10 @@ export function handleCSVDownload(data, columns) {
     .reduce((soFar, row) => soFar + '"' + row.data.join('","') + '"\r\n', [])
     .trim();
 
-  /* taken from react-csv */
+
+
+
+  // taken from react-csv 
   const csv = `${CSVHead}${CSVBody}`;
   const blob = new Blob([csv], { type: "text/csv" });
   const dataURI = `data:text/csv;charset=utf-8,${csv}`;
@@ -418,9 +426,11 @@ export function handleCSVDownload(data, columns) {
   let link = document.createElement("a");
   link.setAttribute("href", downloadURI);
   link.setAttribute("download", "tableDownload.csv");
-  /* document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link); */
+  // document.body.appendChild(link);
+  //  link.click();
+   // document.body.removeChild(link); 
+    const XLSX = React.lazy(() => import('xls'));
+
   const workbook = XLSX.utils.book_new();
   workbook.SheetNames.push("T1");
   var d = [["hey", "goh"]];
@@ -433,7 +443,7 @@ export function handleCSVDownload(data, columns) {
   //	worksheet.cells(10,10).value=3333333
   XLSX.utils.book_append_sheet(workbook, worksheet, "Tabela Exportada");
   XLSX.writeFile(workbook, "TabelaExportada.xls", { compression: true });
-}
+} */
 
 export function INAMCCQuote() {
   let MCC = async function (input, insuranceNeed) {

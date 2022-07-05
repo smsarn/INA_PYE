@@ -100,7 +100,7 @@ export const DEFAULT_INVESTMENT = 3;
 export const DEFAULT_NEED_PERCENT1 = 75;
 export const DEFAULT_NEED_PERCENT2 = 60;
 
-export const DEFAULT_RRIF_AGE = 70;
+export const DEFAULT_RRIF_AGE = 71;
 
 export const DISPLAY_RETIREMENT = 0;
 export const DISPLAY_LIFEEXP = 1;
@@ -189,6 +189,7 @@ export const CONTROLTITLEASSETS = {
     disposeDur: "Duration of Disposal",
     ACB: "ACB",
     smallBusinessCapGainExemption: "Exemption ...",
+    
   },
   fr: {
     type: "Type",
@@ -199,8 +200,28 @@ export const CONTROLTITLEASSETS = {
     disposeDur: "Durée de la cession",
     ACB: "PBR",
     smallBusinessCapGainExemption: "Exonération ...",
+    
   },
 };
+
+export const CONTROLTITLELIABS = {
+  en: {
+    year: "Year",
+    repay: "Repayment",
+    projValue: "Projected Value",
+  },
+  fr: {
+    year: "Année",
+    repay: "Remboursement",
+    projValue: "Valeur projetée",
+  },
+};
+
+
+
+
+
+
 /* export const LIABILITIES = {
   en: {
     header: "Cash Needs at Death",
@@ -628,7 +649,10 @@ export const CONTROLTITLE = {
     load: "Load",
     rec: "Recover",
     notes: "Notes",
-    switch: "Switch Client"
+    switch: "Switch Client",
+    probateOW: "Overwrite Probate",
+    contribsGrow: "Contributions to Assets grow with inflation",
+    withdsGrow: "Withdrawals from Assets grow with inflation",
   },
   fr: {
     age: "Âge",
@@ -692,7 +716,10 @@ export const CONTROLTITLE = {
     load: "Charger",
     rec: "Récupérer",
     notes: "Notes",
-    switch: "Client d'échange"
+    switch: "Client d'échange",
+    probateOW: "Écraser l'homologation",
+    contribsGrow: "Les contributions aux actifs augmentent avec l'inflation",
+    withdsGrow: "Les retraits de l'actif augmentent avec l'inflation",
   },
 };
 
@@ -948,6 +975,7 @@ export const COLUMN_TITLES = {
     FMV: "Fair Market Value",
     FA: "Face Amount",
     EOYBalance: "EOY Balance",
+    AvgGrowth: "Average Growth",
     ACB: "ACB",
     AnnualContribution: "Annual Contribution",
     MinRRIFIncome: "Min. RRIF Income",
@@ -974,6 +1002,7 @@ export const COLUMN_TITLES = {
     FMV: "Juste valeur marchande",
     FA: "Capital assuré",
     EOYBalance: "Valeur FDA",
+    AvgGrowth: "Croissance moyenne",
     ACB: "PBR",
     AnnualContribution: "Cotisations annuelles",
     MinRRIFIncome: "Revenu minimal d'un FERR",
@@ -984,7 +1013,7 @@ export const COLUMN_TITLES = {
     Taxonincome: "Impôt sur le revenu",
     TaxLiabilityatDeath: "Impôt à payer au décès",
     CapitalGain: "Gain en capital",
-    CapitalGainsExemption: "Exonération des gains en capital",
+    CapitalGainsExemption: "Exonération des gains en capital",    
   },
 };
 

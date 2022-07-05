@@ -45,7 +45,7 @@ import { getOutputValues } from "../data/dataExchange";
 import { getInfoINA, getInfoPDF  } from "../definitions/infoIconsDefinitions";
 import { Info } from "./Info";
 
-export class OutputPresentation extends Component {
+export default class OutputPresentation extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -93,6 +93,8 @@ export class OutputPresentation extends Component {
         this.props.encryptedInputLife1AndSpouse,
       "*"
     );
+    // send notif to remove spinner
+    window.parent.postMessage("FRAME_LOADED",	"*");
   };
 
   doCompuLife = () => {
@@ -307,6 +309,15 @@ export class OutputPresentation extends Component {
       dColor = ["#7399c6", "#d9d3a4", "#949ca1", "#847a18"];
     }
     }
+    else if(singleFamily && output.hasChild=== false)  // single family with dep adult
+      {
+        dataLabels = ["A"];
+        dataValues2 = [
+          output.insNeedRet,
+        ];
+        dColor = ["#d9d3a4"];
+      }
+     
 
     /* const dataInsurance = {
       labels: dataLabels,
@@ -345,6 +356,7 @@ export class OutputPresentation extends Component {
     const logoBottom = images.logoBottom;
 
     const PDFTopMargin=singleFamily?0:-37  
+
 
     if (noSurvivor) {
       return (

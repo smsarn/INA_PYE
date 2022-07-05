@@ -6,7 +6,7 @@ import {
   APPLET_INA,
 } from "../definitions/generalDefinitions";
 
-export class AggregateGrid extends Component {
+export default class AggregateGrid extends Component {
   constructor(props) {
     super(props);
   }

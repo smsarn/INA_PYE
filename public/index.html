@@ -34,6 +34,23 @@
 	  Learn how to configure a non-root public URL by running `npm run build`.
 	-->
 	<title>INA</title>
+	<style>
+		.loader {
+		  border: 10px solid #f3f3f3;
+		  border-top: 10px solid #7399C6;
+		  border-radius: 50%;
+		  width: 60px;
+		  height: 60px;
+		  margin-left: 30px;
+		  margin-top: 30px;
+		  animation: spin 2s linear infinite;
+		}
+		
+		@keyframes spin {
+		  0%  { transform: rotate(0deg); }
+		  100% { transform: rotate(360deg); }
+		}
+		</style>
 </head>
 <body>
 	<noscript>
@@ -41,8 +58,15 @@
 	</noscript>
 	
 <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.1/jspdf.debug.js" integrity="" crossorigin="anonymous"></script>-->
-	
+
 	<div id="root"></div>
+	<!-- <script>
+		 window.parent.postMessage("FRAME_LOADED",	"*");
+	</script>
+
+	 <div class="loader-container">
+		<div class="loader"></div>
+	 </div>  -->
 	<!--
 	  This HTML file is a template.
 	  If you open it directly in the browser, you will see an empty page.
@@ -57,5 +81,13 @@
 		don't use now
 	<script src="%PUBLIC_URL%/env.js"></script>
 	-->
+	<!-- <script>
+		document.addEventListener('readystatechange', event => { 
+
+		if (event.target.readyState === "complete") {
+		  window.parent.postMessage("FRAME_LOADED",	"*");
+		}
+	});
+</script> -->
 </body>
 </html>

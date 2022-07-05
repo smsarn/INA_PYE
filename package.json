@@ -1,13 +1,13 @@
 {
   "name": "toolkitdirect",
-  "version": "1.0.15",
-  "buildMode": 0,
+  "version": "1.0.18",
+  "buildMode": 2,
   "comments": {
     "buildModeGuide": "0 is for local, 1 for test-tkdirect, 2 for production toolkitdirect  1 or 2 both work as proxy takes care",
     "proxyGuide": "for test-tkdirect use https://test-tkdirectapi.ppi.ca, for production toolkitdirect use https://privateapi.ppi.ca/ToolkitDirect",
     "proxyReason": "having same URL as the caller of the API via this proxy, makes it same-origin (hence no preflight call). Proxy Server wrapper redirects to the proper API site "
   },
-  "appletMode": "INA",
+  "appletMode": "EP",
   "comments2": {
     "INA": "for INA",
     "EP": "for estate protection"
@@ -16,7 +16,6 @@
   "dependencies": {
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
-    "@material-ui/styles": "^4.10.0",
     "chart.js": "^2.9.3",
     "file-saver": "^2.0.2",
     "isomorphic-fetch": "^2.2.1",
@@ -34,10 +33,9 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.2",
     "react-select": "^3.1.0",
-    "safe-buffer": "^5.2.1",
     "shortid": "^2.2.15",
     "validatorjs": "^3.18.1",
-    "xlsx": "^0.15.6"
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -70,7 +68,6 @@
     "@babel/preset-react": "^7.0.0",
     "babel-eslint": "^10.1.0",
     "eslint-config-prettier": "^6.11.0",
-    "eslint-config-react": "^1.1.7",
     "eslint-plugin-prettier": "^3.1.4",
     "prettier": "^2.0.5"
   }
