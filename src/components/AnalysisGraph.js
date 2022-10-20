@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import { Bar, Line, Chart,Pie } from "react-chartjs-2";
+import { Bar, Line, Chart, Pie } from "react-chartjs-2";
 //import "./Output.css";
 import "./Output.css";
 import { readMCCData } from "../data/dataExchangeMCC";
 import { fetchMCCData } from "../utils/FetchAPIs";
-import { setUIDataToAPI} from "../data/dataExchange";
+import { setUIDataToAPI } from "../data/dataExchange";
 import {
   getProjectedLiabilities,
   cleanFormat,
@@ -12,7 +12,7 @@ import {
   getAssetsTaxCategoryTotal,
   getAssetsCategoryTotal,
   getTaxLiabCategoryTotal,
-  getLiabsCategoryTotal
+  getLiabsCategoryTotal,
 } from "../utils/helper";
 import {
   GROWTHDIR,
@@ -21,7 +21,7 @@ import {
   QUOTE_JOINT,
   ASSET_TAX,
   ASSETS,
-  LIABILITIES
+  LIABILITIES,
 } from "../definitions/generalDefinitions";
 import MCCGraph from "./MCCGraph";
 import { MultiButtons } from "./MultiButtons";
@@ -42,7 +42,7 @@ export default class AnalysisGraphs extends React.Component {
       loadingMCC: true,
       estateLiab: [],
       estateLiabLE: [],
-      taxL:0
+      taxL: 0,
     };
     this.dataAges = [];
     this.dataPremiums = [];
@@ -58,23 +58,23 @@ export default class AnalysisGraphs extends React.Component {
     this.insMultiple = 0;
     this.bestFitEquiBuild = false;
     this.INAEstateOption = DISPLAY_TAXLIAB_CLIENT;
-    this.insuranceAmtInitial = this.props.INAOption === DISPLAY_INCOME
+    this.insuranceAmtInitial =
+      this.props.INAOption === DISPLAY_INCOME
         ? this.props.insuranceNeed
         : this.props.dataEstateLiability[0];
-this.chartRef = React.createRef();
-  this.taxLiabChartRef = React.createRef();
+    this.chartRef = React.createRef();
+    this.taxLiabChartRef = React.createRef();
   }
 
   componentDidMount() {
-    this.getEstateLiabPieCharts()
-
+    this.getEstateLiabPieCharts();
   }
-
 
   shouldComponentUpdate(nextProps, nextState, prevState) {
     if (
       this.props.projectEnd !== nextProps.projectEnd ||
-      this.state.loadingMCC !== prevState.loadingMCC || this.props.INAOption !== nextProps.INAOption
+      this.state.loadingMCC !== prevState.loadingMCC ||
+      this.props.INAOption !== nextProps.INAOption
     ) {
       return true;
     }
@@ -92,10 +92,11 @@ this.chartRef = React.createRef();
       this.INAEstateOption === DISPLAY_TAXLIAB_JLTD
         ? QUOTE_JOINT
         : QUOTE_CLIENT;
-    let FA=this.props.INAOption === DISPLAY_INCOME
+    let FA =
+      this.props.INAOption === DISPLAY_INCOME
         ? this.props.insuranceNeed
         : this.props.dataEstateLiability[0];
-        const FAClean=parseFloat(cleanFormat(FA))
+    const FAClean = parseFloat(cleanFormat(FA));
     let dataMCC = readMCCData(
       this.props.input,
       quotePlanID,
@@ -104,42 +105,37 @@ this.chartRef = React.createRef();
     );
 
     // console.log(this.props.dataAPISite, dataMCC, FA);
-    if(FA>0)
-    {
-    fetchMCCData(
-      this.props.dataAPISite,
-      dataMCC,
-      FAClean
-    )
-      .then(data => {
-        // console.log(data[0]);
-        if (data[0] !== undefined) {
-          //  console.log("POST: MCC_OutputArrays success");
-          this.minPrem = parseInt(cleanFormat(data[0][2].Values[0]));
-          //this.dataDB = data[0][3].Values.map(x=>parseInt(cleanFormat(x)));
-          this.lifeExp = this.props.lifeExp; // Math.round(parseInt(data[0][4].Values[0]));
+    if (FA > 0) {
+      fetchMCCData(this.props.dataAPISite, dataMCC, FAClean)
+        .then((data) => {
+          // console.log(data[0]);
+          if (data[0] !== undefined) {
+            //  console.log("POST: MCC_OutputArrays success");
+            this.minPrem = parseInt(cleanFormat(data[0][2].Values[0]));
+            //this.dataDB = data[0][3].Values.map(x=>parseInt(cleanFormat(x)));
+            this.lifeExp = this.props.lifeExp; // Math.round(parseInt(data[0][4].Values[0]));
 
-          //console.log(this.lifeExp,data[0][4].Values)
-          // make render
-        }
-      })
-      .then(data => {
-        this.getMCCQuoteOutput4();
-      });
+            //console.log(this.lifeExp,data[0][4].Values)
+            // make render
+          }
+        })
+        .then((data) => {
+          this.getMCCQuoteOutput4();
+        });
     }
   };
 
- 
   getMCCQuoteOutput4 = async () => {
     let quotePlanID = 48;
     let quoteClient =
       this.INAEstateOption === DISPLAY_TAXLIAB_JLTD
         ? QUOTE_JOINT
         : QUOTE_CLIENT;
-    let FA= this.props.INAOption === DISPLAY_INCOME
+    let FA =
+      this.props.INAOption === DISPLAY_INCOME
         ? this.props.insuranceNeed
-        : this.props.dataEstateLiability[0];    
-    const FAClean=parseFloat(cleanFormat(FA))
+        : this.props.dataEstateLiability[0];
+    const FAClean = parseFloat(cleanFormat(FA));
     let dataMCC = readMCCData(
       this.props.input,
       quotePlanID,
@@ -152,11 +148,9 @@ this.chartRef = React.createRef();
     let years = this.props.projectEnd;
     dataMCC.policy.objPremium.PremSet = true;
     if (this.bestFitEquiBuild === true) {
-      dataMCC.policy.faceAmount =
-        FAClean / 2;
+      dataMCC.policy.faceAmount = FAClean / 2;
       dataMCC.policy.objRider.ICO20 = true;
-      dataMCC.policy.objRider.T20Amt =
-        FAClean / 2;
+      dataMCC.policy.objRider.T20Amt = FAClean / 2;
       dataMCC.policy.objCustomDB.solveForPremium_On = true;
       dataMCC.policy.objCustomDB.customDB =
         this.props.INAOption === DISPLAY_INCOME
@@ -169,23 +163,19 @@ this.chartRef = React.createRef();
       dataMCC.policy.objPremium.PremSetDur = parseInt(this.premiumDur);
     }
     dataMCC.policy.objPremium.PremSolve = false;
-    fetchMCCData(
-      this.props.dataAPISite,
-      dataMCC,
-      FAClean
-    ).then(data => {
-       if (data[0][1] !== undefined) {
+    fetchMCCData(this.props.dataAPISite, dataMCC, FAClean).then((data) => {
+      if (data[0][1] !== undefined) {
         console.log("POST: MCC_OutputArrays success");
-        this.dataAges = data[0][1].Values.slice(0, years).map(x =>
+        this.dataAges = data[0][1].Values.slice(0, years).map((x) =>
           parseInt(cleanFormat(x))
         );
-        this.dataPremiums = data[0][2].Values.map(x =>
+        this.dataPremiums = data[0][2].Values.map((x) =>
           parseInt(cleanFormat(x))
         );
-        this.dataDB = data[0][3].Values.slice(0, years).map(x =>
+        this.dataDB = data[0][3].Values.slice(0, years).map((x) =>
           parseInt(cleanFormat(x))
         );
-        this.dataSVEquiBuild = data[0][4].Values.slice(0, years).map(x =>
+        this.dataSVEquiBuild = data[0][4].Values.slice(0, years).map((x) =>
           parseInt(cleanFormat(x))
         );
         this.dataDB.unshift(FAClean);
@@ -215,10 +205,11 @@ this.chartRef = React.createRef();
       this.INAEstateOption === DISPLAY_TAXLIAB_JLTD
         ? QUOTE_JOINT
         : QUOTE_CLIENT;
-        let FA = this.props.INAOption === DISPLAY_INCOME
+    let FA =
+      this.props.INAOption === DISPLAY_INCOME
         ? this.props.insuranceNeed
         : this.props.dataEstateLiability[0];
-        const FAClean=parseFloat(cleanFormat(FA))
+    const FAClean = parseFloat(cleanFormat(FA));
     let dataMCC = readMCCData(
       this.props.input,
       quotePlanID,
@@ -237,23 +228,19 @@ this.chartRef = React.createRef();
     dataMCC.policy.objCustomDB.solveForPremium_On = false;
     dataMCC.policy.intRate = 0.035;
     dataMCC.policy.province = "AB"; // data.dataInput.Presentations[0].Province,
-    fetchMCCData(
-      this.props.dataAPISite,
-      dataMCC,
-      FAClean
-    ).then(data => {
-       if (data[0][1] !== undefined) {
+    fetchMCCData(this.props.dataAPISite, dataMCC, FAClean).then((data) => {
+      if (data[0][1] !== undefined) {
         console.log("POST: MCC_OutputArrays success");
-        this.dataAges = data[0][1].Values.slice(0, years).map(x =>
+        this.dataAges = data[0][1].Values.slice(0, years).map((x) =>
           parseInt(cleanFormat(x))
         );
-        this.dataPremiums = data[0][2].Values.map(x =>
+        this.dataPremiums = data[0][2].Values.map((x) =>
           parseInt(cleanFormat(x))
         );
-        this.dataDB = data[0][3].Values.slice(0, years).map(x =>
+        this.dataDB = data[0][3].Values.slice(0, years).map((x) =>
           parseInt(cleanFormat(x))
         );
-        this.dataSVManulife = data[0][4].Values.slice(0, years).map(x =>
+        this.dataSVManulife = data[0][4].Values.slice(0, years).map((x) =>
           parseInt(cleanFormat(x))
         );
 
@@ -358,7 +345,7 @@ this.chartRef = React.createRef();
     await this.setState({ loadingMCC: b });
   };
 
-  solveForOptimumEquiBuild = async e => {
+  solveForOptimumEquiBuild = async (e) => {
     if (e === 1) {
       this.bestPremiumDur = 100;
       let dataFutureINA = this.getDataFutureINA();
@@ -409,61 +396,109 @@ this.chartRef = React.createRef();
     //this.insuranceAmtInitial =parseInt(cleanFormat(this.insuranceAmtInitial))*(1 + this.insMultiple / 100);
     this.getMCCQuoteOutput();
 
-    
-
     let b = !this.state.loadingMCC;
     this.setState({ loadingMCC: b });
     this.minPrem = 1;
     //this.setState({ loading: false });
   };
 
-
-
-getEstateLiabPieCharts= async () => {
-     
+  getEstateLiabPieCharts = async () => {
     const totalLiabProjections = getProjectedLiabilities(
       this.props.input.dataInput,
       this.props.projectEnd,
       this.props.language
     );
 
-
-
     // console.log(this.state.estateLiab,this.state.estateLiabLE)
 
     let dataNA = setUIDataToAPI(this.props.input, 0);
 
-    let estateLiab2=[]
-    estateLiab2.push(totalLiabProjections[0])
-    const l1= await getTaxLiabCategoryTotal(this.props.input.dataInput,ASSET_TAX.REGISTERED.Key,dataNA, 0);
-    this.setState({taxL: l1})
-    estateLiab2.push(l1)
-    const l2=await getTaxLiabCategoryTotal(this.props.input.dataInput,ASSET_TAX.CAPITAL_GAINS_ANNUAL.Key,dataNA, 0)
-    const l3=await getTaxLiabCategoryTotal(this.props.input.dataInput,ASSET_TAX.CAPITAL_GAINS_DEFERRED.Key,dataNA, 0)
-    estateLiab2.push(l2+l3)
-    estateLiab2.push(await getTaxLiabCategoryTotal(this.props.input.dataInput,ASSET_TAX.FULLY_TAXABLE.Key,dataNA, 0))
-    estateLiab2.push(await getTaxLiabCategoryTotal(this.props.input.dataInput,ASSET_TAX.DIVIDEND.Key,dataNA, 0));
+    let estateLiab2 = [];
+    estateLiab2.push(totalLiabProjections[0]);
+    const l1 = await getTaxLiabCategoryTotal(
+      this.props.input.dataInput,
+      ASSET_TAX.REGISTERED.Key,
+      dataNA,
+      0
+    );
+    this.setState({ taxL: l1 });
+    estateLiab2.push(l1);
+    const l2 = await getTaxLiabCategoryTotal(
+      this.props.input.dataInput,
+      ASSET_TAX.CAPITAL_GAINS_ANNUAL.Key,
+      dataNA,
+      0
+    );
+    const l3 = await getTaxLiabCategoryTotal(
+      this.props.input.dataInput,
+      ASSET_TAX.CAPITAL_GAINS_DEFERRED.Key,
+      dataNA,
+      0
+    );
+    estateLiab2.push(l2 + l3);
+    estateLiab2.push(
+      await getTaxLiabCategoryTotal(
+        this.props.input.dataInput,
+        ASSET_TAX.FULLY_TAXABLE.Key,
+        dataNA,
+        0
+      )
+    );
+    estateLiab2.push(
+      await getTaxLiabCategoryTotal(
+        this.props.input.dataInput,
+        ASSET_TAX.DIVIDEND.Key,
+        dataNA,
+        0
+      )
+    );
 
+    this.setState({ estateLiab: estateLiab2 });
 
-    this.setState({estateLiab: estateLiab2});
-
-    let estateLiab3=[]
-    estateLiab3.push(totalLiabProjections[this.lifeExp])
-    estateLiab3.push(await getTaxLiabCategoryTotal(this.props.input.dataInput,ASSET_TAX.REGISTERED.Key,dataNA, this.lifeExp))
-    const l2LE=await getTaxLiabCategoryTotal(this.props.input.dataInput,ASSET_TAX.CAPITAL_GAINS_ANNUAL.Key,dataNA, this.lifeExp)
-    const l3LE=await getTaxLiabCategoryTotal(this.props.input.dataInput,ASSET_TAX.CAPITAL_GAINS_DEFERRED.Key,dataNA, this.lifeExp)
-    estateLiab3.push(l2LE+l3LE)
-    estateLiab3.push(await getTaxLiabCategoryTotal(this.props.input.dataInput,ASSET_TAX.FULLY_TAXABLE.Key,dataNA, this.lifeExp))
-    estateLiab3.push(await getTaxLiabCategoryTotal(this.props.input.dataInput,ASSET_TAX.DIVIDEND.Key,dataNA, this.lifeExp));
-    this.setState({estateLiabLE: estateLiab3});
+    let estateLiab3 = [];
+    estateLiab3.push(totalLiabProjections[this.lifeExp]);
+    estateLiab3.push(
+      await getTaxLiabCategoryTotal(
+        this.props.input.dataInput,
+        ASSET_TAX.REGISTERED.Key,
+        dataNA,
+        this.lifeExp
+      )
+    );
+    const l2LE = await getTaxLiabCategoryTotal(
+      this.props.input.dataInput,
+      ASSET_TAX.CAPITAL_GAINS_ANNUAL.Key,
+      dataNA,
+      this.lifeExp
+    );
+    const l3LE = await getTaxLiabCategoryTotal(
+      this.props.input.dataInput,
+      ASSET_TAX.CAPITAL_GAINS_DEFERRED.Key,
+      dataNA,
+      this.lifeExp
+    );
+    estateLiab3.push(l2LE + l3LE);
+    estateLiab3.push(
+      await getTaxLiabCategoryTotal(
+        this.props.input.dataInput,
+        ASSET_TAX.FULLY_TAXABLE.Key,
+        dataNA,
+        this.lifeExp
+      )
+    );
+    estateLiab3.push(
+      await getTaxLiabCategoryTotal(
+        this.props.input.dataInput,
+        ASSET_TAX.DIVIDEND.Key,
+        dataNA,
+        this.lifeExp
+      )
+    );
+    this.setState({ estateLiabLE: estateLiab3 });
 
     // console.log(this.state.estateLiab,this.state.estateLiabLE)
-// console.log(estateLiab2,estateLiab3)
-}
-
-
-
-
+    // console.log(estateLiab2,estateLiab3)
+  };
 
   getDataFutureINA = () => {
     let dataFutureINA = [];
@@ -479,8 +514,6 @@ getEstateLiabPieCharts= async () => {
       this.props.projectEnd,
       this.props.language
     );
-
-    
 
     const currINA = parseFloat(cleanFormat(this.props.insuranceNeed));
     const intRate = parseFloat(
@@ -528,11 +561,11 @@ getEstateLiabPieCharts= async () => {
   };
  */
 
-handleFocus = (event) => {
-  event.target.select();
-};
+  handleFocus = (event) => {
+    event.target.select();
+  };
 
-  getDataFVofPrems = dataFuture => {
+  getDataFVofPrems = (dataFuture) => {
     let dataFVofPrems = [];
     let i;
     let fv = 0;
@@ -584,9 +617,9 @@ handleFocus = (event) => {
 
           fill: true, // Don't fill area under the line
           borderColor: "darkred", // Line color
-          backgroundColor: "rgba(244, 144, 128, 0.8)"
-        }
-      ]
+          backgroundColor: "rgba(244, 144, 128, 0.8)",
+        },
+      ],
     };
     //} else {
     let dataTaxLiabLifeExp = [];
@@ -613,7 +646,7 @@ handleFocus = (event) => {
 
           fill: true, // Don't fill area under the line
           borderColor: "darkGrey", // Line color
-          backgroundColor: "#607d8b"
+          backgroundColor: "#607d8b",
         },
         {
           label:
@@ -624,157 +657,266 @@ handleFocus = (event) => {
           data: dataTaxLiabLifeExp,
           fill: true, // Don't fill area under the line
           borderColor: "#6AAd8b",
-          backgroundColor: "rgb(106,173,139,.5)"// "rgba(96, 125, 139, .7)"
-        }
-      ]
+          backgroundColor: "rgb(106,173,139,.5)", // "rgba(96, 125, 139, .7)"
+        },
+      ],
     };
 
-  const dataPieAssets = {
-  labels: [
-    "Cash/TFSA/Insurance", "RRSP/RRIF", "Public/Private shares", "Real Estate", "Other"
-  ],
-  datasets: [
-    {
-         data: [
-        getAssetsCategoryTotal(this.props.input.dataInput,ASSETS.CASH.Key)+
-        getAssetsCategoryTotal(this.props.input.dataInput,ASSETS.LIFE_INSURANCE.Key)+
-        getAssetsCategoryTotal(this.props.input.dataInput,ASSETS.CHARITABLE_GIFTS_TAX_CREDIT.Key)
-        , 
-        getAssetsCategoryTotal(this.props.input.dataInput,ASSETS.RRSP_RRIF.Key), 
-        getAssetsCategoryTotal(this.props.input.dataInput,ASSETS.SMALL_BUSINESS_SHARES.Key)+
-        getAssetsCategoryTotal(this.props.input.dataInput,ASSETS.STOCKS_BONDS.Key),
-        getAssetsCategoryTotal(this.props.input.dataInput,ASSETS.REAL_ESTATE.Key)+
-        getAssetsCategoryTotal(this.props.input.dataInput,ASSETS.PERSONAL_RESIDENCE.Key),
-        getAssetsCategoryTotal(this.props.input.dataInput,ASSETS.OTHER_ASSETS.Key)
+    const dataPieAssets = {
+      labels: [
+        "Cash/TFSA/Insurance",
+        "RRSP/RRIF",
+        "Public/Private shares",
+        "Real Estate",
+        "Other",
       ],
-      backgroundColor: ["#F7464A", "#46BFBD", "#FDB45C", "#949FB1", "#4D5360"]
-    }
-  ]
-}
-const dataPieTax = {
-  labels: [
-    "Non-Taxable", "RRSP/RRIF", "Capital Gains", "Taxed As Income", "Dividend"
-  ],
-  datasets: [
-    {
-         data: [
-        getAssetsTaxCategoryTotal(this.props.input.dataInput,ASSET_TAX.NON_TAXABLE.Key), 
-        getAssetsTaxCategoryTotal(this.props.input.dataInput,ASSET_TAX.REGISTERED.Key), 
-        getAssetsTaxCategoryTotal(this.props.input.dataInput,ASSET_TAX.CAPITAL_GAINS_ANNUAL.Key)+
-        getAssetsTaxCategoryTotal(this.props.input.dataInput,ASSET_TAX.CAPITAL_GAINS_DEFERRED.Key),
-        getAssetsTaxCategoryTotal(this.props.input.dataInput,ASSET_TAX.FULLY_TAXABLE.Key), 
-        getAssetsTaxCategoryTotal(this.props.input.dataInput,ASSET_TAX.DIVIDEND.Key)
+      datasets: [
+        {
+          data: [
+            getAssetsCategoryTotal(
+              this.props.input.dataInput,
+              ASSETS.CASH.Key
+            ) +
+              getAssetsCategoryTotal(
+                this.props.input.dataInput,
+                ASSETS.LIFE_INSURANCE.Key
+              ) +
+              getAssetsCategoryTotal(
+                this.props.input.dataInput,
+                ASSETS.CHARITABLE_GIFTS_TAX_CREDIT.Key
+              ),
+            getAssetsCategoryTotal(
+              this.props.input.dataInput,
+              ASSETS.RRSP_RRIF.Key
+            ),
+            getAssetsCategoryTotal(
+              this.props.input.dataInput,
+              ASSETS.SMALL_BUSINESS_SHARES.Key
+            ) +
+              getAssetsCategoryTotal(
+                this.props.input.dataInput,
+                ASSETS.STOCKS_BONDS.Key
+              ),
+            getAssetsCategoryTotal(
+              this.props.input.dataInput,
+              ASSETS.REAL_ESTATE.Key
+            ) +
+              getAssetsCategoryTotal(
+                this.props.input.dataInput,
+                ASSETS.PERSONAL_RESIDENCE.Key
+              ),
+            getAssetsCategoryTotal(
+              this.props.input.dataInput,
+              ASSETS.OTHER_ASSETS.Key
+            ),
+          ],
+          backgroundColor: [
+            "#F7464A",
+            "#46BFBD",
+            "#FDB45C",
+            "#949FB1",
+            "#4D5360",
+          ],
+        },
       ],
-      backgroundColor: ["#F7464A", "#46BFBD", "#FDB45C", "#949FB1", "#4D5360"]
-    }
-  ]
-}
-
-const dataPieLiabs = {
-  labels: [
-    "Loans", "Taxes", "Emergency Fund", "Other"
-  ],
-  datasets: [
-    {
-         data: [
-        getLiabsCategoryTotal(this.props.input.dataInput,LIABILITIES.OUTSTANDING_LOANS.Key)+
-        getLiabsCategoryTotal(this.props.input.dataInput,LIABILITIES.MORTGAGE_REDEMPTION.Key)+
-        getLiabsCategoryTotal(this.props.input.dataInput,LIABILITIES.CREDIT_CARDS.Key)+
-        getLiabsCategoryTotal(this.props.input.dataInput,LIABILITIES.CLIENT_TAX_LIABILITY.Key)
-        , 
-        getLiabsCategoryTotal(this.props.input.dataInput,LIABILITIES.INCOME_TAXES.Key), 
-        getLiabsCategoryTotal(this.props.input.dataInput,LIABILITIES.EMERGENCY_FUND.Key),
-        getLiabsCategoryTotal(this.props.input.dataInput,LIABILITIES.OTHER.Key)+
-        getLiabsCategoryTotal(this.props.input.dataInput,LIABILITIES.CHILD_HOME_CARE.Key)
+    };
+    const dataPieTax = {
+      labels: [
+        "Non-Taxable",
+        "RRSP/RRIF",
+        "Capital Gains",
+        "Taxed As Income",
+        "Dividend",
       ],
-      backgroundColor: ["#F7464A", "#46BFBD", "#FDB45C", "#949FB1"]
-    }
-  ]
-}
-const dataPieLiabsAtDeath = {
-  labels: [
-    "Last Expenses", "Legal and Executor Fees", "Future Commitments"
-  ],
-  datasets: [
-    {
-         data: [
-           getLiabsCategoryTotal(this.props.input.dataInput,LIABILITIES.LAST_EXPENSES.Key),
-        getLiabsCategoryTotal(this.props.input.dataInput,LIABILITIES.LEGAL_AND_EXECUTOR_FEES.Key), 
-        getLiabsCategoryTotal(this.props.input.dataInput,LIABILITIES.LEGACY_FOR_CHILDREN.Key)+
-        getLiabsCategoryTotal(this.props.input.dataInput,LIABILITIES.CHARITABLE_GIFTS.Key)
+      datasets: [
+        {
+          data: [
+            getAssetsTaxCategoryTotal(
+              this.props.input.dataInput,
+              ASSET_TAX.NON_TAXABLE.Key
+            ),
+            getAssetsTaxCategoryTotal(
+              this.props.input.dataInput,
+              ASSET_TAX.REGISTERED.Key
+            ),
+            getAssetsTaxCategoryTotal(
+              this.props.input.dataInput,
+              ASSET_TAX.CAPITAL_GAINS_ANNUAL.Key
+            ) +
+              getAssetsTaxCategoryTotal(
+                this.props.input.dataInput,
+                ASSET_TAX.CAPITAL_GAINS_DEFERRED.Key
+              ),
+            getAssetsTaxCategoryTotal(
+              this.props.input.dataInput,
+              ASSET_TAX.FULLY_TAXABLE.Key
+            ),
+            getAssetsTaxCategoryTotal(
+              this.props.input.dataInput,
+              ASSET_TAX.DIVIDEND.Key
+            ),
+          ],
+          backgroundColor: [
+            "#F7464A",
+            "#46BFBD",
+            "#FDB45C",
+            "#949FB1",
+            "#4D5360",
+          ],
+        },
       ],
-      backgroundColor: ["#F7464A", "#46BFBD", "#FDB45C"]
-    }
-  ]
-}
+    };
 
+    const dataPieLiabs = {
+      labels: ["Loans", "Taxes", "Emergency Fund", "Other"],
+      datasets: [
+        {
+          data: [
+            getLiabsCategoryTotal(
+              this.props.input.dataInput,
+              LIABILITIES.OUTSTANDING_LOANS.Key
+            ) +
+              getLiabsCategoryTotal(
+                this.props.input.dataInput,
+                LIABILITIES.MORTGAGE_REDEMPTION.Key
+              ) +
+              getLiabsCategoryTotal(
+                this.props.input.dataInput,
+                LIABILITIES.CREDIT_CARDS.Key
+              ) +
+              getLiabsCategoryTotal(
+                this.props.input.dataInput,
+                LIABILITIES.CLIENT_TAX_LIABILITY.Key
+              ),
+            getLiabsCategoryTotal(
+              this.props.input.dataInput,
+              LIABILITIES.INCOME_TAXES.Key
+            ),
+            getLiabsCategoryTotal(
+              this.props.input.dataInput,
+              LIABILITIES.EMERGENCY_FUND.Key
+            ),
+            getLiabsCategoryTotal(
+              this.props.input.dataInput,
+              LIABILITIES.OTHER.Key
+            ) +
+              getLiabsCategoryTotal(
+                this.props.input.dataInput,
+                LIABILITIES.CHILD_HOME_CARE.Key
+              ),
+          ],
+          backgroundColor: ["#F7464A", "#46BFBD", "#FDB45C", "#949FB1"],
+        },
+      ],
+    };
+    const dataPieLiabsAtDeath = {
+      labels: [
+        "Last Expenses",
+        "Legal and Executor Fees",
+        "Future Commitments",
+      ],
+      datasets: [
+        {
+          data: [
+            getLiabsCategoryTotal(
+              this.props.input.dataInput,
+              LIABILITIES.LAST_EXPENSES.Key
+            ),
+            getLiabsCategoryTotal(
+              this.props.input.dataInput,
+              LIABILITIES.LEGAL_AND_EXECUTOR_FEES.Key
+            ),
+            getLiabsCategoryTotal(
+              this.props.input.dataInput,
+              LIABILITIES.LEGACY_FOR_CHILDREN.Key
+            ) +
+              getLiabsCategoryTotal(
+                this.props.input.dataInput,
+                LIABILITIES.CHARITABLE_GIFTS.Key
+              ),
+          ],
+          backgroundColor: ["#F7464A", "#46BFBD", "#FDB45C"],
+        },
+      ],
+    };
 
+    //options
+    var optionsPie = {
+      responsive: true,
+      title: {
+        display: true,
+        position: "top",
+        text: "Assets Breakdown Today",
+        fontSize: 14, //8,
+        fontColor: "#111",
+      },
+      legend: {
+        display: true,
+        position: "right",
+        labels: {
+          fontColor: "#333",
+          fontSize: 12, //16
+        },
+      },
+    };
 
+    let optionsPieTax = JSON.parse(JSON.stringify(optionsPie));
+    optionsPieTax.title.text = "Tax Treatment of Assets";
 
-//options
-  var optionsPie = {
-    responsive: true,
-    title: {
-      display: true,
-      position: "top",
-      text: "Assets Breakdown Today",
-      fontSize: 14,//8,
-      fontColor: "#111"
-    },
-    legend: {
-      display: true,
-      position: "right",
-      labels: {
-        fontColor: "#333",
-        fontSize: 12//16
-      }
-    }
-  };
-   
-   
-   let optionsPieTax = JSON.parse(JSON.stringify(optionsPie));
-   optionsPieTax.title.text="Tax Treatment of Assets"
+    let optionsPieLiabsAtDeath = JSON.parse(JSON.stringify(optionsPie));
+    optionsPieLiabsAtDeath.title.text = "Liabilities At Death";
 
-let optionsPieLiabsAtDeath = JSON.parse(JSON.stringify(optionsPie));
-   optionsPieLiabsAtDeath.title.text="Liabilities At Death"
+    let optionsPieLiabs = JSON.parse(JSON.stringify(optionsPie));
+    optionsPieLiabs.title.text = "Liabilities Breakdown";
 
-let optionsPieLiabs = JSON.parse(JSON.stringify(optionsPie));
-   optionsPieLiabs.title.text="Liabilities Breakdown"
+    const dataPieEstateLiabNow = {
+      labels: [
+        "Liabilities",
+        "Taxes: RRSP/RRIF",
+        "Taxes: Capital Gains",
+        "Taxes: As Income",
+        "Taxes: Dividend",
+      ],
+      datasets: [
+        {
+          data: this.state.estateLiab,
+          backgroundColor: [
+            "#F7464A",
+            "#46BFBD",
+            "#FDB45C",
+            "#949FB1",
+            "#4D5360",
+          ],
+        },
+      ],
+    };
+    const dataPieEstateLiabLE = {
+      labels: [
+        "Liabilities",
+        "Taxes: RRSP/RRIF",
+        "Taxes: Capital Gains",
+        "Taxes: As Income",
+        "Taxes: Dividend",
+      ],
+      datasets: [
+        {
+          data: this.state.estateLiabLE,
+          backgroundColor: [
+            "#F7464A",
+            "#46BFBD",
+            "#FDB45C",
+            "#949FB1",
+            "#4D5360",
+          ],
+        },
+      ],
+    };
+    let optionsPieEstateLiab = JSON.parse(JSON.stringify(optionsPie));
+    optionsPieEstateLiab.title.text = "Estate Liability Today";
 
-
-
-
-const dataPieEstateLiabNow = {
-  labels: [
-    "Liabilities", "Taxes: RRSP/RRIF", "Taxes: Capital Gains", "Taxes: As Income", "Taxes: Dividend"
-  ],
-  datasets: [
-    {
-         data: this.state.estateLiab,
-      backgroundColor: ["#F7464A", "#46BFBD", "#FDB45C", "#949FB1", "#4D5360"]
-    }
-  ]
-}
-const dataPieEstateLiabLE = {
-  labels: [
-    "Liabilities", "Taxes: RRSP/RRIF", "Taxes: Capital Gains", "Taxes: As Income", "Taxes: Dividend"
-  ],
-  datasets: [
-    {
-         data: this.state.estateLiabLE,
-      backgroundColor: ["#F7464A", "#46BFBD", "#FDB45C", "#949FB1", "#4D5360"]
-    }
-  ]
-}
- let optionsPieEstateLiab= JSON.parse(JSON.stringify(optionsPie));
-   optionsPieEstateLiab.title.text="Estate Liability Today"
-
-let optionsPieEstateLiabLE= JSON.parse(JSON.stringify(optionsPie));
-   optionsPieEstateLiabLE.title.text="Estate Liability at Life Expectancy +3"
-
-
-
-
+    let optionsPieEstateLiabLE = JSON.parse(JSON.stringify(optionsPie));
+    optionsPieEstateLiabLE.title.text =
+      "Estate Liability at Life Expectancy +3";
 
     /* var ctx = document.getElementById('myChart3');
 
@@ -812,7 +954,7 @@ let optionsPieEstateLiabLE= JSON.parse(JSON.stringify(optionsPie));
       }
     });
  */
-    
+
     //this.taxLiabChartRef = this.chartRef.current.getContext("2d");
     /* new Chart(this.taxLiabChartRef, {
       type: "bar", // override the default type
@@ -864,7 +1006,7 @@ let optionsPieEstateLiabLE= JSON.parse(JSON.stringify(optionsPie));
           data: dataFVofPrems,
           fill: true,
           borderColor: "darkgreen", // Line color
-          backgroundColor: "rgba(144, 244, 88, .2)"
+          backgroundColor: "rgba(144, 244, 88, .2)",
         },
         {
           label:
@@ -882,9 +1024,9 @@ let optionsPieEstateLiabLE= JSON.parse(JSON.stringify(optionsPie));
           backgroundColor:
             this.props.INAOption === DISPLAY_INCOME
               ? "rgba(244, 144, 128, 0.9)"
-              : "#607D8B"
-        }
-      ]
+              : "#607D8B",
+        },
+      ],
     };
 
     let SumOfSquresDiff = 0;
@@ -914,7 +1056,7 @@ let optionsPieEstateLiabLE= JSON.parse(JSON.stringify(optionsPie));
           data: this.dataDB,
           fill: true,
           borderColor: "darkblue", // Line color
-          backgroundColor: "rgba(144, 144, 188, .3)"
+          backgroundColor: "rgba(144, 144, 188, .3)",
         },
         {
           label:
@@ -932,9 +1074,9 @@ let optionsPieEstateLiabLE= JSON.parse(JSON.stringify(optionsPie));
           backgroundColor:
             this.props.INAOption === DISPLAY_INCOME
               ? "rgba(244, 144, 128, 0.9)"
-              : "#607D8B"
-        }
-      ]
+              : "#607D8B",
+        },
+      ],
     };
 
     const optionsFV = {
@@ -945,9 +1087,9 @@ let optionsPieEstateLiabLE= JSON.parse(JSON.stringify(optionsPie));
           {
             stacked: true,
             ticks: {
-              beginAtZero: true
-            }
-          }
+              beginAtZero: true,
+            },
+          },
         ],
         yAxes: [
           {
@@ -955,11 +1097,11 @@ let optionsPieEstateLiabLE= JSON.parse(JSON.stringify(optionsPie));
             ticks: {
               beginAtZero: true,
               steps: 10,
-              stepValue: 5
-            }
-          }
-        ]
-      }
+              stepValue: 5,
+            },
+          },
+        ],
+      },
     };
 
     //let colHeaders=["Year", "Survivor's Age", "Insurance Need", "Propsed Plan Death Benefit", "Future Value of Premiums", "Net Advantage of Insurance" ];
@@ -968,7 +1110,7 @@ let optionsPieEstateLiabLE= JSON.parse(JSON.stringify(optionsPie));
       "Insurance Need",
       "Premiums",
       "Propsed Plan Death Benefit",
-      "Future Value of Premiums"
+      "Future Value of Premiums",
     ];
     let dataProjection = [];
     dataProjection.push(this.dataAges);
@@ -1007,57 +1149,117 @@ let optionsPieEstateLiabLE= JSON.parse(JSON.stringify(optionsPie));
             selectMultiButton={this.selectMultiButtonINAorTax}
           />
         )}
-        
+
         <div style={{ width: "90%" }}>
-        <div style={{ width: "100%" }}> 
-        
-           <h3 className="ppi1">
-          {this.props.INAOption === DISPLAY_INCOME
-            ? "Your current financial situation is summerized below:" //this.props.insuranceNeed
-            : <div><br/><br/>Estate Liability breakdown Today and at Life Expectancy plus 3 years: <br/></div>
-            }
-          {/*numFormat(this.props.dataTaxLiability[0], false, 2, ",")}*/}
-        </h3>
-
- 
           <div style={{ width: "100%" }}>
+            <h3 className="ppi1">
+              {this.props.INAOption === DISPLAY_INCOME ? (
+                "Your current financial situation is summerized below:" //this.props.insuranceNeed
+              ) : (
+                <div>
+                  <br />
+                  <br />
+                  Estate Liability breakdown Today and at Life Expectancy plus 3
+                  years: <br />
+                </div>
+              )}
+              {/*numFormat(this.props.dataTaxLiability[0], false, 2, ",")}*/}
+            </h3>
+            <div style={{ width: "100%" }}>
+              {this.props.INAOption === DISPLAY_INCOME ? (
+                <div>
+                  <article
+                    className="canvas-container"
+                    style={{ height: "450px" }}
+                  >
+                    <div
+                      style={{
+                        overflow: "hidden",
+                        float: "left",
+                        width: "50%",
+                        height: "400px",
+                      }}
+                    >
+                      <Pie data={dataPieAssets} options={optionsPie} />
+                    </div>
+                    <div
+                      style={{ float: "left", width: "50%", height: "400px" }}
+                    >
+                      <Pie data={dataPieTax} options={optionsPieTax} />
+                    </div>
+                  </article>
+                  <article
+                    className="canvas-container"
+                    style={{ height: "450px" }}
+                  >
+                    <div
+                      style={{
+                        overflow: "hidden",
+                        float: "left",
+                        width: "50%",
+                        height: "400px",
+                      }}
+                    >
+                      <Pie data={dataPieLiabs} options={optionsPieLiabs} />
+                    </div>
+                    <div
+                      style={{ float: "left", width: "50%", height: "400px" }}
+                    >
+                      <Pie
+                        data={dataPieLiabsAtDeath}
+                        options={optionsPieLiabsAtDeath}
+                      />
+                    </div>
+                  </article>
+                </div>
+              ) : (
+                <article
+                  className="canvas-container"
+                  style={{ height: "450px" }}
+                >
+                  <div
+                    style={{
+                      overflow: "hidden",
+                      float: "left",
+                      width: "50%",
+                      height: "400px",
+                    }}
+                  >
+                    <Pie
+                      data={dataPieEstateLiabNow}
+                      options={optionsPieEstateLiab}
+                    />
+                  </div>
+                  <div style={{ float: "left", width: "50%", height: "400px" }}>
+                    <Pie
+                      data={dataPieEstateLiabLE}
+                      options={optionsPieEstateLiabLE}
+                    />
+                  </div>
+                </article>
+              )}
+            </div>
+            <br />
+            <h3 className="ppi1">
+              {this.props.INAOption === DISPLAY_INCOME ? (
+                <div>
+                  "Net Worth Today:"
+                  <br /> "Assets:"
+                  <br /> "Liabilities:"
+                </div> //this.props.insuranceNeed
+              ) : (
+                <br />
+              )}
+              {/*numFormat(this.props.dataTaxLiability[0], false, 2, ",")}*/}
+            </h3>
+            <h3 className="ppi1">
+              {needTo} {/*:{" "}*/}
+              {this.props.INAOption === DISPLAY_INCOME
+                ? "" //this.props.insuranceNeed
+                : ""}
+              {/*numFormat(this.props.dataTaxLiability[0], false, 2, ",")}*/}
+            </h3>
             {this.props.INAOption === DISPLAY_INCOME ? (
-               <div><article className="canvas-container" style={{height: "450px" }}>
-                <div style={{overflow:'hidden', float: 'left', width: '50%',height: "400px" }}><Pie data={dataPieAssets} options={optionsPie} /></div>
-                <div style={{float: 'left',width: '50%',height: "400px"}}><Pie data={dataPieTax} options={optionsPieTax} /></div>
-              </article>
-              <article className="canvas-container" style={{height: "450px" }}>
-                <div style={{overflow:'hidden', float: 'left', width: '50%',height: "400px" }}><Pie data={dataPieLiabs} options={optionsPieLiabs} /></div>
-                <div style={{float: 'left',width: '50%',height: "400px"}}><Pie data={dataPieLiabsAtDeath} options={optionsPieLiabsAtDeath} /></div>
-              </article></div>
-         ) : (
-           
-            <article className="canvas-container" style={{height: "450px" }}>
-                <div style={{overflow:'hidden', float: 'left', width: '50%',height: "400px" }}><Pie data={dataPieEstateLiabNow} options={optionsPieEstateLiab} /></div >
-                <div style={{float: 'left',width: '50%',height: "400px"}}><Pie data={dataPieEstateLiabLE} options={optionsPieEstateLiabLE} /></div>
-              </article>)}
-          </div>
-
-<br/>
-           <h3 className="ppi1">
-          {this.props.INAOption === DISPLAY_INCOME
-            ? <div>"Net Worth Today:"<br/> "Assets:"<br/> "Liabilities:"</div> //this.props.insuranceNeed
-            : <br/>
-            }
-          {/*numFormat(this.props.dataTaxLiability[0], false, 2, ",")}*/}
-        </h3>
-
-
-
-        <h3 className="ppi1">
-          {needTo} {/*:{" "}*/}
-          {this.props.INAOption === DISPLAY_INCOME
-            ? "" //this.props.insuranceNeed
-            : ""}
-          {/*numFormat(this.props.dataTaxLiability[0], false, 2, ",")}*/}
-        </h3>
-
-             {this.props.INAOption === DISPLAY_INCOME ? (
               <article className="canvas-container" style={{ height: "200px" }}>
                 <Line data={dataShortfallFV} options={optionsFV} />
               </article>
@@ -1066,13 +1268,11 @@ let optionsPieEstateLiabLE= JSON.parse(JSON.stringify(optionsPie));
                 <Bar data={dataTaxLiability} options={optionsFV} />
               </article>
             )}
-
             {/*  {this.props.INAOption !== DISPLAY_INCOME &&
              <div>
               <canvas id="myChart" ref={this.chartRef} />
             </div>}
              */}
-          
             <br /> <br /> <br /> <br />
             <hr />
             <h2>Insurance Quote:</h2>
@@ -1096,9 +1296,11 @@ let optionsPieEstateLiabLE= JSON.parse(JSON.stringify(optionsPie));
               format={2}
               Count={1}
               language={this.props.language}
-              inputValue={this.props.INAOption === DISPLAY_INCOME
-        ? this.props.insuranceNeed
-        : this.props.dataEstateLiability[0]}
+              inputValue={
+                this.props.INAOption === DISPLAY_INCOME
+                  ? this.props.insuranceNeed
+                  : this.props.dataEstateLiability[0]
+              }
               maxValue={1000}
               handleUpdateInput={this.selectMultiButton}
             />
@@ -1143,7 +1345,6 @@ let optionsPieEstateLiabLE= JSON.parse(JSON.stringify(optionsPie));
             <p />
             <br />
             <hr />
-           
             <div style={{ width: "60%" }}>
               <DataTable
                 dataColTitles={colHeaders}
@@ -1159,10 +1360,12 @@ let optionsPieEstateLiabLE= JSON.parse(JSON.stringify(optionsPie));
                   dataColTitles={[
                     "Age",
                     "EquiBuild Surrnder Value",
-                    "ManuLife UL Surrnder Value"
+                    "ManuLife UL Surrnder Value",
                   ]}
                   dataProjection={dataProjectionCV}
-                  gridTitle={"Compare Surrender Values: EquiBuild vs Manulife UL"}
+                  gridTitle={
+                    "Compare Surrender Values: EquiBuild vs Manulife UL"
+                  }
                   language={this.props.language}
                 />
               </div>

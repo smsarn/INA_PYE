@@ -21,6 +21,7 @@ import {
   IMAGE_LOGO,
   IMAGE_LOGO_OTHERPAGES,
   APPLET_INA,
+  TITLES
 } from "../definitions/generalDefinitions";
 import { MAX_LOGO_HEIGHT, PAGE_HEIGHT } from "./PDF";
 import { getName, getLogoAndAppletImage,formatted,isMobileDevice, extractCSS, versionDetails } from "../utils/helper";
@@ -39,7 +40,7 @@ import {
   numFormat,
   familyProjectionYears,
   isSingleFamily,
-  
+  doCompuLife
 } from "../utils/helper";
 import { getOutputValues } from "../data/dataExchange";
 import { getInfoINA, getInfoPDF  } from "../definitions/infoIconsDefinitions";
@@ -50,6 +51,9 @@ export default class OutputPresentation extends Component {
     super(props);
     this.state = {
       image: this.props.dataInput.Presentations[0].adviserLogo,
+      showShortfallHint:false,
+      showHowLongHint:false,
+
     };
     this.dateApplet = "";
     this.pdfRef = React.createRef();
@@ -82,6 +86,20 @@ export default class OutputPresentation extends Component {
       "*"
     );
   };
+
+  doCA = async () => {
+    //window.top.location.href = 'localhost:8086';
+    //window.parent.changeLogo();
+
+    await window.parent.postMessage(
+      "CA_" +
+        this.props.dataInput.Presentations[0].language +
+        "_" +
+        this.props.encryptedInputLife1AndSpouse,
+      "*"
+    );
+  };
+  
   doEP = async () => {
     
   
@@ -97,7 +115,16 @@ export default class OutputPresentation extends Component {
     window.parent.postMessage("FRAME_LOADED",	"*");
   };
 
-  doCompuLife = () => {
+  /* doCompuLife = (
+    this.props.dataInput.Presentations[0].language,
+    this.props.insuranceNeed,
+    this.props.dataInput.Presentations[0].provinceKey,
+    this.props.dataInput.Clients[0].Age, 
+    this.props.dataInput.Clients[0].sexKey,
+    this.props.dataInput.Clients[0].smokerKey,
+    this.props.dataInput.Presentations[0].designedBy, 
+    this.props.dataInput.Presentations[0].designedFor, 
+    ) => {
     const lang = this.props.dataInput.Presentations[0].language;
    // const formatFr = lang === "fr" ? true : false;
     const FA = parseFloat(cleanFormat(this.props.insuranceNeed, lang));
@@ -167,11 +194,21 @@ export default class OutputPresentation extends Component {
     this.containerEl = this.externalWindow.document.createElement("div");
     this.externalWindow.document.body.appendChild(this.containerEl);
 
-    /* try {
-      window.open(url, "_blank");
-    } catch (e) {} */
+    // try {
+    //  window.open(url, "_blank");
+    //} catch (e) {} 
   };
 
+  */
+
+  toggleHint=()=>{
+this.setState({showShortfallHint:!this.state.showShortfallHint})
+  }
+
+  toggleHintHL=()=>{
+    this.setState({showHowLongHint:!this.state.showHowLongHint})
+      }
+    
 
   render() {
     // presentation output shared with pdf
@@ -202,7 +239,7 @@ export default class OutputPresentation extends Component {
     const singleFamily = isSingleFamily(clients);
     const noSurvivor = singlePerson && versionDetails().versionNumeric<=10014
 
-    
+    console.log(this.props.LE)
     
 
     //const insNeedLine= getInsNeedLine(this.props.dataInput.Presentations[0], this.props.projectEnd, lang,noSurvivor,singleFamily,protectionPeriod)
@@ -358,6 +395,16 @@ export default class OutputPresentation extends Component {
     const PDFTopMargin=singleFamily?0:-37  
 
 
+    
+    let styleSelCell=[]
+    styleSelCell.push(this.props.dataInput.Presentations[0].periodOption === DISPLAY_RETIREMENT? {color: "#ffffff", background:"#334754"}:{})
+    styleSelCell.push(this.props.dataInput.Presentations[0].periodOption === DISPLAY_LIFEEXP?  {color: "#ffffff", background:"#334754"}:{})
+    styleSelCell.push(this.props.dataInput.Presentations[0].periodOption === DISPLAY_ENDAGE? {color: "#ffffff", background:"#334754"}:{})
+
+    const styleAmtCell ={textAlign: "right", height: "1px"}
+
+    
+
     if (noSurvivor) {
       return (
         <div>
@@ -392,9 +439,8 @@ export default class OutputPresentation extends Component {
                }}><Info infoIcon={getInfoPDF(lang)}/></div>} 
            
           </div>
-          <div style={{ width: "100%", float: "left", clear: "left" }}>
-            {/* <input type="file" onChange={this.onImageChange} id="logo"/> */}
-
+          {/* <div style={{ width: "100%", float: "left", clear: "left" }}>
+            
             <input
               className="roundedCornerCmd"
               style={{
@@ -403,7 +449,15 @@ export default class OutputPresentation extends Component {
                 paddingRight: "8px",
                 float: "right",
               }}
-              onClick={this.doCompuLife}
+              onClick={()=>doCompuLife(this.props.dataInput.Presentations[0].language,
+                this.props.insuranceNeed,
+                this.props.dataInput.Presentations[0].provinceKey,
+                this.props.dataInput.Clients[0].Age, 
+                this.props.dataInput.Clients[0].sexKey,
+                this.props.dataInput.Clients[0].smokerKey,
+                this.props.dataInput.Presentations[0].designedBy, 
+                this.props.dataInput.Presentations[0].designedFor, 
+                )}
               type="button"
               value={CONTROLTITLE[lang].compulife}
             />
@@ -452,21 +506,261 @@ export default class OutputPresentation extends Component {
               type="button"
               value={CONTROLTITLE[lang].wl}
             />
+          </div> */}
           </div>
-          </div>
-          <div className="contentPres">
-            <h3 className="ppi1">
+
+
+
+
+          <div style={{width: "100%", paddingTop: "10px", color:"#334754" }}>
+
+          <h3 className="ppi1" style={{paddingLeft: "5px"}}>
               {needTo}
-              {/* : {dollarEn}
-          {formatMoney(
-            cleanFormat(this.props.insuranceNeed, formatFr),
-            0,
-            decimalChar,
-            thousands
-          ) */}
               <Info infoIcon={getInfoINA(lang)} />
             </h3>
+  
+          <div className="row" style={{marginTop: "-30px"}}>
+            
+            { lang==="en" &&
+            <div className="column">
+              <table
+                className="tableEP"
+                style={{ paddingLeft: "10px", width: "100%", minWidth:"600px"}}
+              >
 
+                <tbody style={{ fontSize: "14px", verticalAlign: "top" }}>
+                  <tr>
+                    <th className="noBorder" width="15%"></th>
+                    <th className="noBorder" width="10%"></th>
+                    <th className="noBorder" width="10%"></th>
+                    <th className="noBorder" width="10%"></th>
+                    <th className="noBorder" width="55%"></th>
+                    
+                  </tr>
+                  <tr>
+                    <th className="tableNeedsEP" >Insurance Needs</th>
+                    <th className="tableNeedsEP" style={styleSelCell[0]}>To Retirement</th>
+                    <th className="tableNeedsEP" style={styleSelCell[1]}>To Life Expectancy </th>
+                    <th className="tableNeedsEP" style={styleSelCell[2]}>To Age 100</th>
+
+                    <th className="tableNeedsEP" >Smart Choice:</th>
+                  </tr>
+                  <tr>
+                    <td style={{ height: "1px", textAlign: "right" }}>
+                      to cover Survivors' Life Style:
+                    </td>
+                    <td className="textalignright" style={styleAmtCell}>
+                      {formatted(
+                          this.props.insuranceNeedRet,
+                         lang
+                      ).replace("$","")}
+                    </td>
+                    <td className="textalignright" style={styleAmtCell}>
+                      {formatted(
+                          this.props.insuranceNeedLE,
+                        lang
+                      ).replace("$","")}
+
+                    </td>
+                    
+                    <td className="textalignright" style={styleAmtCell}>
+                      {formatted(
+                          this.props.insuranceNeedEAge,
+                        lang
+                      ).replace("$","")}
+
+                    </td>
+                    
+                    <td>
+                    {this.state.showShortfallHint ? <span style={{color:"#612C51", fontSize:"16px", cursor:"pointer"}} onClick={this.toggleHint}>&#9650;</span>
+                                :<span style={{color:"#612C51", fontSize:"16px", cursor:"pointer"}} onClick={this.toggleHint}>&#9660;</span>}
+                    {this.state.showShortfallHint ? <span style={{display:"block", marginLeft:"15px"}}>{labelsBilingual.INASummaryTableC25Open}</span>:labelsBilingual.INASummaryTableC25Closed}
+                    </td>
+                  </tr>
+                  <tr>
+
+                  <td rowSpan="2"  style={{ height: "1px", textAlign: "right"}}>
+                      {labelsBilingual.INASummaryTableC31}
+                    </td>
+                    <td  rowSpan="2" style={styleAmtCell}>
+                      {projYears.noProjectYrsRet}
+                    </td>
+                    <td  rowSpan="2" style={styleAmtCell}>
+                      {projYears.noProjectYrsLE}
+                    </td>
+                    <td  rowSpan="2" style={styleAmtCell}>
+                      {projYears.noProjectYrs100}
+                    </td>
+                    <td style={{color:"white", backgroundColor:"#612C51"}}>
+                    <span style={{fontSize:"14px",fontWeight:"bold", paddingLeft:"6px", display:"block"}}>{this.props.yrsCoverageIfCashAll}: 
+                    {labelsBilingual.INASummaryTableC35}</span>
+                    </td >
+                  </tr>
+
+                  <tr>
+
+                    <td >
+                    
+                    {this.state.showHowLongHint ? <span style={{color:"#612C51", fontSize:"16px", cursor:"pointer"}} onClick={this.toggleHintHL}>&#9650;</span>
+                                :<span style={{color:"#612C51", fontSize:"16px", cursor:"pointer"}} onClick={this.toggleHintHL}>&#9660;</span>}
+                    {this.state.showHowLongHint ? labelsBilingual.INASummaryTableC35Open:labelsBilingual.INASummaryTableC35Closed}
+                    </td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+            </div>}
+
+
+            <div
+              className="column"
+              style={{
+                textAlign: "right",
+                width: "300px",
+                float: "right",
+              }}
+            >
+              <table
+                className="tableEP"
+                style={{ paddingLeft: "10px", width: "100%" }}
+              >
+                <tbody style={{ fontSize: "14px" }}>
+                  <tr>
+                    <th
+                      className="tableNeedsEP"
+                      style={{
+                        borderStyle: "hidden",
+                        background: "transparent",
+                        verticalAlign: "bottom",
+                      }}
+                    >
+                      {labelsBilingual.exportData}
+                      {/* {
+                          <div
+                            style={{
+                              paddingTop: "0px",
+                              marginTop: "-3px",
+                              marginLeft: "150px"
+                            }}
+                          >
+                            <Info infoIcon={getInfoExportINA(lang)} />
+                          </div>
+                        }
+ */}
+                    </th>
+                  </tr>
+                  <tr>
+                    <td
+                      style={{
+                        borderStyle: "hidden",
+                        padding: "5px",
+                      }}
+                    >
+                      
+                      <div
+                        style={{ width: "100%", float: "left", clear: "left" }}
+                      >
+             <input
+              className="roundedCornerCmd"
+              style={{
+               // width: "180px",
+                marginTop: "0px",
+                paddingRight: "8px",
+                float: "right",
+              }}
+              onClick={()=>doCompuLife(this.props.dataInput.Presentations[0].language,
+                this.props.insuranceNeed,
+                this.props.dataInput.Presentations[0].provinceKey,
+                this.props.dataInput.Clients[0].Age, 
+                this.props.dataInput.Clients[0].sexKey,
+                this.props.dataInput.Clients[0].smokerKey,
+                this.props.dataInput.Presentations[0].designedBy, 
+                this.props.dataInput.Presentations[0].designedFor, 
+                )}
+              type="button"
+              value={CONTROLTITLE[lang].compulife}
+            />
+                      </div>
+                      <div style={{ width: "100%", float: "left", clear: "left" }}>
+                      <input
+              className="roundedCornerCmd"
+              style={{
+           //     width: "180px",
+                marginTop: "10px",
+                marginRight: "0px",
+                paddingRight: "8px",
+                float: "right",
+              }}
+              onClick={this.doEP}
+              type="button"
+              value={CONTROLTITLE[lang].ep}
+            />
+                    </div>
+                      <div style={{ width: "100%", float: "left", clear: "left" }}>
+              
+          <input
+            className="roundedCornerCmd"
+            style={{
+              //    width: "80px",
+              marginTop: "-1px",
+              marginRight: "0px",
+              paddingRight: "8px",
+              float: "right",
+            }}
+            onClick={this.doLIFO}
+            type="button"
+            value={CONTROLTITLE[lang].lifo}
+          />
+        </div>
+        <div style={{ width: "100%", float: "left", clear: "left" }}>
+        <input
+              className="roundedCornerCmd"
+              style={{
+            //    width: "80px",
+                marginTop: "0px",
+                marginRight: "0px",
+                paddingRight: "8px",
+                float: "right",
+              }}
+              onClick={this.doWL}
+              type="button"
+              value={CONTROLTITLE[lang].wl}
+            />
+        </div>
+        <div style={{ width: "100%", float: "left", clear: "left" }}>
+          <input
+            className="roundedCornerCmd"
+            style={{
+              //    width: "80px",
+              marginTop: "-1px",
+              marginRight: "0px",
+              paddingRight: "8px",
+              float: "right",
+            }}
+            onClick={this.doCA}
+            type="button"
+            value={CONTROLTITLE[lang].ca}
+          />
+        </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+       
+
+
+
+
+          <div className="contentPres">
+          {/*   <h3 className="ppi1">
+              {needTo}
+              <Info infoIcon={getInfoINA(lang)} />
+            </h3>
+ */}
              
               {/* add logo */}
               {images.logo1stPage}
@@ -1520,7 +1814,7 @@ export default class OutputPresentation extends Component {
                       <td>
                         <strong></strong>
                         {labelsBilingual.pg8TabRow3}
-                        {this.props.LE})
+                        {this.props.LE.spouse + projYears.survivorAge })
                       </td>
                       <td className="textalignright">
                         {/* {dollarEn+this.props.insuranceNeedLE+dollarFr} */}

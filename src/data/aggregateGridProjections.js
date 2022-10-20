@@ -1,4 +1,4 @@
-import { numFormat, cleanFormat, formatMoney2 } from "../utils/helper";
+import { numFormat, cleanFormat, formatMoney2, arrayFormatMoney } from "../utils/helper";
 import { getAssetGridValues } from "./assetGridProjections";
 import { setUIDataToAPI } from "./dataExchange";
 //import _ from "lodash";
@@ -413,7 +413,8 @@ function INAFullSpreadsheetHeaders(lang) {
 async function EPFullSpreadsheetData(
   cols,
   noProjectYrs, // + 1,
-  input
+  input,
+  nonTaxLiability
 ) {
   let noYrs = noProjectYrs;
   const language = input.Presentations[0].language;
@@ -438,10 +439,14 @@ async function EPFullSpreadsheetData(
         dataColumns[col][yr] = data.dataProjection[col][yr];
       }
     }
+
+    
     // year 0 is today, change it
     // dataColumns[0][0]=ASSET_YEAR_TODAY[language].today;
     // dont add up year and age
-    for (let col = 2; col < Math.min(cols, data.dataProjection.length); col++) {
+    
+    const colCount=Math.min(cols, data.dataProjection.length) // since col header already added
+    for (let col = 2; col < colCount; col++) {
       for (let yr = 0; yr < noYrs; yr++) {
         dataColumns[col][yr] =
           parseInt(cleanFormat(dataColumns[col][yr], language)) +
@@ -451,31 +456,54 @@ async function EPFullSpreadsheetData(
     //  console.log(dataColumns)
   }
 
+  console.log(dataColumns, dataColumns[cols-2])
+
+  let colData=[];
+  for (let col = 0; col < cols-2; col++) {
+      colData.push(dataColumns[col])
+  } 
+
+  console.log(colData)
+
+  let colDataNonTax=new Array(noYrs).fill(0)
+  for (let yr = 0; yr < noYrs; yr++) {
+    colDataNonTax[yr] =
+      parseInt(cleanFormat(nonTaxLiability[yr], language))
+  }
+ 
+  colData.push(colDataNonTax)
+  console.log(colData)
+  colData.push(dataColumns[cols-2])
+  console.log(colData)
+    
+  console.log(nonTaxLiability,colData)
+
+
   for (let col = 0; col < cols; col++) {
     for (let yr = 0; yr < noYrs; yr++) {
       if (yr === 0)
-        dataColumns[2][yr] =
-          parseInt(dataColumns[10][yr]) -
-          parseInt(dataColumns[4][yr]) -
-          parseInt(dataColumns[5][yr]) +
-          parseInt(dataColumns[6][yr]) +
-          parseInt(dataColumns[7][yr]);
-      else dataColumns[2][yr] = dataColumns[10][yr - 1];
+        colData[2][yr] =
+          parseInt(colData[10][yr]) -
+          parseInt(colData[4][yr]) -
+          parseInt(colData[5][yr]) +
+          parseInt(colData[6][yr]) +
+          parseInt(colData[7][yr]);
+      else colData[2][yr] = colData[10][yr - 1];
 
       // average growth
       const ratio =
         -1 +
-        (parseFloat(dataColumns[10][yr]) + parseFloat(dataColumns[6][yr])) /
-          parseFloat(dataColumns[2][yr]);
-      dataColumns[EP_SHEET_HEADERS_AVG_GROWTH][yr] =
+        (parseFloat(colData[10][yr]) + parseFloat(colData[6][yr])) /
+          parseFloat(colData[2][yr]);
+      colData[EP_SHEET_HEADERS_AVG_GROWTH][yr] =
         Math.round((ratio + Number.EPSILON) * 10000) / 100;
 
-      /* dataColumns[EP_SHEET_HEADERS_AVG_GROWTH][yr] =
+      /* colData[EP_SHEET_HEADERS_AVG_GROWTH][yr] =
         Math.round(
           10000 *
             (-1 +
-              (parseInt(dataColumns[10][yr]) + parseInt(dataColumns[6][yr])) /
-                parseInt(dataColumns[2][yr]))
+              (parseInt(colData[10][yr]) + parseInt(colData[6][yr])) /
+                parseInt(colData[2][yr]))
         ).toFixed(2) /
           100 +
         " %"; */
@@ -485,8 +513,8 @@ async function EPFullSpreadsheetData(
   for (let col = 0; col < cols; col++) {
     if (col !== EP_SHEET_HEADERS_AVG_GROWTH && col !== 1) {
       for (let yr = 0; yr < noYrs; yr++) {
-        dataColumns[col][yr] = formatMoney2(
-          dataColumns[col][yr],
+        colData[col][yr] = formatMoney2(
+          colData[col][yr],
           0,
           language,
           false
@@ -494,16 +522,16 @@ async function EPFullSpreadsheetData(
       }
     } else
       for (let yr = 0; yr < noYrs; yr++) {
-        if (col !== 1 && isNaN(dataColumns[col][yr])) dataColumns[col][yr] = 0;
+        if (col !== 1 && isNaN(colData[col][yr])) colData[col][yr] = 0;
       }
   }
   // year 0 is today, change it
-  dataColumns[0][0] = ASSET_YEAR_TODAY[language].today;
-  return dataColumns;
+  colData[0][0] = ASSET_YEAR_TODAY[language].today;
+  return colData;
 }
 
 // EP spreadsheet
-export async function getEPGridData(noProjectYrs, input) {
+export async function getEPGridData(noProjectYrs, input, nonTaxLiability) {
   let gridColumnAligns;
   let dataTitle;
   let dataColHeaders;
@@ -517,11 +545,15 @@ export async function getEPGridData(noProjectYrs, input) {
   dataTitle = TITLES[language].appletEP;
   dataColHeaders = EPFullSpreadsheetHeaders(language);
 
+  console.log(nonTaxLiability)
   dataColumns = await EPFullSpreadsheetData(
     dataColHeaders.length,
     noProjectYrs + 1, // + 1,
-    input
+    input,
+    nonTaxLiability
   );
+  console.log(dataColumns,nonTaxLiability)
+
   gridColumnAligns = new Array(dataColHeaders.length).fill(2);
   gridIcons = new Array(dataColHeaders.length);
   dataColHeaders.forEach((item) => {
@@ -530,14 +562,15 @@ export async function getEPGridData(noProjectYrs, input) {
         // boy
         language
       );
-    gridIcons[dataColHeaders.length - 3] = gridIcons[2]; //eoy
+    gridIcons[dataColHeaders.length - 4] = gridIcons[2]; //eoy
     if (item === COLUMN_TITLES[language].AvgGrowth)
-      gridIcons[dataColHeaders.length-2] = getInfoAvgGrowth(  // boy
+      gridIcons[dataColHeaders.length-3] = getInfoAvgGrowth(  // boy
         language
       );
   });
   const decimalChar = language === "en" ? "." : ",";
   const thousands = language === "en" ? "," : " ";
+
 
   return {
     gridTitle: dataTitle,

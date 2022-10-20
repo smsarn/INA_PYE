@@ -48,12 +48,15 @@ export class DropDown extends Component {
   }
 
   disableOption = (option) => {
-    let disable=this.props.disableOption===undefined?false:(this.props.disableOption[option.value-1])
-    return  disable;
+    let disable =
+      this.props.disableOption === undefined
+        ? false
+        : this.props.disableOption[option.value - 1];
+    return disable;
     //(
 
     //  this.props.disableOption[option.value-1]===true
-      /* (this.props.Title === "Member" || this.props.Title === "Membre") &&
+    /* (this.props.Title === "Member" || this.props.Title === "Membre") &&
       (option.label === "Client" ||
         (this.props.hasSurivor &&
           (option.label === "Spouse" || option.label === "Conjoint"))) */

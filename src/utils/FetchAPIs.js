@@ -183,7 +183,7 @@ export async function fetchInsuranceNeedsData(dataNA, provincekey) {
       body: JSON.stringify(dataNA),
     });
     let data = await insuranceNeedsData.json();
-  //  console.log(dataNA, data)
+    console.log(dataNA, data)
 
     return {
       ages: data[1],
@@ -194,6 +194,7 @@ export async function fetchInsuranceNeedsData(dataNA, provincekey) {
       cpp: data[7].Values[0],
       cppDB: Math.round(data[8].Values[0]),
       orphan: Math.round(data[9].Values[0]),
+      yrsCoverageIfCashAll: Math.round(data[20].Values[0]),
       lifeExp: Math.round(data[12].Values[0]),
       lifeExpClient: Math.round(data[13].Values[0]),
       lifeExpJLTD: Math.round(data[14].Values[0]),
@@ -201,6 +202,7 @@ export async function fetchInsuranceNeedsData(dataNA, provincekey) {
       dataTaxLiability: data[16],
       encryptedInput: data[17].Values[0],
       probate: data[18],
+      dataNonTaxLiability: data[21],
     };
   } catch (error) {
     console.log("error, InsuranceNeedsData API failed", error);
@@ -365,7 +367,7 @@ export async function handleFetchInsuranceNeedsNew(dataNA, dataInput) {
     });
 
     let dataINA = await data.json();
-    // console.log(data)
+    console.log(JSON.stringify(dataNA))
 
     let dataDetails = await fetchInsuranceNeedsData(
       dataNA,
@@ -385,11 +387,13 @@ export async function handleFetchInsuranceNeedsNew(dataNA, dataInput) {
         cppDB: dataDetails.cppDB,
         orphan: dataDetails.orphan,
         probate: dataDetails.probate,
+        yrsCoverageIfCashAll:dataDetails.yrsCoverageIfCashAll,
         lifeExp: dataDetails.lifeExp,
         lifeExpClient: dataDetails.lifeExpClient,
         lifeExpJLTD: dataDetails.lifeExpJLTD,
         provinceMargTax: dataDetails.provinceMargTax,
         dataTaxLiability: dataDetails.dataTaxLiability,
+        dataNonTaxLiability: dataDetails.dataNonTaxLiability,
         encryptedInput: dataDetails.encryptedInput,
       };
     }
@@ -581,7 +585,7 @@ export async function handleFetchPDF(){
 }
 
 
-export async function fetchValidateTokenGetAgentEmailFromDB(authToken, applet){
+export async function fetchValidateTokenGetAgentEmailRecordAppletLogin(authToken, applet){
   /* 
   try {
     const url = appSiteAPI + "/api/TKD_ValidateJWT?authToken=" + authToken;
@@ -616,6 +620,6 @@ export async function fetchValidateTokenGetAgentEmailFromDB(authToken, applet){
     return data;
   }
  } catch (error) {
-    console.log("fetchValidateTokenGetAgentEmailFromDB", error);
+    console.log("fetchValidateTokenGetAgentEmailRecordAppletLogin", error);
   }
 }

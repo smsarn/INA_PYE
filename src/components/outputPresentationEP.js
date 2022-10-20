@@ -16,9 +16,10 @@ import { OUTPUTTEXTEP } from "../definitions/outputDefinitionsEP";
 import { doSavePdfActionEP } from "./OutputPDFEP";
 import { MultiButtons } from "./MultiButtons";
 import { OutputGraphsEPLeakage } from "./OutputGraphsEPLeakage";
-import {getLogoAndAppletImage,getAgesEP} from "../utils/helper";
-import { getInfoExportINA  } from "../definitions/infoIconsDefinitions";
+import { getLogoAndAppletImage, getAgesEP } from "../utils/helper";
+import { getInfoExportINA } from "../definitions/infoIconsDefinitions";
 import { Info } from "./Info";
+import PdfPYE_LIFO from "./PYE_LIFO.pdf";
 
 //import { AdjustibleImage } from "./AdjustibleImage";
 //import jsPDF from 'jspdf';
@@ -28,6 +29,8 @@ import {
   formatMoney2,
   getListItemNameFromKey,
   getProjectedLiabilities,
+  doCompuLife,
+  getInsNeedLineEP,
 } from "../utils/helper";
 import { getOutputValues, setUIDataToAPI } from "../data/dataExchange";
 import { getAssetLiabProjections } from "../data/aggregateGridProjections";
@@ -38,7 +41,6 @@ import {
   fetchAssetFMVandTaxLiab,
 } from "../utils/FetchAPIs";
 
-import { getAssetGridValues } from "../data/assetGridProjections";
 import DataTable from "./GridExcelComponent/DataTable";
 //import { isEqual } from "lodash";
 import Loader from "react-loader-spinner";
@@ -68,27 +70,63 @@ export default class OutputPresentationEP extends Component {
     this.AssetLiabProjs = null;
   }
 
-
   doINA = async () => {
     //window.top.location.href = 'localhost:8086';
     //window.parent.changeLogo();
-   // console.log(this.props);
+    // console.log(this.props);
     /* console.log("INA_" +
     this.props.dataInput.Presentations[0].language +
     "_" +
     this.props.encryptedInput,
   "*") */
-   await window.parent.postMessage(
+    await window.parent.postMessage(
       "INA_" +
         this.props.dataInput.Presentations[0].language +
         "_" +
         this.props.encryptedInputLife1AndSpouse,
       "*"
     );
-
-   
   };
 
+  doLIFO = async () => {
+    //window.top.location.href = 'localhost:8086';
+    //window.parent.changeLogo();
+
+    await window.parent.postMessage(
+      "LIFO_" +
+        this.props.dataInput.Presentations[0].language +
+        "_" +
+        this.props.encryptedInputLife1AndSpouse,
+      "*"
+    );
+  };
+  componentWillReceiveProps(nextProps) {
+    this.setState({ showGrids: false });
+  }
+
+  doCA = async () => {
+    //window.top.location.href = 'localhost:8086';
+    //window.parent.changeLogo();
+
+    await window.parent.postMessage(
+      "CA_" +
+        this.props.dataInput.Presentations[0].language +
+        "_" +
+        this.props.encryptedInputLife1AndSpouse,
+      "*"
+    );
+  };
+  
+  doEB = async () => {
+    await window.parent.postMessage(
+      "EB_" +
+        this.props.dataInput.Presentations[0].language +
+        "_" +
+        this.props.encryptedInputLife1AndSpouse,
+      "*"
+    );
+  };
+  
   componentWillReceiveProps(nextProps) {
     this.setState({ showGrids: false });
   }
@@ -142,20 +180,23 @@ export default class OutputPresentationEP extends Component {
 
   render() {
     this.AssetLiabProjs = getAssetLiabProjections(this.props);
-    
+
     this.output = getOutputValues(this.props);
-    const styleWithLogo = { overflow: "hidden", width: "100%", overflowX: "auto" };
-    const styleWithLogoGrids = {width: "100%" };
-    
+    const styleWithLogo = {
+      overflow: "hidden",
+      width: "100%",
+      overflowX: "auto",
+    };
+    const styleWithLogoGrids = { width: "100%" };
+
     const lang = this.props.dataInput.Presentations[0].language;
     const LE = this.props.LE;
     const clients = this.props.dataInput.Clients;
+    const labelsBilingual = OUTPUTTEXTEP[lang];
 
     let loaded =
       this.AssetLiabProjs.AssetnEstateLiabs.length > 0 ? true : false;
 
-    
-  
     //let dataAges = [];
 
     const startAge =
@@ -164,21 +205,22 @@ export default class OutputPresentationEP extends Component {
         : clients[QUOTE_CLIENT].Age;
     // do to LE+3
 
-
-    let dataAges=getAgesEP (clients, LE)
-    
+    let dataAges = getAgesEP(clients, LE);
 
     let p2 = 1;
     let p5 = 1;
     let p6 = 1;
-   
+
     //const { grids, loading } = this.state;
     let totalAssets = 0;
     let totalLiabs = 0;
     if (this.AssetLiabProjs.projectionsGrids[0] === undefined) {
-      return <div class="loader-container"><div class="loader"></div></div> //<div><Loader type="TailSpin" color="black" height={30} width={30} /></div>
+      return (
+        <div className="loader-container">
+          <div className="loader"></div>
+        </div>
+      ); //<div><Loader type="TailSpin" color="black" height={30} width={30} /></div>
     }
-
 
     const allPages =
       this.props.dataInput.Presentations[0].adviserLogo.image !== null &&
@@ -186,10 +228,13 @@ export default class OutputPresentationEP extends Component {
 
     let j = 0;
 
-    const images=getLogoAndAppletImage(this.props.dataInput, this.props.imageRemove,this.props.imageAdjust)
-    const logoTop=images.logoTop
-    const logoBottom=images.logoBottom
-   
+    const images = getLogoAndAppletImage(
+      this.props.dataInput,
+      this.props.imageRemove,
+      this.props.imageAdjust
+    );
+    const logoTop = images.logoTop;
+    const logoBottom = images.logoBottom;
 
     return (
       <div id="presentation">
@@ -198,35 +243,103 @@ export default class OutputPresentationEP extends Component {
           style={{
             //width: "90px",
             marginTop: "-32px",
-                marginRight: "0px",
-                paddingRight: "8px",
-                float: "right",
+            marginRight: "0px",
+            paddingRight: "8px",
+            float: "right",
           }}
           onClick={this.doPDF}
           type="button"
           value={CONTROLTITLE[lang].pdf}
         />
-        <div style={{ width: "100%", float: "left", clear: "left" }}>
 
-      
-
+        {/* <div style={{ float: "right" }}>
+          Export data to:
+          {
+            <div
+              style={{
+                paddingTop: "0px",
+                float: "right",
+                marginTop: "-3px",
+              }}
+            >
+              <Info infoIcon={getInfoExportINA(lang)} />
+            </div>
+          }
+        </div>
+        <div style={{ width: "100%", float: "left", clear: "left" }}> */}
+          {/* PYE dodesn't fit into Compulife term policies  remove */}
+          {/* <div style={{ width: "100%", float: "left", clear: "left" }}>
+            
             <input
               className="roundedCornerCmd"
               style={{
-           //     width: "180px",
-                marginTop: "25px",
-                marginRight: "0px",
+                // width: "180px",
+                marginTop: "-2px",
                 paddingRight: "8px",
                 float: "right",
               }}
-              onClick={this.doINA}
+              onClick={() =>
+                doCompuLife(
+                  this.props.dataInput.Presentations[0].language,
+                  this.props.insuranceNeed,
+                  this.props.dataInput.Presentations[0].provinceKey,
+                  this.props.dataInput.Clients[0].Age,
+                  this.props.dataInput.Clients[0].sexKey,
+                  this.props.dataInput.Clients[0].smokerKey,
+                  this.props.dataInput.Presentations[0].designedBy,
+                  this.props.dataInput.Presentations[0].designedFor
+                )
+              }
               type="button"
-              value={TITLES[lang].appletINA}
-            />{<div style={{
-                 paddingTop: "10px",
-                 float: "right",
-               }}><Info infoIcon={getInfoExportINA(lang)}/></div>} 
+              value={CONTROLTITLE[lang].compulife}
+            />
           </div>
+ */}
+
+       {/*    <input
+            className="roundedCornerCmd"
+            style={{
+              //     width: "180px",
+              marginTop: "10px",
+              marginRight: "0px",
+              paddingRight: "8px",
+              float: "right",
+            }}
+            onClick={this.doINA}
+            type="button"
+            value={TITLES[lang].appletINA}
+          />
+        </div>
+        <div style={{ width: "100%", float: "left", clear: "left" }}>
+          <input
+            className="roundedCornerCmd"
+            style={{
+              //    width: "80px",
+              marginTop: "-1px",
+              marginRight: "0px",
+              paddingRight: "8px",
+              float: "right",
+            }}
+            onClick={this.doLIFO}
+            type="button"
+            value={CONTROLTITLE[lang].lifo}
+          />
+        </div>
+        <div style={{ width: "100%", float: "left", clear: "left" }}>
+          <input
+            className="roundedCornerCmd"
+            style={{
+              //    width: "80px",
+              marginTop: "-1px",
+              marginRight: "0px",
+              paddingRight: "8px",
+              float: "right",
+            }}
+            onClick={this.doCA}
+            type="button"
+            value={CONTROLTITLE[lang].ca}
+          />
+        </div> */}
         {/* <object id="obj" type="application/pdf" width="50%" height="0px">
           <p>
             It appears you don't have a PDF plugin for this browser. Please
@@ -266,17 +379,350 @@ export default class OutputPresentationEP extends Component {
           {needTo}: {this.props.insuranceNeed}
         </h3>
  */}
+        {/*  <div className="contentPres" style={{ marginTop:"-15px" }}>
+          <table className="EP">
+            <tr>
+              <td
+                style={{
+                  border: "none",
+                  borderBottom: "1px solid",
+                  borderRight: "1px solid",
+                  width: "10%",
+                }}
+              >
+                Insurance Needs
+              </td>
+              <td style={{ border: "none", textAlign: "center"}}>
+                Today
+              </td>
+              <td style={{ border: "none", textAlign: "center"}}>
+                Life Expectancy
+              </td>
+                         </tr>
+            <tr>
+              <td style={{ border: "none"}}>
+                Tax Liabilities:{" "}
+              </td>
+              <td>$2000,000</td>
+              <td>$20</td>
 
-        <div className="contentPres">
+              
+            </tr>
+            <tr>
+              <td style={{ border: "none"}}>
+                All Liabilities:{" "}
+              </td>
+              <td>$2000,000</td>
+              <td>$2000</td>
+              
+            </tr>
+
+            
+          </table>
+        </div> */}
+
+        {/* 
+<div style={{ paddingLeft: "20px", width: "70%"}}>
+                <div>
+                  <table
+                    className="tableEP"
+                    style={{ paddingLeft: "10px", width: "100%" }}
+                  >
+                    <tbody style={{fontSize:"14px"}}>
+                      <tr>
+                        <th className="tableNeedsEP">
+                          Insurance Needs
+                        </th>
+                        <th className="tableNeedsEP">
+                          Today
+                        </th>
+                        <th className="tableNeedsEP">
+                          at Life Expectancy
+                        </th>
+
+                        <th className="tableNeedsEP">
+                          Smart Choice:
+                          </th>
+               
+
+
+                      </tr>
+                          <tr>
+                            <td style={{ height: "1px", textAlign:"right"  }}>
+                            to cover Tax Liabilities:      
+                            </td>
+                            <td
+                              className="textalignright"
+                              style={{ height: "1px" }}
+                            >
+                              {formatMoney2(this.props.taxLiability!==undefined && this.props.taxLiability[0] , 0, lang)}
+                            </td>
+                            <td
+                              className="textalignright"
+                              style={{ height: "1px" }}
+                            >
+                              {formatMoney2(this.props.taxLiability!==undefined && this.props.taxLiability[LE] , 0, lang)}
+                            </td>
+
+                            <td
+                              rowspan="2">
+                          You may wish to purchase a permanent life insurance policy with a Face + Fund option and a short premium payment period so that death benefit grows over time and matches your needs at Life Expectancy. See a quick way of exploring such options
+                          <a href = {PdfPYE_LIFO} target='_blank'> here </a> using <ital>Life Insurance Funding Options</ital>
+                </td>
+
+                          </tr>
+
+                          <tr >
+                            <td style={{ height: "1px", textAlign:"right" }}>
+                            to cover All Liabilities: 
+                            </td>
+                            <td
+                              className="textalignright"
+                              style={{ height: "1px" }}
+                            >
+                              {formatMoney2(this.props.dataEstateLiability[0] , 0, lang)}
+                            </td>
+                            <td
+                              className="textalignright"
+                              style={{ height: "1px" }}
+                            >
+                              {formatMoney2(this.props.dataEstateLiability[LE] , 0, lang)}
+                            </td>
+                          </tr>
+                          
+                    </tbody>
+                  </table>
+                  
+                </div>
+                
+              </div>
+           */}
+
+        <div style={{width: "100%", paddingTop: "10px" }}>
+          <div className="row">
+            <div className="column">
+              <table
+                className="tableEP"
+                style={{ paddingLeft: "10px", width: "100%", minWidth:"600px"}}
+                >
+  
+                  <tbody style={{ fontSize: "14px", verticalAlign: "top" }}>
+                    <tr>
+                      <th className="noBorder" width="14%"></th>
+                      <th className="noBorder" width="8%"></th>
+                      <th className="noBorder" width="8%"></th>
+                      <th className="noBorder" width="70%"></th>
+                      
+                    </tr>
+                          <tr>
+                    <th className="tableNeedsEP" >{labelsBilingual.EPSummaryTableC11}</th>
+                    <th className="tableNeedsEP" >{labelsBilingual.EPSummaryTableC12}</th>
+                    <th className="tableNeedsEP" >{labelsBilingual.EPSummaryTableC13}</th>
+
+                    <th className="tableNeedsEP" >{labelsBilingual.EPSummaryTableC14}</th>
+                  </tr>
+                  <tr>
+                    <td style={{ height: "1px", textAlign: "right" }}>
+                    {labelsBilingual.EPSummaryTableC21}
+                    </td>
+                    <td className="textalignright" style={{ height: "1px", whiteSpace: "nowrap" }}>
+                      {formatMoney2(
+                        this.props.taxLiability !== undefined &&
+                          this.props.taxLiability[0],
+                        0,
+                        lang
+                      )}
+                    </td>
+                    <td className="textalignright" style={{ height: "1px", whiteSpace: "nowrap" }}>
+                      {formatMoney2(
+                        this.props.taxLiability !== undefined &&
+                          this.props.taxLiability[LE],
+                        0,
+                        lang
+                      )}
+                    </td>
+
+                    <td rowSpan="2">
+                    {labelsBilingual.EPSummaryTableC24} <span  onClick={this.doLIFO} style={{color:"#0070c0", cursor:"pointer"}}><u><b><i>{CONTROLTITLE[lang].lifo}</i></b></u></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ height: "1px", textAlign: "right" }}>
+                    {labelsBilingual.EPSummaryTableC31}
+                    </td>
+                    <td className="textalignright" style={{ height: "1px", whiteSpace: "nowrap" }}>
+                      {formatMoney2(this.props.dataEstateLiability[0], 0, lang)}
+                    </td>
+                    <td className="textalignright" style={{ height: "1px", whiteSpace: "nowrap" }}>
+                      {formatMoney2(
+                        this.props.dataEstateLiability[LE],
+                        0,
+                        lang
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div
+              className="column"
+              style={{
+                textAlign: "right",
+                width: "300px",
+                float: "right",
+              }}
+            >
+              <table
+                className="tableEP"
+                style={{ paddingLeft: "10px", width: "100%" }}
+              >
+                <tbody style={{ fontSize: "14px" }}>
+                  <tr>
+                    <th
+                      className="tableNeedsEP"
+                      style={{
+                        borderStyle: "hidden",
+                        background: "transparent",
+                        verticalAlign: "bottom",
+                      }}
+                    >
+                      {labelsBilingual.exportData}
+                      {
+                          <div
+                            style={{
+                              paddingTop: "0px",
+                              marginTop: "-3px",
+                              marginLeft: "150px"
+                            }}
+                          >
+                            <Info infoIcon={getInfoExportINA(lang)} />
+                          </div>
+                        }
+
+                    </th>
+                  </tr>
+                  <tr>
+                    <td
+                      style={{
+                        borderStyle: "hidden",
+                        padding: "5px",
+                      }}
+                    >
+                      
+                      <div
+                        style={{ width: "100%", float: "left", clear: "left" }}
+                      >
+                        
+
+<input
+            className="roundedCornerCmd"
+            style={{
+              //     width: "180px",
+              marginTop: "10px",
+              marginRight: "0px",
+              paddingRight: "8px",
+              float: "right",
+            }}
+            onClick={this.doINA}
+            type="button"
+            value={TITLES[lang].appletINA}
+          />
+                      </div>
+                      <div style={{ width: "100%", float: "left", clear: "left" }}>
+          <input
+            className="roundedCornerCmd"
+            style={{
+              //    width: "80px",
+              marginTop: "-1px",
+              marginRight: "0px",
+              paddingRight: "8px",
+              float: "right",
+            }}
+            onClick={this.doLIFO}
+            type="button"
+            value={CONTROLTITLE[lang].lifo}
+          />
+        </div>
+        <div style={{ width: "100%", float: "left", clear: "left" }}>
+          <input
+            className="roundedCornerCmd"
+            style={{
+              //    width: "80px",
+              marginTop: "-1px",
+              marginRight: "0px",
+              paddingRight: "8px",
+              float: "right",
+            }}
+            onClick={this.doCA}
+            type="button"
+            value={CONTROLTITLE[lang].ca}
+          />
+        </div>
+        <div style={{ width: "100%", float: "left", clear: "left" }}>
+          <input
+            className="roundedCornerCmd"
+            style={{
+              //    width: "80px",
+              marginTop: "-1px",
+              marginRight: "0px",
+              paddingRight: "8px",
+              float: "right",
+            }}
+            onClick={this.doEB}
+            type="button"
+            value={CONTROLTITLE[lang].eb}
+          />
+        </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div className="contentPres" style={{ marginTop: "80px" }}>
           {/* PAGE 1 */}
-
+          {/* <h4 className="ppi1">
+          {getInsNeedLineEP(true,false,lang,formatMoney2(
+                          this.props.dataEstateLiability[LE] ,
+                          0,
+                          lang
+                        ), this.props.dataInput.Clients[0].name)
+          }   
+          </h4> 
+           
+          <h4 className="ppi1">
+          {getInsNeedLineEP(true,true,lang,formatMoney2(
+                          this.props.dataEstateLiability[0] ,
+                          0,
+                          lang
+                        ), this.props.dataInput.Clients[0].name)
+          }   
+          </h4>
+          
+          <h4 className="ppi1" style={{marginTop:"40px"}}>
+          {getInsNeedLineEP(false,false,lang,formatMoney2(
+                          this.props.taxLiabilities[LE] ,
+                          0,
+                          lang
+                        ), this.props.dataInput.Clients[0].name)
+          }   
+          </h4>
+          <h4 className="ppi1">
+          {getInsNeedLineEP(false,true,lang,formatMoney2(
+                          this.props.taxLiabilities[0] ,
+                          0,
+                          lang
+                        ), this.props.dataInput.Clients[0].name)
+          }   
+          </h4>   */}
           <p />
-        {/* add logo */}
+          {/* add logo */}
           {images.logo1stPage}
-            {/* add image */}
-            {images.applet}
-
-{/*           {this.props.dataInput.Presentations[0].adviserLogo.image !== null && (
+          {/* add image */}
+          {images.applet}
+          {/*           {this.props.dataInput.Presentations[0].adviserLogo.image !== null && (
             <AdjustibleImage
               image={this.props.dataInput.Presentations[0].adviserLogo.image}
               showDetails={
@@ -299,30 +745,29 @@ export default class OutputPresentationEP extends Component {
             imageLeft={0}
             ID={"EPPage1"}
           />
- */}          {/*            <img
+ */}{" "}
+          {/*            <img
             className="ppi1"
             id="EPPage1"
             src={require("../images/estate.protection.applet.cover.graphic.png")}
             width="90%"
           />  */}
-          <h1 className="ppi1">{OUTPUTTEXTEP[lang].pg1T}</h1>
+          <h1 className="ppi1">{labelsBilingual.pg1T}</h1>
           <h5 className="ppi2">
-            {OUTPUTTEXTEP[lang].pg1P1} {this.output.designedFor}
+            {labelsBilingual.pg1P1} {this.output.designedFor}
             <br />
-            {OUTPUTTEXTEP[lang].pg1P2} {this.output.designedBy}
+            {labelsBilingual.pg1P2} {this.output.designedBy}
             <br />
-            {OUTPUTTEXTEP[lang].pg1P3} {this.output.dateApplet}
+            {labelsBilingual.pg1P3} {this.output.dateApplet}
             <br />
-            {OUTPUTTEXTEP[lang].pg1P4} {this.output.province}
+            {labelsBilingual.pg1P4} {this.output.province}
             <br />
           </h5>
           <hr className="ppi1" />
-          
           {logoBottom}
           {/* PAGE 2 Intro*/}
-
           <div style={styleWithLogo}>
-          {logoTop}
+            {logoTop}
             {/* {allPages && (
               <AdjustibleImage
                 image={this.props.dataInput.Presentations[0].adviserLogo.image}
@@ -340,9 +785,9 @@ export default class OutputPresentationEP extends Component {
               />
             )} */}
             <br />
-            <h2 className="ppi1">{OUTPUTTEXTEP[lang].pg2T}</h2>
+            <h2 className="ppi1">{labelsBilingual.pg2T}</h2>
             {/* number changed to bullets feek */}
-            {OUTPUTTEXTEP[lang].pg2Paragraphs.map((item) => (
+            {labelsBilingual.pg2Paragraphs.map((item) => (
               <p className="ppi1" key={p2++}>
                 {p2 >= 4 && p2 !== 6 && p2 !== 9 && p2 <= 12 && (
                   <span
@@ -363,12 +808,10 @@ export default class OutputPresentationEP extends Component {
               </p>
             ))}
           </div>
-
           {/* PAGE 3 fin situation*/}
           {logoBottom}
-          
           <div style={styleWithLogo}>
-          {logoTop}
+            {logoTop}
             {/* {allPages && (
               <AdjustibleImage
                 image={this.props.dataInput.Presentations[0].adviserLogo.image}
@@ -385,8 +828,8 @@ export default class OutputPresentationEP extends Component {
               />
             )} */}
             <br />
-            <h2 className="ppi1">{OUTPUTTEXTEP[lang].pg3T}</h2>
-            <p className="ppi1">{OUTPUTTEXTEP[lang].pg3P1}</p>
+            <h2 className="ppi1">{labelsBilingual.pg3T}</h2>
+            <p className="ppi1">{labelsBilingual.pg3P1}</p>
 
             <div style={{ fontSize: "14px" }}>
               <div style={{ paddingLeft: "20px", width: "35%", float: "left" }}>
@@ -398,7 +841,7 @@ export default class OutputPresentationEP extends Component {
                     <tbody>
                       <tr>
                         <th className="tableTitleEP" colSpan="2">
-                          {OUTPUTTEXTEP[lang].pg3TabT}
+                          {labelsBilingual.pg3TabT}
                         </th>
                       </tr>
                       {/* add assets*/}
@@ -432,7 +875,7 @@ export default class OutputPresentationEP extends Component {
                           textAlign: "right",
                         }}
                       >
-                        <td>{OUTPUTTEXTEP[lang].pg3Tab2RTot}</td>
+                        <td>{labelsBilingual.pg3Tab2RTot}</td>
                         <td
                           className="textalignright"
                           style={{ height: "1px" }}
@@ -468,7 +911,7 @@ export default class OutputPresentationEP extends Component {
                     <tbody>
                       <tr>
                         <th className="tableTitleEP" colSpan="2">
-                          {OUTPUTTEXTEP[lang].pg3Tab2T}
+                          {labelsBilingual.pg3Tab2T}
                         </th>
                       </tr>
                       {/* liabs*/}
@@ -493,7 +936,7 @@ export default class OutputPresentationEP extends Component {
                           textAlign: "right",
                         }}
                       >
-                        <td>{OUTPUTTEXTEP[lang].pg3Tab2RTot}</td>
+                        <td>{labelsBilingual.pg3Tab2RTot}</td>
                         <td
                           className="textalignright"
                           style={{ height: "1px" }}
@@ -511,7 +954,7 @@ export default class OutputPresentationEP extends Component {
                           textAlign: "right",
                         }}
                       >
-                        <td>{OUTPUTTEXTEP[lang].pg3Tab2NW}</td>
+                        <td>{labelsBilingual.pg3Tab2NW}</td>
                         <td
                           className="textalignright"
                           style={{ height: "1px" }}
@@ -526,10 +969,9 @@ export default class OutputPresentationEP extends Component {
               </div>
             </div>
           </div>
-          <h2 className="ppi1">{OUTPUTTEXTEP[lang].pg3T2}</h2>
-          <p className="ppi1">{OUTPUTTEXTEP[lang].pg3P2}</p>
-          <p className="ppi1">{OUTPUTTEXTEP[lang].pg3P3}</p>
-
+          <h2 className="ppi1">{labelsBilingual.pg3T2}</h2>
+          <p className="ppi1">{labelsBilingual.pg3P2}</p>
+          <p className="ppi1">{labelsBilingual.pg3P3}</p>
           <div
             style={{
               fontFamily: "Georgia, 'Times New Roman', imes, serif",
@@ -545,20 +987,20 @@ export default class OutputPresentationEP extends Component {
                   <tbody>
                     <tr>
                       <th className="tableTitleEP" style={{ width: "30%" }}>
-                        {OUTPUTTEXTEP[lang].pg3Tab3R1C1}
+                        {labelsBilingual.pg3Tab3R1C1}
                       </th>
                       <th className="tableTitleEP" style={{ width: "20%" }}>
-                        {OUTPUTTEXTEP[lang].pg3Tab3R1C2}
+                        {labelsBilingual.pg3Tab3R1C2}
                       </th>
                       <th className="tableTitleEP" style={{ width: "20%" }}>
-                        {OUTPUTTEXTEP[lang].pg3Tab3R1C3}
+                        {labelsBilingual.pg3Tab3R1C3}
                       </th>
                       <th className="tableTitleEP" style={{ width: "20%" }}>
-                        {OUTPUTTEXTEP[lang].pg3Tab3R1C4}
+                        {labelsBilingual.pg3Tab3R1C4}
                       </th>
                     </tr>
                     <tr>
-                      <td>{OUTPUTTEXTEP[lang].pg3Tab3R2C1}</td>
+                      <td>{labelsBilingual.pg3Tab3R2C1}</td>
                       <td className="textalignright">
                         {
                           this.AssetLiabProjs.EstateLiabsByTypeGrowth[
@@ -602,7 +1044,7 @@ export default class OutputPresentationEP extends Component {
                       </td>
                     </tr>
                     <tr>
-                      <td>{OUTPUTTEXTEP[lang].pg3Tab3R3C1}</td>
+                      <td>{labelsBilingual.pg3Tab3R3C1}</td>
                       <td className="textalignright">
                         {
                           this.AssetLiabProjs.EstateLiabsByTypeGrowth[
@@ -644,7 +1086,7 @@ export default class OutputPresentationEP extends Component {
                       </td>
                     </tr>
                     <tr>
-                      <td>{OUTPUTTEXTEP[lang].pg3Tab3R4C1}</td>
+                      <td>{labelsBilingual.pg3Tab3R4C1}</td>
                       <td className="textalignright">
                         {
                           this.AssetLiabProjs.EstateLiabsByTypeGrowth[
@@ -686,7 +1128,7 @@ export default class OutputPresentationEP extends Component {
                       </td>
                     </tr>
                     <tr>
-                      <td>{OUTPUTTEXTEP[lang].pg3Tab3R5C1}</td>
+                      <td>{labelsBilingual.pg3Tab3R5C1}</td>
                       <td className="textalignright">
                         {
                           this.AssetLiabProjs.EstateLiabsByTypeGrowth[
@@ -728,7 +1170,7 @@ export default class OutputPresentationEP extends Component {
                       </td>
                     </tr>
                     <tr>
-                      <td>{OUTPUTTEXTEP[lang].pg3Tab3R6C1}</td>
+                      <td>{labelsBilingual.pg3Tab3R6C1}</td>
                       <td className="textalignright">
                         {
                           this.AssetLiabProjs.EstateLiabsByTypeGrowth[
@@ -770,7 +1212,7 @@ export default class OutputPresentationEP extends Component {
                       </td>
                     </tr>
                     <tr>
-                      <td>{OUTPUTTEXTEP[lang].pg3Tab3R7C1}</td>
+                      <td>{labelsBilingual.pg3Tab3R7C1}</td>
                       <td className="textalignright">
                         {
                           this.AssetLiabProjs.EstateLiabsByTypeGrowth[
@@ -814,7 +1256,7 @@ export default class OutputPresentationEP extends Component {
                     <tr
                       style={{ backgroundColor: "#f0f0f5", textAlign: "right" }}
                     >
-                      <td colSpan="2">{OUTPUTTEXTEP[lang].pg3Tab3R8C1}</td>
+                      <td colSpan="2">{labelsBilingual.pg3Tab3R8C1}</td>
                       <td className="textalignright">
                         {/* ${formatMoney(this.AssetLiabProjs.EstateLiabsByTypeTotal, 0, ",", ",")} */}
                         {formatMoney2(
@@ -845,17 +1287,15 @@ export default class OutputPresentationEP extends Component {
                 float: "left",
               }}
             >
-              {OUTPUTTEXTEP[lang].pg3P4}
+              {labelsBilingual.pg3P4}
               <br />
-              {OUTPUTTEXTEP[lang].pg3P5}
+              {labelsBilingual.pg3P5}
             </p>
           </div>
-
           {logoBottom}
-          
           {/* PAGE 4 fin situation*/}
           <div style={styleWithLogo}>
-          {logoTop}
+            {logoTop}
             {/* {allPages && (
               <AdjustibleImage
                 image={this.props.dataInput.Presentations[0].adviserLogo.image}
@@ -872,21 +1312,17 @@ export default class OutputPresentationEP extends Component {
               />
             )} */}
             <br />
-            <h2 className="ppi1">{OUTPUTTEXTEP[lang].pg4T}</h2>
-            <p className="ppi1">{OUTPUTTEXTEP[lang].pg4P1}</p>
+            <h2 className="ppi1">{labelsBilingual.pg4T}</h2>
+            <p className="ppi1">{labelsBilingual.pg4P1}</p>
           </div>
-
-          {
-            (loaded === true && (
-              <OutputGraphStacked
-                language={lang}
-                dataAges={dataAges}
-                dataAssetnEstateLiabProj={this.AssetLiabProjs.AssetnEstateLiabs}
-                LE={LE} //
-              />
-            ))
-          }
-
+          {loaded === true && (
+            <OutputGraphStacked
+              language={lang}
+              dataAges={dataAges}
+              dataAssetnEstateLiabProj={this.AssetLiabProjs.AssetnEstateLiabs}
+              LE={LE} //
+            />
+          )}
           <p
             className="ppi1"
             style={{
@@ -896,9 +1332,8 @@ export default class OutputPresentationEP extends Component {
               float: "left",
             }}
           >
-            {OUTPUTTEXTEP[lang].pg4P2 + LE + ")"}
+            {labelsBilingual.pg4P2 + LE + ")"}
           </p>
-
           <p
             className="ppi1"
             style={{
@@ -910,7 +1345,7 @@ export default class OutputPresentationEP extends Component {
               marginLeft: "30px",
             }}
           >
-            {OUTPUTTEXTEP[lang].pg4P3
+            {labelsBilingual.pg4P3
               .replace(
                 "X1",
                 formatMoney2(
@@ -928,12 +1363,11 @@ export default class OutputPresentationEP extends Component {
                 )
               )}
           </p>
-
           <div>
             <OutputGraphsEPLeakage
               insuranceNeed={this.props.insuranceNeed}
               projectEnd={startAge + LE + 3}
-              dataEstateLiability={this.props.dataEstateLiability}
+              //  dataEstateLiability={this.props.dataEstateLiability}
               dataInput={this.props.dataInput}
               dataNAAges={dataAges}
               probate={this.props.probate}
@@ -951,13 +1385,10 @@ export default class OutputPresentationEP extends Component {
               //periodOption={DISPLAY_LIFEEXP_PLUS_3}
             />
           </div>
-
           {logoBottom}
-          
           {/* PAGE 5 Estate Protection Alternatives*/}
-
           <div style={styleWithLogo}>
-          {logoTop}
+            {logoTop}
             {/* {allPages && (
               <AdjustibleImage
                 image={this.props.dataInput.Presentations[0].adviserLogo.image}
@@ -974,9 +1405,9 @@ export default class OutputPresentationEP extends Component {
               />
             )} */}
             <br />
-            <h2 className="ppi1">{OUTPUTTEXTEP[lang].pg5T}</h2>
+            <h2 className="ppi1">{labelsBilingual.pg5T}</h2>
 
-            {OUTPUTTEXTEP[lang].pg5Paragraphs.map((item) => (
+            {labelsBilingual.pg5Paragraphs.map((item) => (
               <p className="ppi1" key={p5++}>
                 {p5 >= 4 && p5 !== 8 && p5 <= 12 && (
                   <span style={{ paddingLeft: "15px", color: "#759AC7" }}>
@@ -999,14 +1430,11 @@ export default class OutputPresentationEP extends Component {
                 marginLeft: "30px",
               }}
             >
-              {OUTPUTTEXTEP[lang].pg5Plast}
+              {labelsBilingual.pg5Plast}
             </p>
           </div>
-
           {logoBottom}
-          
           {/* PAGE 6 Using Life Insurance to Preserve Your Estate*/}
-
           <div
             style={{ overflowX: "hidden", overflowY: "hidden", width: "100%" }}
           >
@@ -1028,8 +1456,8 @@ export default class OutputPresentationEP extends Component {
             )}
  */}
             <br />
-            <h2 className="ppi1">{OUTPUTTEXTEP[lang].pg6T}</h2>
-            {OUTPUTTEXTEP[lang].pg6Paragraphs1.map((item) => (
+            <h2 className="ppi1">{labelsBilingual.pg6T}</h2>
+            {labelsBilingual.pg6Paragraphs1.map((item) => (
               <p className="ppi1" key={p6++}>
                 {p6 >= 4 && p6 <= 6 && (
                   <span style={{ paddingLeft: "15px", color: "#759AC7" }}>
@@ -1041,17 +1469,14 @@ export default class OutputPresentationEP extends Component {
               </p>
             ))}
             {/*} don't show for now*/}
-            {/* {OUTPUTTEXTEP[lang].pg6Paragraphs2.map(item =>
+            {/* {labelsBilingual.pg6Paragraphs2.map(item =>
               (<p className="ppi1" key={p6++}>{p6 > 12 && <span style={{ paddingLeft: '15px', color: '#759AC7' }}>&#8226;  </span>} {item}<br /></p>)
             )} */}
           </div>
-
           {logoBottom}
-          
           {/* PAGE 7 Summary*/}
-
           <div style={styleWithLogo}>
-          {logoTop}
+            {logoTop}
             {/* {allPages && (
               <AdjustibleImage
                 image={this.props.dataInput.Presentations[0].adviserLogo.image}
@@ -1068,24 +1493,22 @@ export default class OutputPresentationEP extends Component {
               />
             )} */}
             <br />
-            <h2 className="ppi1">{OUTPUTTEXTEP[lang].pg7T}</h2>
-            <p className="ppi1">{OUTPUTTEXTEP[lang].pg7P1}</p>
+            <h2 className="ppi1">{labelsBilingual.pg7T}</h2>
+            <p className="ppi1">{labelsBilingual.pg7P1}</p>
           </div>
-
           {/* PAGE 8 appendix ledgers*/}
-
           <div style={styleWithLogoGrids}>
             <br />
-            <h2 className="ppi1">{OUTPUTTEXTEP[lang].pg8T}</h2>
+            <h2 className="ppi1">{labelsBilingual.pg8T}</h2>
 
-            <p className="ppi1">{OUTPUTTEXTEP[lang].pg8P2}</p>
+            <p className="ppi1">{labelsBilingual.pg8P2}</p>
 
             <div style={{ marginLeft: "24px" }}>
               <MultiButtons
                 noButtons={2}
                 buttonCaption={[
-                  OUTPUTTEXTEP[lang].pg8O1,
-                  OUTPUTTEXTEP[lang].pg8O2,
+                  labelsBilingual.pg8O1,
+                  labelsBilingual.pg8O2,
                 ]}
                 selected={this.state.showGrids ? 2 : 1}
                 selectMultiButton={this.clickMultiButton}
@@ -1116,13 +1539,10 @@ export default class OutputPresentationEP extends Component {
                 })}
             </div>
           </div>
-
           {logoBottom}
-          
           {/* PAGE 9 notes*/}
-
           <div style={styleWithLogo}>
-          {logoTop}
+            {logoTop}
             {/* {allPages && (
               <AdjustibleImage
                 image={this.props.dataInput.Presentations[0].adviserLogo.image}
@@ -1139,13 +1559,12 @@ export default class OutputPresentationEP extends Component {
               />
             )} */}
             <br />
-            <h2 className="ppi1">{OUTPUTTEXTEP[lang].pg9T}</h2>
+            <h2 className="ppi1">{labelsBilingual.pg9T}</h2>
 
-            <p className="ppi1">{OUTPUTTEXTEP[lang].pg9P1}</p>
-            <p className="ppi1">{OUTPUTTEXTEP[lang].pg9P2}</p>
+            <p className="ppi1">{labelsBilingual.pg9P1}</p>
+            <p className="ppi1">{labelsBilingual.pg9P2}</p>
 
             {logoBottom}
-          
           </div>
         </div>
       </div>

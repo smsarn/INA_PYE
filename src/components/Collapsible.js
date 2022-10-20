@@ -19,14 +19,13 @@ export class Collapsible extends Component {
   }
 
   togglePanel = async (e) => {
-    if(this.props.enabled!==false)
-      {
-    await this.props.handleCollapsibleClick({
-      id: this.state.id,
-      open: this.state.open,
-    });
-    this.setState({ open: !this.state.open });
-  }
+    if (this.props.enabled !== false) {
+      await this.props.handleCollapsibleClick({
+        id: this.state.id,
+        open: this.state.open,
+      });
+      this.setState({ open: !this.state.open });
+    }
   };
   render() {
     const arr = this.state.open ? (
@@ -35,11 +34,13 @@ export class Collapsible extends Component {
       <span style={{ fontSize: "14px", float: "right" }}>&#9660;</span>
     );
     return (
-      <div >
+      <div>
         <div onClick={this.togglePanel} className="header">
           {this.props.title}
-          {this.props.infoIcon !== undefined && <Info infoIcon={this.props.infoIcon} /> }
-             {arr}
+          {this.props.infoIcon !== undefined && (
+            <Info infoIcon={this.props.infoIcon} />
+          )}
+          {arr}
         </div>
         {this.state.open ? (
           <div className="content">{this.props.children}</div>

@@ -1,3 +1,4 @@
+import React from "react";
 export const OUTPUTTEXT = {
   en: {
     insNeeds100: "Insurance Needs to age 100",
@@ -135,7 +136,42 @@ export const OUTPUTTEXT = {
       "INA Graphs and Spreadsheet",
       pgAppendixP1: "Incoming cash flows (+) vs outgoing income needs (-)",
       pgAppendixP2: "Shortfall = incoming - outgoing cash flows and is funded by insurance",
-      pgAppendixP3 : "Current financial situation"
+      pgAppendixP3 : "Current financial situation",
+      INASummaryTableC11:"Insurance Needs",
+      INASummaryTableC12:"To Retirement",
+      INASummaryTableC13:"To Life Expectancy",
+      INASummaryTableC14:"To Age 100",
+      INASummaryTableC15:"Smart Choice:",
+      INASummaryTableC21:"to cover Survivors' Life Style:",
+      INASummaryTableC25Closed: (
+        <span> Type of insurance based on <b><i>Shortfall</i></b> ... </span>)  ,
+      INASummaryTableC25Open: (
+        <span> Graph of <b><i>Shortfall</i></b> can be helpful in mapping out the type of insurance that covers shortfalls: Term if needs are temporary, Permanent if needs are long term and Permamnent with Term riders if both.  </span>),
+        INASummaryTableC31:"Number of coverage years:",
+      
+        INASummaryTableC35Closed: (
+        <span> Advantages of insurance over cashing all Assets ...</span> ) ,
+        INASummaryTableC35:"  ... with no insurance if all Assets had to be cashed today",
+        INASummaryTableC35Open: (
+          <ul><li> Assets continue to work for survivors efficiently</li>
+          <li>Probate is reduced or postponed</li>
+          <li>            
+            Insurance proceeds and Assets take care of any liabilities
+            and/or maintain life style of survivors for as long as
+            necessary
+          </li></ul>
+        ),
+        
+      exportData: "Export Data to:",
+        
+      
+
+
+
+
+
+
+
   },
   fr: {
     insNeeds100: "Besoins en assurance jusqu'à l'âge de 100 ans",
@@ -283,7 +319,12 @@ export const OUTPUTTEXT = {
       "Graphiques et feuilles de calcul de l'analyse des besoins en matière d'assurance",
       pgAppendixP1: "Flux de trésorerie entrants (+) et sortants (-)",
       pgAppendixP2: "Le manque à gagner = flux de trésorerie entrants - sortants et est financé par l'assurance",
-      pgAppendixP3 : "Situation financière actuelle"
+      pgAppendixP3 : "Situation financière actuelle",
+
+
+
+      exportData: "Exporter des données vers:",
+      
 
   }
 };
@@ -340,5 +381,6 @@ export const GRAPHS_LABLES = {
     insNeedsRetLE: "Besoins en assurance jusqu'à l'espérance de vie (âge ",
     
     currFins: "YLe sommaire de votre situation financière actuelle se trouve ci-dessous: "
+    
   }
 }

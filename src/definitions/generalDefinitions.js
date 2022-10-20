@@ -5,6 +5,7 @@ export const APPLET_INA = appletMode === "INA";
 export const APPLET_EP = appletMode === "EP";
 export const DISPLAY_NAME = appletMode;
 export const DEFAULT_QUOTE = appletMode === "INA" ? "INADefaultData" : "EPDefaultData";
+export const DISPLAY_ANALYSIS_ON = false; // not showing now so dont load
 
 export const QUOTE_CLIENT = 0;
 export const QUOTE_SPOUSE = 1;
@@ -644,6 +645,8 @@ export const CONTROLTITLE = {
     lifo: "Life Insurance Funding Options",
     wl: "Insurance for Your Whole Life",
     ep: "Protecting Your Estate ",
+    ca: "Capital Alternatives ",
+    eb: "Creating an Estate Bond ",
     compulife: "Get a Quote ...",
     save: "Save",
     load: "Load",
@@ -711,6 +714,8 @@ export const CONTROLTITLE = {
     lifo: "Modes de financement de l'assurance vie",
     wl: "L'assurance pour votre vie entière",
     ep: "Protection de votre patrimoine",
+    ca: "Options de capital ",
+    eb: "Création d'un bon successoral ",
     compulife: "Générer une cotation",
     save: "Enregistrer",
     load: "Charger",
@@ -939,6 +944,7 @@ export const COLUMN_TITLES = {
         "Capital Gains Exemption",
         "EOY Balance",
         "Average Growth",
+        "Non-Tax Liabilities",
         "Tax Payable at Death",
       ],
     },
@@ -956,6 +962,7 @@ export const COLUMN_TITLES = {
         "Exonération des gains en capital",
         "Valeur en fin d'année",
         "Croissance moyenne",
+        "obligations non fiscales",
         "Impôt payable au décès",
       ],
     },

@@ -141,6 +141,8 @@ const MESSAGES = {
       "Asset projections take Tax Liability into account. You don't need to enter a separate liability related to taxes such as capital gains",
       liabDesc:
       "You may use this to indicate a permanent/non-permanent liability",
+      infoRecover:
+      "Recover brings back the latest values you had in this presentation",
   },
   fr: {
     infoYr0:
@@ -278,7 +280,9 @@ const MESSAGES = {
       taxLiab:
       "Les projections d'actifs prennent en compte le passif fiscal. Vous n'avez pas besoin d'entrer un passif séparé lié aux impôts tel que les gains en capital",
       liabDesc:
-      "You may use this to indicate a permanent/non-permanent liability ^F",
+      "Vous pouvez l'utiliser pour indiquer une obligation permanente/non permanente",
+      infoRecover:
+      "Récupérer ramène les dernières valeurs que vous aviez obtenues lors de cette présentation",
   },
 };
 
@@ -475,6 +479,24 @@ export function getInfoINA(lang) {
     },
   };
 }
+
+
+export function getInfoRecover(lang) {
+  return {
+    infoID: "infoRecover",
+    infoText: MESSAGES[lang].infoRecover,
+    iconMode: SHOW_STANDARD,
+    popupOpenByProps: false,
+    popupBorderColor: POPUP_BORDER_INFO,
+    position: {
+      marginLeft: DEFAULT_MARGIN_LEFT,
+      marginTop: DEFAULT_MARGIN_TOP,
+      width: DEFAULT_WIDTH + 50,
+      height: DEFAULT_HEIGHT,
+    },
+  };
+}
+
 
 export function getInfoPDF(lang) {
   return {

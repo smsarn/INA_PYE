@@ -28,7 +28,7 @@ import {
 } from "../definitions/generalDefinitions";
 import { appletMode } from "../../package.json";
 
-export async function getAssetGridValues(dataNA, assetCurr, lang, aggregate) {
+export async function getAssetGridValues(dataNA, assetCurr, lang, aggregate, nontaxLiabs) {
   const title = COLUMN_TITLES[lang];
 
   let data = await fetchAssetAllGridColumns(dataNA, assetCurr.id);
@@ -81,6 +81,7 @@ export async function getAssetGridValues(dataNA, assetCurr, lang, aggregate) {
       lang,
       0
     );
+    
     
     const arrRRIF = arrayFormatMoney(
       data[ASSET_API_OUTPUT_RRIF].numericValues,

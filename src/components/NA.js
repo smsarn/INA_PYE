@@ -10,6 +10,8 @@ import { Header, hideRecover } from "./Header";
 import { PopupUserinputDialog } from "./PopupUserInput";
 import { Collapsible } from "./Collapsible";
 import PasteClients from "./PasteClients";
+import Spinner from "./Spinner";
+
 import {
   getEPGridData,
   getINAGridData,
@@ -22,7 +24,7 @@ import {
   handleFetchInsuranceNeedsNew,
   handleFetchINADataFromQueryString,
   handleFetchQueryString,
-  fetchValidateTokenGetAgentEmailFromDB,
+  fetchValidateTokenGetAgentEmailRecordAppletLogin,
 } from "../utils/FetchAPIs";
 import debounce from "lodash.debounce";
 import cloneDeep from "lodash.clonedeep";
@@ -88,6 +90,7 @@ import {
   IMAGE_LOGO,
   DEFAULT_QUOTE,
   DEFAULT_RRIF_AGE,
+  DISPLAY_ANALYSIS_ON
 } from "../definitions/generalDefinitions";
 
 import "isomorphic-fetch";
@@ -111,7 +114,7 @@ import {
 } from "../definitions/infoIconsDefinitions";
 
 import { getAssetGridValues } from "../data/assetGridProjections";
-import Loader from "react-loader-spinner";
+import { TrendingUpOutlined } from "@material-ui/icons";
 
 const COLLAPSIBLE_CLIENTS = 0;
 const COLLAPSIBLE_ASSETS = 1;
@@ -134,6 +137,13 @@ const waitTime = 1800;
 //const RRIF_LAST_START_AGE = 71;
 
 const SITE_TEST = "https://test-tkdirect";
+
+const SAVETO_FILE = 0;
+const LOAD_FILE = 1;
+const LOAD_STORAGE = 2;
+const EMAIL_FILE = 3;
+const CHANGE_LANG = 4;
+const DEFAULT = 5;
 
 // to send it to Proxy make API site ""
 //const API_SITE="https://ppitoolkitapi.azurewebsites.net"
@@ -163,12 +173,25 @@ let appSiteParent =
 
 //defaults.global.maintainAspectRatio = false;
 
-const OutputPresentation = React.lazy(() => import("./outputPresentation"));
-const OutputPresentationEP = React.lazy(() => import("./outputPresentationEP"));
+let OutputPresentation;
+if (APPLET_INA)
+  OutputPresentation = React.lazy(() => import("./outputPresentation"));
 
-const OutputGraphs = React.lazy(() => import("./OutputGraphs"));
-const OutputGraphsEP = React.lazy(() => import("./OutputGraphsEP"));
-const AnalysisGraphs = React.lazy(() => import("./AnalysisGraph"));
+let OutputPresentationEP;
+if (APPLET_EP)
+  OutputPresentationEP = React.lazy(() => import("./outputPresentationEP"));
+
+let OutputGraphs;
+if (APPLET_INA)
+   OutputGraphs = React.lazy(() => import("./OutputGraphs"));
+
+let OutputGraphsEP;
+if (APPLET_EP)
+  OutputGraphsEP = React.lazy(() => import("./OutputGraphsEP"));
+
+let AnalysisGraphs;
+if (DISPLAY_ANALYSIS_ON)
+  AnalysisGraphs = React.lazy(() => import("./AnalysisGraph"));
 
 const AggregateGrid = React.lazy(() => import("./AggregateGrid"));
 
@@ -202,9 +225,11 @@ export class NA extends Component {
       dataInput: getDefaultData(),
       loading: true,
       initialLoading: true,
+      //initialLazyLoaded: false,
+     
       //outputInitilized: false,
       failedAPI: false,
-      showMsg: false,
+      promptForSave: false,
       failedRemove: false,
       SnapImport: false,
 
@@ -212,16 +237,19 @@ export class NA extends Component {
         dataInsuranceNeeds: [],
         dataCashFlowPersonal: [],
         dataTaxLiability: [],
+        dataNonTaxLiability: [],
         dataCashFlowGov: [],
         dataCashFlowNeeds: [],
         dataNAAges: [],
         dataShortfall: [],
+        yrsCoverageIfCashAll: 0,
         govBenefits: { cppSurvivor: null, cppDB: null, cppOrphan: null },
         lifeExpectancy: { client: 0, spouse: 0, joint: 0 },
         assetProjections: [],
         aggregateGrid: null,
         encryptedInputLife1AndSpouse: "",
         encryptedInputLife1: "",
+        
       },
     };
     this.openCollapsible = [];
@@ -251,6 +279,7 @@ export class NA extends Component {
     this.dataQS = "";
     this.intervalID = 0;
     this.INAOption = APPLET_INA ? DISPLAY_INCOME : DISPLAY_TAXLIAB;
+    
 
     //this.OutputPresentation = null;
     //this.OutputPresentationEP = null;
@@ -350,7 +379,7 @@ export class NA extends Component {
       await this.handleInitilizeQuoteFromQueryString(query.QS);
       //this.handleInitilizeQuoteFromQueryString(query.QS);
     } else {
-      await this.handleIntitalFetch(
+      await this.handleIntitalFetch1(
         // this.handleIntitalFetch(
         query.lang === "fr" || global.langFr ? "fr" : "en"
       );
@@ -384,6 +413,13 @@ export class NA extends Component {
     if (this.state.initialLoading === false) {
       window.parent.postMessage("FRAME_LOADED", "*");
     }
+    // now UI is loaded call initiaal API calls async but dont await
+    if (query.QS === undefined) {
+      this.handleIntitalFetch(
+        // this.handleIntitalFetch(
+        query.lang === "fr" || global.langFr ? "fr" : "en"
+      );
+    }
   };
 
   setToken = async (authToken) => {
@@ -395,7 +431,7 @@ export class NA extends Component {
       const email = sessionStorage.getItem("userEmail");
       //console.log(email, this.userEmail, this.agentID);
       if (email === null || email === undefined || email === "") {
-        const agentSpecs = await fetchValidateTokenGetAgentEmailFromDB(
+        const agentSpecs = await fetchValidateTokenGetAgentEmailRecordAppletLogin(
           authToken,
           APPLET_INA ? "INA" : "EP"
         );
@@ -409,7 +445,7 @@ export class NA extends Component {
         }
       } else {
         // save applet login
-        fetchValidateTokenGetAgentEmailFromDB(
+        fetchValidateTokenGetAgentEmailRecordAppletLogin(
           authToken,
           APPLET_INA ? "INA" : "EP"
         );
@@ -429,6 +465,15 @@ export class NA extends Component {
     //await this.setState({userEmail:userEmail, userGUID: result.caseGUID});
   };
 
+  /* checkAndCallInitialFetch = async () => {
+    if (this.state.initialLazyLoaded === false) {
+      await this.handleIntitalFetch(
+        this.state.dataInput.Presentations[0].language
+      );
+      this.setState({initialLazyLoaded: true});
+    }
+  }
+ */
   handleIntitalFetch = async (lang) => {
     //let presentation = this.state.dataInput.Presentations[0];
     /* await this.handleUpdatePresentation(presentation, true);
@@ -474,7 +519,37 @@ export class NA extends Component {
         : COLLAPSIBLES_CLOSED;
 
     // before eupdating state, resync, recalcuate, update state to re_render
-    this.setState({ ...newState, loading: false, initialLoading: false });
+    this.setState({ ...newState, loading: false, initialLoading: false});
+    
+  };
+
+  handleIntitalFetch1 = (lang) => {
+    this.setState({ loading: true });
+    let { dataInput, dataOutput } = this.state;
+    const newDataInput = cloneDeep(dataInput);
+    const newDataOutput = cloneDeep(dataOutput);
+
+    let presentation = newDataInput.Presentations[0];
+
+    // set new lang if coming from lang change in landing page
+    presentation.language = lang;
+    newDataInput.Presentations[0] = presentation;
+
+    //this.AddInitialGovBenefits(newDataInput);
+
+    // first asset needs to be updated with grid etc
+    this.openCollapsible[COLLAPSIBLE_CLIENTS].open =
+      newDataInput.Presentations[0].language === "en"
+        ? COLLAPSIBLES_OPEN
+        : COLLAPSIBLES_CLOSED;
+
+    // before eupdating state, resync, recalcuate, update state to re_render
+    this.setState({
+      dataInput: newDataInput,
+      dataOutput: newDataOutput,
+      loading: false,
+      initialLoading: false,
+    });
   };
 
   handleUpdateOutput = async (
@@ -539,7 +614,7 @@ export class NA extends Component {
       );
 
       newStateCandidateOutput.encryptedInputLife1AndSpouse =
-        await this.handleQueryString(
+        await this.handleEncryptedDataModes(
           MODE_ONLY_GET_ENCRYPTED_QS,
           newDataInputClient12,
           newStateCandidateOutput
@@ -554,7 +629,7 @@ export class NA extends Component {
       );
 
       newStateCandidateOutput.encryptedInputLife1 =
-        await this.handleQueryString(
+        await this.handleEncryptedDataModes(
           MODE_ONLY_GET_ENCRYPTED_QS,
           newDataInputClient1,
           newStateCandidateOutput
@@ -617,6 +692,8 @@ export class NA extends Component {
         dataOutputCandidate.dataCashFlowPersonal.numericValues;
       dataOutput.dataTaxLiability =
         dataOutputCandidate.dataTaxLiability.numericValues;
+      dataOutput.dataNonTaxLiability =
+        dataOutputCandidate.dataNonTaxLiability.numericValues;
       dataOutput.dataCashFlowGov =
         dataOutputCandidate.dataCashFlowGov.numericValues;
       dataOutput.dataCashFlowNeeds =
@@ -628,6 +705,8 @@ export class NA extends Component {
       dataOutput.govBenefits.cppDB = dataOutputCandidate.cppDB;
       dataOutput.govBenefits.cppOrphan = dataOutputCandidate.orphan;
       dataOutput.probate = dataOutputCandidate.probate;
+      dataOutput.yrsCoverageIfCashAll =
+        dataOutputCandidate.yrsCoverageIfCashAll;
       dataOutput.lifeExpectancy.client = dataOutputCandidate.lifeExpClient;
       dataOutput.lifeExpectancy.spouse = dataOutputCandidate.lifeExp;
       dataOutput.lifeExpectancy.joint = dataOutputCandidate.lifeExpJLTD;
@@ -647,6 +726,7 @@ export class NA extends Component {
     dataOutput.dataInsuranceNeeds = data.dataInsuranceNeeds;
     dataOutput.dataCashFlowPersonal = data.dataCashFlowPersonal.numericValues;
     dataOutput.dataTaxLiability = data.dataTaxLiability.numericValues;
+    dataOutput.dataNonTaxLiability = data.dataNonTaxLiability.numericValues;
     dataOutput.dataCashFlowGov = data.dataCashFlowGov.numericValues;
     dataOutput.dataCashFlowNeeds = data.dataCashFlowNeeds.numericValues;
     dataOutput.dataNAAges = data.dataNAAges.numericValues;
@@ -661,7 +741,7 @@ export class NA extends Component {
     this.setState({ dataOutput: dataOutput, SnapImport: false });
   };
 
-  handleQueryString = async (mode, dataInput, dataOutput) => {
+  handleEncryptedDataModes = async (mode, dataInput, dataOutput) => {
     const lang = dataInput.Presentations[0].language;
     const insuranceNeed =
       dataOutput.dataInsuranceNeeds[dataInput.Presentations[0].periodOption]
@@ -671,7 +751,7 @@ export class NA extends Component {
     if (data !== undefined) {
       this.dataQS = data;
       if (mode === MODE_ONLY_GET_ENCRYPTED_QS) return data;
-      else if (mode === MODE_SAVE) this.setState({ showMsg: true });
+      else if (mode === MODE_SAVE) this.setState({ promptForSave: true });
       else if (mode === MODE_EMAIL) {
         let url =
           "mailto: ?subject= " +
@@ -708,7 +788,7 @@ export class NA extends Component {
     let objJSONData = await loadSavedDataToUI(data, this.state.dataInput);
 
     // put loaded data to quote and show
-    this.updateStateFromJSon(objJSONData);
+    await this.updateStateFromJSon(objJSONData);
   };
 
   handleUpdateClient = async (client) => {
@@ -782,7 +862,10 @@ export class NA extends Component {
         newStateCandidateOutput
       );
 
-      if (newStateCandidateInput.Presentations[0].overwriteProbate === false || APPLET_EP) {
+      if (
+        newStateCandidateInput.Presentations[0].overwriteProbate === false ||
+        APPLET_EP
+      ) {
         newStateCandidateInput = await this.probateSync(
           newStateCandidateInput,
           newStateCandidateOutput
@@ -796,6 +879,7 @@ export class NA extends Component {
         dataInput: newStateCandidateInput,
         dataOutput: newStateCandidateOutput,
       };
+      
     } catch (error) {}
   };
 
@@ -897,7 +981,8 @@ export class NA extends Component {
         } else if (APPLET_EP) {
           aggregateGrid = await getEPGridData(
             noProjectYrs,
-            newStateCandidateInput
+            newStateCandidateInput,
+            newStateCandidateOutput.dataNonTaxLiability
           );
         }
       }
@@ -1124,7 +1209,10 @@ export class NA extends Component {
   };
 
   saveAsDefaultCase = (clear) => {
+    //await this.checkAndCallInitialFetch();
+    
     // save as default if needed
+
     const storageName = DEFAULT_QUOTE;
     if (clear) {
       localStorage.removeItem(storageName);
@@ -1723,6 +1811,8 @@ export class NA extends Component {
   };
 
   changeLang = () => {
+    //await this.checkAndCallInitialFetch();
+    
     let pres = this.copyPresentation();
     pres.language = pres.language === "en" ? "fr" : "en";
     const noRecalc = false;
@@ -2209,7 +2299,9 @@ export class NA extends Component {
     return dataE;
   };
 
-  loadStorage = async () => {
+  loadStorage = () => {
+    //await this.checkAndCallInitialFetch();
+    
     let storageKey = APPLET_INA ? "INAData" : "EPData";
 
     const objJSONData = JSON.parse(localStorage.getItem(storageKey));
@@ -2219,6 +2311,7 @@ export class NA extends Component {
   updateStateFromJSon = async (objJSONData) => {
     if (objJSONData !== null && objJSONData !== undefined) {
       // put loaded data to quote and show
+      
       this.setState({ loading: true });
       //  console.log(objJSONData)
       this.caseFromFile = true;
@@ -2248,7 +2341,9 @@ export class NA extends Component {
     hideRecover();
   };
 
-  loadFromFile = (e) => {
+  loadFromFile =  (e) => {
+   // await this.checkAndCallInitialFetch();
+    
     const fileTarget = e.target.files[0];
     if (!fileTarget) {
       return;
@@ -2275,6 +2370,7 @@ export class NA extends Component {
       if (encrptedSave === true) {
         // file is saved a s querystring
         this.handleInitilizeQuoteFromQueryString(contentsFile);
+
       } else {
         // name changes
         contentsFile = contentsFile.split("Amount").join("amount");
@@ -2387,7 +2483,7 @@ export class NA extends Component {
   };
 
   respondToSaveRequest = (fileName) => {
-    this.setState({ showMsg: false });
+    this.setState({ promptForSave: false });
     let blob;
     if (versionDetails().saveEncrypt === false)
       // regular text file
@@ -2427,17 +2523,33 @@ export class NA extends Component {
     saveAs(blob, "INASavedData.json");
   };
 
+  headerCommand = async (command) => {
+    await this.checkAndCallInitialFetch()
+    if (command === SAVETO_FILE) this.saveToFile();
+    else if (command === LOAD_FILE) this.loadFromFile();
+    else if (command === LOAD_STORAGE) this.loadStorage();
+    else if (command === EMAIL_FILE) this.EmailINA();
+    else if (command === CHANGE_LANG) this.changeLang();
+    else if (command === DEFAULT) this.saveAsDefaultCase();
+  };
+
   saveToFile = () => {
+    //await this.checkAndCallInitialFetch();
+
     if (versionDetails().saveEncrypt === false)
       // regular text file
       this.respondToSaveRequest("fileINA");
     else {
-      this.handleQueryString(
+     
+      console.log(this.state.dataInput, this.state.loading)
+
+      this.handleEncryptedDataModes(
         MODE_SAVE,
         this.state.dataInput,
         this.state.dataOutput
       );
     }
+    
   };
 
   loadData = () => {
@@ -2465,10 +2577,11 @@ export class NA extends Component {
     }
   };
 
-  EmailINA = () => {
+  EmailINA =  () => {
     // test
-
-    this.handleQueryString(
+    //await this.checkAndCallInitialFetch();
+    
+    this.handleEncryptedDataModes(
       MODE_EMAIL,
       this.state.dataInput,
       this.state.dataOutput
@@ -2495,6 +2608,8 @@ export class NA extends Component {
   };
 
   handleCollapsibleClick = async (collapsible) => {
+    //await this.checkAndCallInitialFetch();
+
     if (collapsible.id === COLLAPSIBLE_RESULTS) {
       /* if (this.state.outputInitilized === false)
       {
@@ -2636,12 +2751,16 @@ export class NA extends Component {
     let l = 1;
     let n = 1;
 
-    const showInput = this.state.showMsg;
+
+
+    const showInput = this.state.promptForSave;
 
     const dataInput = this.state.dataInput;
     const lang = dataInput.Presentations[0].language;
 
     const dataOutput = this.state.dataOutput;
+
+
     const insuranceNeeds = this.state.dataOutput.dataInsuranceNeeds;
     const periodOption = dataInput.Presentations[0].periodOption;
 
@@ -2754,6 +2873,8 @@ export class NA extends Component {
         dataOutput.probate
       );
 
+      console.log(totalLiabProjections)
+
       dataAges = dataOutput.dataNAAges.slice(0, noProjectYrs);
       dataGov = dataOutput.dataCashFlowGov.slice(0, noProjectYrs);
       dataPCV = dataOutput.dataCashFlowPersonal.slice(0, noProjectYrs);
@@ -2763,6 +2884,7 @@ export class NA extends Component {
         dataOutput.dataTaxLiability,
         totalLiabProjections
       );
+
       dataNeed = dataOutput.dataCashFlowNeeds.slice(0, noProjectYrs);
       dataShort = dataOutput.dataShortfall.slice(0, noProjectYrs);
 
@@ -2792,7 +2914,7 @@ export class NA extends Component {
 
     const graphs = (
       <Suspense
-        fallback={<div>{lang === "en" ? "loading..." : "attendez..."}</div>}
+        fallback={<Spinner/>}
       >
         <OutputGraphs
           insuranceNeed={insNeed}
@@ -2822,18 +2944,19 @@ export class NA extends Component {
     );
     const graphsEP = (
       <Suspense
-        fallback={<div>{lang === "en" ? "loading..." : "attendez..."}</div>}
+        fallback={<Spinner/>}
       >
         <OutputGraphsEP
           insuranceNeed={insNeedLE3}
           projectEnd={projectEnd} // try this now // always to the end
-          dataEstateLiability={dataEstateLiability}
+         // dataEstateLiability={dataEstateLiability}
           dataInput={dataInput}
           dataNAAges={dataAges}
           lifeExp={dataOutput.lifeExpectancy.joint} // client or if spouse JLTD
           lifeExpJLTD={dataOutput.lifeExpectancy.joint}
           lifeExpClient={dataOutput.lifeExpectancy.client}
           probate={dataOutput.probate}
+          nonTaxLiabilities={dataOutput.dataNonTaxLiability}
           INAOption={this.INAOption}
           //dataShortfall={dataShort}
           //dataAPISite={appSiteAPI}
@@ -2855,7 +2978,7 @@ export class NA extends Component {
         }}
       >
         <Suspense
-          fallback={<div>{lang === "en" ? "loading..." : "attendez..."}</div>}
+          fallback={<Spinner/>}
         >
           <AnalysisGraphs
             insuranceNeed={insNeedLE3}
@@ -2893,6 +3016,7 @@ export class NA extends Component {
       </div>
     );
 
+    
     if (this.state.initialLoading === true) {
       return null;
     } else {
@@ -2900,7 +3024,7 @@ export class NA extends Component {
         <div
           id="main"
           className={
-            this.state.initialLoading === true ? "mainDivBlocked" : "mainDiv"
+            (this.state.initialLoading === true || this.state.loading === true ) ? "mainDivBlocked" : "mainDiv"
           }
         >
           <style>{`@media print {display: none;}`}</style>
@@ -2910,15 +3034,24 @@ export class NA extends Component {
                 ? TITLES[lang].appletINA
                 : TITLES[lang].appletEP
             }
+             
+        
             saveToFile={this.saveToFile}
             loadFromFile={this.loadFromFile}
             loadStorage={this.loadStorage}
             EmailINA={this.EmailINA}
             changeLang={this.changeLang}
-            saveAsDefaultCase={this.saveAsDefaultCase}
+            saveAsDefaultCase={this.saveAsDefaultCase} 
+            /* saveToFile={() => this.headerCommand(SAVETO_FILE)}
+            loadFromFile={() => this.headerCommand(LOAD_FILE)}
+            loadStorage={() => this.headerCommand(LOAD_STORAGE)}
+            EmailINA={() => this.headerCommand(EMAIL_FILE)}
+            changeLang={() => this.headerCommand(CHANGE_LANG)}
+            saveAsDefaultCase={() => this.headerCommand(DEFAULT)} */
+
             language={lang}
           />
-
+          {  (this.state.initialLoading === true || this.state.loading === true ) && <Spinner/> }
           {/* <div style={{marginTop:'15px'}} ><MultiButtons
         
           noButtons={2}
@@ -2936,6 +3069,7 @@ export class NA extends Component {
               respondToInput={this.respondToSaveRequest}
             />
           </div>
+          {/* {this.state.initialLazyLoaded === false ? <span>{lang === "en" ? "loading..." : "attendez..."}</span> : "" } */}
           <Collapsible
             id={COLLAPSIBLE_PRESENTATION}
             title={TITLES[lang].presentations}
@@ -2946,7 +3080,7 @@ export class NA extends Component {
             {dataInput.Presentations.map((presentation) => (
               <Suspense
                 fallback={
-                  <div>{lang === "en" ? "loading..." : "attendez..."}</div>
+                   <Spinner/>
                 }
               >
                 <Presentation
@@ -3008,7 +3142,8 @@ export class NA extends Component {
             {dataInput.Assets.map((asset) => (
               <Suspense
                 fallback={
-                  <div>{lang === "en" ? "loading..." : "attendez..."}</div>
+                  <Spinner/>
+                  
                 }
               >
                 <Asset
@@ -3053,7 +3188,8 @@ export class NA extends Component {
             {dataInput.Liabilitys.map((liability) => (
               <Suspense
                 fallback={
-                  <div>{lang === "en" ? "loading..." : "attendez..."}</div>
+                  <Spinner/>
+                  
                 }
               >
                 <Liability
@@ -3066,7 +3202,9 @@ export class NA extends Component {
                   handleUpdate={this.handleUpdateLiability}
                   handleAddLiability={this.handleAddLiability}
                   handleRemoveLiability={this.handleRemoveLiability}
-                  overwriteProbate={dataInput.Presentations[0].overwriteProbate && APPLET_INA}
+                  overwriteProbate={
+                    dataInput.Presentations[0].overwriteProbate && APPLET_INA
+                  }
                   // handleAddAssetTaxCredit={this.handleAddAssetTaxCredit}
                   disableAddRemove={this.state.loading}
                 />
@@ -3118,7 +3256,8 @@ export class NA extends Component {
                   /* !(source.amount === 0 && source.id < noSources && source.sourceTypeKey === INCOMESOURCES.SURVIVORS_INCOME.Key) && */
                   <Suspense
                     fallback={
-                      <div>{lang === "en" ? "loading..." : "attendez..."}</div>
+                      <Spinner/>
+                      
                     }
                   >
                     <Source
@@ -3165,7 +3304,8 @@ export class NA extends Component {
               {dataInput.Needs.map((need) => (
                 <Suspense
                   fallback={
-                    <div>{lang === "en" ? "loading..." : "attendez..."}</div>
+                    <Spinner/>
+                    
                   }
                 >
                   <Need
@@ -3288,9 +3428,8 @@ export class NA extends Component {
                     dataOutput.aggregateGrid !== undefined && (
                       /* !showSinglePerson && */ <Suspense
                         fallback={
-                          <div>
-                            {lang === "en" ? "loading..." : "attendez..."}
-                          </div>
+                          <Spinner/>
+                          
                         }
                       >
                         <AggregateGrid
@@ -3314,7 +3453,8 @@ export class NA extends Component {
               ) : this.INAOption === DISPLAY_INCOME ? (
                 <Suspense
                   fallback={
-                    <div>{lang === "en" ? "loading..." : "attendez..."}</div>
+                    <Spinner/>
+                    
                   }
                 >
                   <OutputPresentation
@@ -3324,7 +3464,7 @@ export class NA extends Component {
                     insuranceNeedEAge={insNeedEAge}
                     projectEnd={projectEnd}
                     insNeedLine={insNeedLine}
-                    LE={dataOutput.lifeExpectancy.spouse + survAge}
+                    LE={dataOutput.lifeExpectancy}
                     dataInput={dataInput}
                     INAOption={this.INAOption}
                     dataShortfall={dataShort}
@@ -3335,13 +3475,15 @@ export class NA extends Component {
                     }
                     encryptedInputLife1={dataOutput.encryptedInputLife1}
                     //periodOption={periodOption}
+                    yrsCoverageIfCashAll={parseInt(dataOutput.yrsCoverageIfCashAll-1) + (dataOutput.yrsCoverageIfCashAll===2?" year":" years")}
                     getSpouseINA={this.getSwitchClientsState}
                   />
                 </Suspense>
               ) : (
                 <Suspense
                   fallback={
-                    <div>{lang === "en" ? "loading..." : "attendez..."}</div>
+                    <Spinner/>
+                    
                   }
                 >
                   <OutputPresentationEP
@@ -3355,9 +3497,11 @@ export class NA extends Component {
                     assetProjections={dataOutput.assetProjections}
                     aggregateGrid={dataOutput.aggregateGrid}
                     probate={dataOutput.probate}
+                    taxLiability={dataOutput.dataTaxLiability}
                     INAOption={this.INAOption}
-                    //dataEstateLiability={dataEstateLiability} //getDataFutureEstateLiability(this.dataTaxLiability.numericValues, totalLiabProjections)}
+                    dataEstateLiability={dataEstateLiability} //getDataFutureEstateLiability(this.dataTaxLiability.numericValues, totalLiabProjections)}
                     dataShortfall={dataShort}
+                    appSiteParent={appSiteParent}
                     imageRemove={this.imageRemove}
                     imageAdjust={this.imageAdjust}
                     //periodOption={periodOption}

@@ -54,8 +54,6 @@ import {
 } from "../definitions/generalDefinitions";
 
 import { GridButton } from "./GridButton";
-//import { getAssetGridValues } from "../data/assetGridProjections";
-//import { Language } from "@material-ui/icons";
 
 const ASSET_DROPDOWN_TYPE = 0;
 // inserted desc here not a dropdown no need for indes

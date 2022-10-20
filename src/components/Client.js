@@ -232,6 +232,7 @@ export class Client extends Component {
     }
 
     if (changed) {
+      console.log(client)
       this.props.handleUpdate(client);
       this.setState({ loading: this.props.disableAddRemove });
     }

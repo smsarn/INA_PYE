@@ -81,7 +81,7 @@ td{
 }
 
 .tableTitleEP{
-  font-size: 14px;
+  font-size: 12px;
   font-weight: bold;
   
   text-align: left;
@@ -90,9 +90,25 @@ td{
   background: #d9d9d9;
   
  
-  padding: 6px 6px 3px;
+  padding: 10px 4px 10px 4px;
   height:25px;
 }
+
+.tableNeedsEP{
+  font-size: 12px;
+  font-weight: bold;
+  
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.514); 
+  border-bottom: none;
+  background: #d9d9d9;
+  
+ 
+  padding: 10px 4px 10px 4px;
+  height:25px;
+}
+
+
 
 .tableEP, th, td {
   font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
@@ -101,7 +117,7 @@ td{
   border-collapse: collapse;
   }
   .tableEP th {
-    font-family: Georgia, "Times New Roman", Times, serif;
+    font-family: Georgia, "Times New Roman", Times, serif;vertical-align: middle;
   }
 
 p.ppi1 {
@@ -150,6 +166,19 @@ h2.ppi1 {
 	padding-right: 30px;
 }
 
+h4.ppi1 {
+  /* font-family: Georgia, "Times New Roman", Times, serif; */
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 16px; 
+	color: #455560;
+	text-align: left;
+	/* line-height: 1.0; */
+	font-weight: 100;
+	/* padding-top: 10px; */
+	padding-left: 2.5%;/* 20px; */
+	padding-right: 30px;
+}
+
 h3.ppi1 {
   font-family: Georgia, "Times New Roman", Times, serif;
   /*  font-family: Trebuchet MS, Arial, Helvetica, sans-serif; */
@@ -161,6 +190,21 @@ h3.ppi1 {
 	padding-top: 20px;
 	padding-left: 2.5%;/* 20px; */
 	padding-right: 30px;
+}
+
+.EP {
+  font-family: "Trebuchet MS", "Times New Roman", Times, serif;
+  font-size: 14px; 
+	color: #455560;
+	text-align: center;
+	font-weight: 100;
+	white-space: nowrap;
+  border-collapse:collapse;
+  padding:10px
+
+}
+th, td {
+  padding: 10px;
 }
 
 h5.ppi1 {
@@ -556,3 +600,32 @@ background-color: #DCE5F0;
   margin-left: ${props => props.margin};
   margin-right : 3%;
 ` */
+/* * {
+  box-sizing: border-box;
+} */
+/* Create a two-column layout */
+.column {
+  float: left;
+  width: 50%;
+  padding: 5px;
+}
+
+/* Clearfix (clear floats) */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+@media only screen and (max-width:600px) {
+  .column {
+    width: 100%;
+  }
+}
+
+.noBorder {
+  border-right-style:hidden;
+  border-left-style:hidden;
+  border-top-style:hidden;
+  height:25px;
+}

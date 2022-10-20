@@ -72,11 +72,11 @@ export default class OutputGraphsEP extends React.Component {
     // get data similar to presentation
     const AssetLiabProjs = getAssetLiabProjections(this.props);
     const lang = this.props.dataInput.Presentations[0].language;
-    const totalLiabProjections = getProjectedLiabilities(
+    const totalLiabProjections =this.props.nonTaxLiabilities/*  getProjectedLiabilities(
       this.props.dataInput,
       this.props.projectEnd,
       this.props.probate
-    );
+    ); */
 
 //console.log(this.props,totalLiabProjections)
 

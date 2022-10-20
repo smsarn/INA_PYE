@@ -85,7 +85,7 @@ export const OUTPUTTEXTEP = {
     pg3Tab3R8C2: "",
     pg3Tab3R8C3: "",
     pg3Tab3R8C4: "",
-    pg3P4:" * Tax liability is estimated based on today's  personal income tax rate and current income tax legislation",
+    pg3P4:" * Tax liability is estimated based on today's personal income tax rate and current income tax legislation",
     pg3P5:" ** Please see assumptions in Appendix for withdrawals of amounts from RRIF as they factor into this calculation",
     pg4T: "Future Value of Your Estate",
     pg4P1:
@@ -166,6 +166,16 @@ export const OUTPUTTEXTEP = {
       graphsLeakage1: "Net Estate Value",
       graphsLeakage2: "Tax Liability",
       graphsLeakage3: "Other Liabilities",
+
+      EPSummaryTableC11: "Insurance Needs",
+      EPSummaryTableC12: "Today",
+      EPSummaryTableC13: "at Life Expectancy",
+      EPSummaryTableC14: "Smart Choice:",
+      EPSummaryTableC21: "to cover Tax Liabilities",
+      EPSummaryTableC31: "to cover All Liabilities",
+      EPSummaryTableC24: "A permanent life insurance policy can be custom designed to include the Face + Fund option, a short premium payment period, and a death benefit that covers the need today and grows over time to match the need at Life Expectancy. Note the Insurance Need at Life Expectancy, and use trial and error in ",
+      exportData: "Export Data to:",
+
       
   },
   fr:  {
@@ -328,6 +338,17 @@ export const OUTPUTTEXTEP = {
       graphsLeakage1: "Valeur successorale nette",
       graphsLeakage2: "Obligation fiscale",
       graphsLeakage3: "Autres éléments de passif",
+
+      EPSummaryTableC11: "Besoins en matière d'assurance",
+      EPSummaryTableC12: "aujourd'hui",
+      EPSummaryTableC13: "à l'espérance de vie",
+      EPSummaryTableC14: "choix judicieux :",
+      EPSummaryTableC21: "pour couvrir les obligations fiscales :",
+      EPSummaryTableC31: "pour couvrir toutes les obligations :",
+      EPSummaryTableC24: "Une police d'assurance-vie permanente peut être conçue sur mesure pour inclure l'option Montant d'assurance + fonds, une courte période de paiement des primes et une prestation de décès qui couvre le besoin aujourd'hui et qui augmente avec le temps pour correspondre au besoin à l'espérance de vie. Notez le besoin d'assurance à l'espérance de vie et faites des essais et erreurs dans  ",
+      exportData: "Exporter des données vers:",
+
   },
+
 
 };
