@@ -929,7 +929,6 @@ export function familyProjectionYears(
     } 
     else if (clients.length > 1) {
       // survivorExists or EP
-
       projectEnd =
         periodOption === DISPLAY_RETIREMENT
           ? clients[survIdx].retirementAge
@@ -994,7 +993,7 @@ export function getInsNeedLine(
       ? labelsBilingual.insNeeds100
       : labelsBilingual.insNeedsRetLE;
 
-  if (versionDetails().versionNumeric <= 10014 && numSurvivor === 0)
+  if (false && numSurvivor === 0) // treat as 0 insurance need 
     needTo = labelsBilingual.addSurvivor;
   else if (singleFamily)
     needTo +=

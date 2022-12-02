@@ -456,14 +456,14 @@ async function EPFullSpreadsheetData(
     //  console.log(dataColumns)
   }
 
-  console.log(dataColumns, dataColumns[cols-2])
+ // console.log(dataColumns, dataColumns[cols-2])
 
   let colData=[];
   for (let col = 0; col < cols-2; col++) {
       colData.push(dataColumns[col])
   } 
 
-  console.log(colData)
+//  console.log(colData)
 
   let colDataNonTax=new Array(noYrs).fill(0)
   for (let yr = 0; yr < noYrs; yr++) {
@@ -472,11 +472,11 @@ async function EPFullSpreadsheetData(
   }
  
   colData.push(colDataNonTax)
-  console.log(colData)
+ // console.log(colData)
   colData.push(dataColumns[cols-2])
-  console.log(colData)
+ // console.log(colData)
     
-  console.log(nonTaxLiability,colData)
+ // console.log(nonTaxLiability,colData)
 
 
   for (let col = 0; col < cols; col++) {
@@ -545,14 +545,14 @@ export async function getEPGridData(noProjectYrs, input, nonTaxLiability) {
   dataTitle = TITLES[language].appletEP;
   dataColHeaders = EPFullSpreadsheetHeaders(language);
 
-  console.log(nonTaxLiability)
+ // console.log(nonTaxLiability)
   dataColumns = await EPFullSpreadsheetData(
     dataColHeaders.length,
     noProjectYrs + 1, // + 1,
     input,
     nonTaxLiability
   );
-  console.log(dataColumns,nonTaxLiability)
+ // console.log(dataColumns,nonTaxLiability)
 
   gridColumnAligns = new Array(dataColHeaders.length).fill(2);
   gridIcons = new Array(dataColHeaders.length);

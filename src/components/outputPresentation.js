@@ -239,7 +239,6 @@ this.setState({showShortfallHint:!this.state.showShortfallHint})
     const singleFamily = isSingleFamily(clients);
     const noSurvivor = singlePerson && versionDetails().versionNumeric<=10014
 
-    console.log(this.props.LE)
     
 
     //const insNeedLine= getInsNeedLine(this.props.dataInput.Presentations[0], this.props.projectEnd, lang,noSurvivor,singleFamily,protectionPeriod)
@@ -393,7 +392,8 @@ this.setState({showShortfallHint:!this.state.showShortfallHint})
     const logoBottom = images.logoBottom;
 
     const PDFTopMargin=singleFamily?0:-37  
-
+    
+    const posGrid= (singleFamily || singlePerson)? "-80px":"-30px";
 
     
     let styleSelCell=[]
@@ -519,9 +519,9 @@ this.setState({showShortfallHint:!this.state.showShortfallHint})
               <Info infoIcon={getInfoINA(lang)} />
             </h3>
   
-          <div className="row" style={{marginTop: "-30px"}}>
+          <div className="row" style={{marginTop: posGrid}}>
             
-            { lang==="en" &&
+            {singleFamily===false && singlePerson===false &&
             <div className="column">
               <table
                 className="tableEP"
@@ -530,51 +530,61 @@ this.setState({showShortfallHint:!this.state.showShortfallHint})
 
                 <tbody style={{ fontSize: "14px", verticalAlign: "top" }}>
                   <tr>
-                    <th className="noBorder" width="15%"></th>
-                    <th className="noBorder" width="10%"></th>
-                    <th className="noBorder" width="10%"></th>
-                    <th className="noBorder" width="10%"></th>
-                    <th className="noBorder" width="55%"></th>
+                    <th className="noBorder" width="13%"></th>
+                    <th className="noBorder" width="12%"></th>
+                    <th className="noBorder" width="12%"></th>
+                    <th className="noBorder" width="12%"></th>
+                    <th className="noBorder" width="12%"></th>
+                    <th className="noBorder" width="39%"></th>
                     
                   </tr>
                   <tr>
-                    <th className="tableNeedsEP" >Insurance Needs</th>
-                    <th className="tableNeedsEP" style={styleSelCell[0]}>To Retirement</th>
-                    <th className="tableNeedsEP" style={styleSelCell[1]}>To Life Expectancy </th>
-                    <th className="tableNeedsEP" style={styleSelCell[2]}>To Age 100</th>
+                    <th className="tableNeedsEP" >{labelsBilingual.INASummaryTableC11}</th>
+                    <th className="tableNeedsEP" style={styleSelCell[0]}>{labelsBilingual.INASummaryTableC12}</th>
+                    <th className="tableNeedsEP" style={styleSelCell[1]}>{labelsBilingual.INASummaryTableC13} </th>
+                    <th className="tableNeedsEP" style={styleSelCell[2]}>{labelsBilingual.INASummaryTableC14}</th>
+                    <th className="tableNeedsEP" style={{color:"white", backgroundColor:"#612C51"}}>{labelsBilingual.INASummaryTableC15}</th>
 
-                    <th className="tableNeedsEP" >Smart Choice:</th>
+                    <th className="tableNeedsEP" >{labelsBilingual.INASummaryTableC16}</th>
                   </tr>
                   <tr>
                     <td style={{ height: "1px", textAlign: "right" }}>
-                      to cover Survivors' Life Style:
+                    {labelsBilingual.INASummaryTableC21}
                     </td>
                     <td className="textalignright" style={styleAmtCell}>
                       {formatted(
                           this.props.insuranceNeedRet,
                          lang
-                      ).replace("$","")}
+                      )}
                     </td>
                     <td className="textalignright" style={styleAmtCell}>
                       {formatted(
                           this.props.insuranceNeedLE,
                         lang
-                      ).replace("$","")}
+                      )}
 
                     </td>
-                    
-                    <td className="textalignright" style={styleAmtCell}>
+                    <td className="textalignright"  style={styleAmtCell}>
                       {formatted(
                           this.props.insuranceNeedEAge,
                         lang
-                      ).replace("$","")}
+                      )}
 
+                    </td>
+                    
+                    <td className="textalignright" style={{color:"#612C51"}}>
+                      {/* {formatted(
+                          "-",
+                        lang
+                      ).replace("$","")} */}
+                      _
+                     
                     </td>
                     
                     <td>
                     {this.state.showShortfallHint ? <span style={{color:"#612C51", fontSize:"16px", cursor:"pointer"}} onClick={this.toggleHint}>&#9650;</span>
                                 :<span style={{color:"#612C51", fontSize:"16px", cursor:"pointer"}} onClick={this.toggleHint}>&#9660;</span>}
-                    {this.state.showShortfallHint ? <span style={{display:"block", marginLeft:"15px"}}>{labelsBilingual.INASummaryTableC25Open}</span>:labelsBilingual.INASummaryTableC25Closed}
+                    {this.state.showShortfallHint ? <span style={{display:"block", marginLeft:"15px"}}>{labelsBilingual.INASummaryTableC26Open}</span>:labelsBilingual.INASummaryTableC26Closed}
                     </td>
                   </tr>
                   <tr>
@@ -591,10 +601,13 @@ this.setState({showShortfallHint:!this.state.showShortfallHint})
                     <td  rowSpan="2" style={styleAmtCell}>
                       {projYears.noProjectYrs100}
                     </td>
-                    <td style={{color:"white", backgroundColor:"#612C51"}}>
+                    <td  rowSpan="2"  style={{color:"#612C51", textAlign: "right"}}>
+                      {      this.props.yrsCoverageIfCashAll}
+                    </td>
+                    {/* <td style={{color:"white", backgroundColor:"#612C51"}}>
                     <span style={{fontSize:"14px",fontWeight:"bold", paddingLeft:"6px", display:"block"}}>{this.props.yrsCoverageIfCashAll}: 
                     {labelsBilingual.INASummaryTableC35}</span>
-                    </td >
+                    </td > */}
                   </tr>
 
                   <tr>
@@ -603,7 +616,7 @@ this.setState({showShortfallHint:!this.state.showShortfallHint})
                     
                     {this.state.showHowLongHint ? <span style={{color:"#612C51", fontSize:"16px", cursor:"pointer"}} onClick={this.toggleHintHL}>&#9650;</span>
                                 :<span style={{color:"#612C51", fontSize:"16px", cursor:"pointer"}} onClick={this.toggleHintHL}>&#9660;</span>}
-                    {this.state.showHowLongHint ? labelsBilingual.INASummaryTableC35Open:labelsBilingual.INASummaryTableC35Closed}
+                    {this.state.showHowLongHint ? labelsBilingual.INASummaryTableC36Open:labelsBilingual.INASummaryTableC36Closed}
                     </td>
                   </tr>
                   

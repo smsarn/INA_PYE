@@ -232,7 +232,6 @@ export class Client extends Component {
     }
 
     if (changed) {
-      console.log(client)
       this.props.handleUpdate(client);
       this.setState({ loading: this.props.disableAddRemove });
     }
@@ -545,6 +544,7 @@ export class Client extends Component {
             currentID={this.props.id}
             numberComps={this.props.clientsNo}
             fixedFirstRow={true}
+            lang={this.props.language}
             minComps={1} //{appletMode==="INA"?2:1}
             disabled={this.props.disableAddRemove}
             maxRows={APPLET_INA ? 100 : 2}

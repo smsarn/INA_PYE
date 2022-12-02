@@ -8,6 +8,7 @@ import { Client } from "./Client";
 //import Presentation  from "./Presentation";
 import { Header, hideRecover } from "./Header";
 import { PopupUserinputDialog } from "./PopupUserInput";
+import { PopupMessage } from "./PopupMessage";
 import { Collapsible } from "./Collapsible";
 import PasteClients from "./PasteClients";
 import Spinner from "./Spinner";
@@ -39,6 +40,7 @@ import { OutputGraphsEP } from "./OutputGraphsEP";
 import { AnalysisGraphs } from "./AnalysisGraph"; */
 import { AddRemove } from "./AddRemove";
 import { Info } from "./Info";
+import { TKDFeedback } from "./Feedback";
 import {
   isMobileDevice,
   //isVersion2019,
@@ -90,13 +92,17 @@ import {
   IMAGE_LOGO,
   DEFAULT_QUOTE,
   DEFAULT_RRIF_AGE,
-  DISPLAY_ANALYSIS_ON
+  DISPLAY_ANALYSIS_ON,
 } from "../definitions/generalDefinitions";
 
 import "isomorphic-fetch";
 import shortid from "shortid";
 import { buildMode } from "../../package.json";
-import { setUIDataToAPI, loadSavedDataToUI } from "../data/dataExchange";
+import {
+  setUIDataToAPI,
+  loadSavedDataToUI,
+  sendToReloadINA,
+} from "../data/dataExchange";
 import {
   createDefaultAsset,
   createDefaultClient,
@@ -111,10 +117,11 @@ import {
   getInfoIconInflationGrowth,
   getInfoIconPYE_JLTD,
   getInfoIconNeedGrowth,
+  getInfoSave
 } from "../definitions/infoIconsDefinitions";
 
 import { getAssetGridValues } from "../data/assetGridProjections";
-import { TrendingUpOutlined } from "@material-ui/icons";
+import { Feedback, TrendingUpOutlined } from "@material-ui/icons";
 
 const COLLAPSIBLE_CLIENTS = 0;
 const COLLAPSIBLE_ASSETS = 1;
@@ -182,12 +189,10 @@ if (APPLET_EP)
   OutputPresentationEP = React.lazy(() => import("./outputPresentationEP"));
 
 let OutputGraphs;
-if (APPLET_INA)
-   OutputGraphs = React.lazy(() => import("./OutputGraphs"));
+if (APPLET_INA) OutputGraphs = React.lazy(() => import("./OutputGraphs"));
 
 let OutputGraphsEP;
-if (APPLET_EP)
-  OutputGraphsEP = React.lazy(() => import("./OutputGraphsEP"));
+if (APPLET_EP) OutputGraphsEP = React.lazy(() => import("./OutputGraphsEP"));
 
 let AnalysisGraphs;
 if (DISPLAY_ANALYSIS_ON)
@@ -225,11 +230,13 @@ export class NA extends Component {
       dataInput: getDefaultData(),
       loading: true,
       initialLoading: true,
-      //initialLazyLoaded: false,
-     
-      //outputInitilized: false,
+      initialQSParsing: 1,
       failedAPI: false,
       promptForSave: false,
+      promptShowCases: false,
+      promptShowClients: false,
+      showPopupMessage: "",
+      promptShowFeedback: 0,
       failedRemove: false,
       SnapImport: false,
 
@@ -249,7 +256,6 @@ export class NA extends Component {
         aggregateGrid: null,
         encryptedInputLife1AndSpouse: "",
         encryptedInputLife1: "",
-        
       },
     };
     this.openCollapsible = [];
@@ -279,7 +285,6 @@ export class NA extends Component {
     this.dataQS = "";
     this.intervalID = 0;
     this.INAOption = APPLET_INA ? DISPLAY_INCOME : DISPLAY_TAXLIAB;
-    
 
     //this.OutputPresentation = null;
     //this.OutputPresentationEP = null;
@@ -360,6 +365,82 @@ export class NA extends Component {
     return dataInput;
   };
 
+  parseQSs = async (query) => {
+    let caseID = "";
+    if (query.caseGUID !== undefined) caseID = query.caseGUID;
+    if (query.clientGUID !== undefined)
+      this.clientIDToShowCasesFor = query.clientGUID;
+
+    // Database
+    if (query.DBAction !== undefined) {
+      this.DBApplet = "";
+      if (query.DBAction.toLowerCase() === "clients")
+        this.setState({ promptShowClients: true });
+      else {
+        this.setState({ promptShowCases: true });
+        if (query.DBAction !== "" && query.DBAction.toLowerCase() !== "cases")
+          this.DBApplet = query.DBAction;
+      }
+    }
+    // Feedback
+    else if (query.FBAction === "1") {
+      const FB = query.lang === "fr" ? 2 : 1;
+      this.setState({ promptShowFeedback: FB });
+    }
+    // INA or PYE
+    else {
+      if (query.QS === undefined && caseID === "") {
+        await this.handleIntitalFetch1(
+          // this.handleIntitalFetch(
+          query.lang === "fr" || global.langFr ? "fr" : "en"
+        );
+      } else {
+        if (query.QS !== undefined || query.qs !== undefined)
+          await this.handleInitilizeQuoteFromQueryString(query.QS);
+        else {
+          this.caseForEditID = caseID; // if same applet keep it
+          await this.handleInitilizeQuoteFromCaseID(caseID);
+        }
+      }
+    }
+    if (query.recover !== undefined) {
+      if (query.recover === "true") {
+        let d = new Date();
+        d = d.setHours(d.getHours(), d.getMinutes() - 5, 0, 0);
+        const objJSONData = JSON.parse(
+          localStorage.getItem(APPLET_INA ? "INAData" : "EP")
+        );
+
+        var dRecover = new Date(
+          objJSONData.dataPresentations.Presentations[0].valuationDate
+        );
+        dRecover = new Date(
+          objJSONData.dataPresentations.Presentations[0].presentationDate
+        );
+        if (dRecover > d) {
+          await this.loadStorage();
+          hideRecover();
+        }
+      }
+    }
+    // console.log(query)
+    if (query.snapimport !== undefined) {
+      if (query.snapimport === "1") {
+        this.setState({ SnapImport: true });
+      }
+    }
+    if (this.state.initialLoading === false) {
+      window.parent.postMessage("FRAME_LOADED", "*");
+    }
+    // now UI is loaded call initiaal API calls async but dont await
+    if (query.QS === undefined) {
+      this.handleIntitalFetch(
+        // this.handleIntitalFetch(
+        query.lang === "fr" || global.langFr ? "fr" : "en"
+      );
+    }
+  };
+
   componentDidMount = async () => {
     const el = document.querySelector(".loader-container");
     if (el) {
@@ -373,9 +454,33 @@ export class NA extends Component {
 
     const query = queryString.parse(window.location.search);
 
-    await this.setToken(query.TKTOK);
+    this.setState({ initialQSParsing: 1 });
 
-    if (query.QS !== undefined) {
+    //await this.setToken(query.TKTOK, query.authToken);
+
+    let validToken = false;
+    if (query.authToken !== undefined)
+      validToken = await this.setToken(query.authToken);
+    else if (query.TKTOK !== undefined)
+      validToken = await this.setToken(query.TKTOK);
+
+    await this.parseQSs(query);
+
+    await this.setState({ initialQSParsing: validToken ? 0 : -1 });
+    this.setState({ initialQSParsing: 0 });
+
+    /* if (validToken === false) {
+      localStorage.removeItem("TKTOK");
+      console.log("send To Reload INA");
+      await sendToReloadINA();
+    }
+     
+    if (this.state.initialLoading === false) {
+      window.parent.postMessage("FRAME_LOADED", "*");
+    }*/
+  };
+
+  /* if (query.QS !== undefined) {
       await this.handleInitilizeQuoteFromQueryString(query.QS);
       //this.handleInitilizeQuoteFromQueryString(query.QS);
     } else {
@@ -421,21 +526,23 @@ export class NA extends Component {
       );
     }
   };
-
+  */
   setToken = async (authToken) => {
     let validToken = false;
-    if (authToken !== undefined && authToken !== "") {
-      // const decoded = jwt_decode(authToken);
+    let token = authToken;
+    if (token !== undefined && token !== "" && token !== null) {
+      //const decoded = jwt_decode(authToken);
 
-      // this.userEmail = decoded.upn;
+      //this.userEmail = decoded.upn;
       const email = sessionStorage.getItem("userEmail");
       //console.log(email, this.userEmail, this.agentID);
       if (email === null || email === undefined || email === "") {
-        const agentSpecs = await fetchValidateTokenGetAgentEmailRecordAppletLogin(
-          authToken,
-          APPLET_INA ? "INA" : "EP"
-        );
-        await console.log(agentSpecs);
+        const agentSpecs =
+          await fetchValidateTokenGetAgentEmailRecordAppletLogin(
+            token,
+            APPLET_INA ? "INA" : "EP"
+          );
+        // await console.log("agentSpecs:" +agentSpecs);
         validToken = agentSpecs.validToken;
         if (validToken === true) {
           this.userEmail = agentSpecs.email;
@@ -446,7 +553,7 @@ export class NA extends Component {
       } else {
         // save applet login
         fetchValidateTokenGetAgentEmailRecordAppletLogin(
-          authToken,
+          token,
           APPLET_INA ? "INA" : "EP"
         );
 
@@ -455,7 +562,7 @@ export class NA extends Component {
         validToken = true;
       }
     }
-
+    //console.log("this.userEmail:" + this.userEmail);
     return validToken;
 
     //   let result= await fetchGetAgentGUIDFromDB(this.userEmail)
@@ -519,8 +626,7 @@ export class NA extends Component {
         : COLLAPSIBLES_CLOSED;
 
     // before eupdating state, resync, recalcuate, update state to re_render
-    this.setState({ ...newState, loading: false, initialLoading: false});
-    
+    this.setState({ ...newState, loading: false, initialLoading: false });
   };
 
   handleIntitalFetch1 = (lang) => {
@@ -879,7 +985,6 @@ export class NA extends Component {
         dataInput: newStateCandidateInput,
         dataOutput: newStateCandidateOutput,
       };
-      
     } catch (error) {}
   };
 
@@ -1210,7 +1315,7 @@ export class NA extends Component {
 
   saveAsDefaultCase = (clear) => {
     //await this.checkAndCallInitialFetch();
-    
+
     // save as default if needed
 
     const storageName = DEFAULT_QUOTE;
@@ -1812,7 +1917,7 @@ export class NA extends Component {
 
   changeLang = () => {
     //await this.checkAndCallInitialFetch();
-    
+
     let pres = this.copyPresentation();
     pres.language = pres.language === "en" ? "fr" : "en";
     const noRecalc = false;
@@ -2102,6 +2207,11 @@ export class NA extends Component {
   syncPanelsValues2 = (newStateCandidateInput, itemToUpdateGroup) => {
     // EP dosent have needs and sources to sync
 
+    let needsDur = false;
+    let sourcesDur = false;
+    let needsAmt = false;
+    let sourcesAmt = false;
+
     this.survIdx = this.setSurivorIndex2(newStateCandidateInput);
     let protectionPeriod =
       newStateCandidateInput.Clients[this.survIdx].retirementAge -
@@ -2139,6 +2249,7 @@ export class NA extends Component {
               newStateCandidateInput.Needs[i].Percent >= 0
             ) {
               newStateCandidateInput.Needs[i].amount = needPercent;
+              needsAmt = true;
             }
 
             if (
@@ -2154,6 +2265,7 @@ export class NA extends Component {
                   dur > 0)
               ) {
                 newStateCandidateInput.Needs[i].duration = dur;
+                needsDur = true;
               }
               if (
                 newStateCandidateInput.Needs[i].duration === 100 &&
@@ -2187,6 +2299,7 @@ export class NA extends Component {
                   0,
                   Math.min(4, UNIVERSITY_END_AGE - children.Age)
                 );
+                needsDur = true;
               }
             }
           }
@@ -2203,6 +2316,7 @@ export class NA extends Component {
 
           // allow a different surv income dur if they input directly
           if (
+            this.caseFromFile === false &&
             itemToUpdateGroup !== COLLAPSIBLE_SOURCES &&
             itemToUpdateGroup !== COLLAPSIBLE_RESULTS
           ) {
@@ -2215,6 +2329,7 @@ export class NA extends Component {
               dur > 0
             ) {
               newStateCandidateInput.Sources[i].duration = dur;
+              sourcesDur = true;
             }
           }
 
@@ -2225,6 +2340,7 @@ export class NA extends Component {
           if (newStateCandidateInput.Clients.length > 1) {
             //!singleFamily){
             if (
+              this.caseFromFile === false &&
               itemToUpdateGroup !== COLLAPSIBLE_SOURCES &&
               itemToUpdateGroup !== COLLAPSIBLE_RESULTS &&
               newStateCandidateInput.Sources[i].ownerID - 1 > 0
@@ -2244,6 +2360,7 @@ export class NA extends Component {
                     newStateCandidateInput.Sources[i].ownerID - 1
                   ].Income
                 );
+                sourcesAmt = true;
               }
             }
           }
@@ -2284,6 +2401,32 @@ export class NA extends Component {
       }
     }
 
+    let msg = "";
+    const lang = newStateCandidateInput.Presentations[0].language;
+    if (lang === "en") {
+      if (sourcesAmt || sourcesDur) msg = "'Sources of Income'";
+      if (sourcesAmt && sourcesDur) msg += " amounts and durations";
+      else if (sourcesAmt && needsAmt === false) msg += " amounts";
+      else if (sourcesDur && needsDur === false) msg += " durations";
+      if (msg !== "" && (needsAmt || needsDur)) msg += ", and ";
+
+      if (needsAmt || needsDur) msg += "'Income Needs' ";
+      if (needsAmt && needsDur) msg += " amounts and durations";
+      else if (needsAmt) msg += " amounts ";
+      else if (needsDur) msg += " durations ";
+
+      if (msg !== "") msg += " were adjusted";
+    } else {
+      if (sourcesDur || needsDur) msg = "les durées de ";
+      else if (sourcesAmt || needsAmt) msg = "les montants de ";
+      if (sourcesAmt || sourcesDur) msg += "'Sources de revenus'";
+
+      if ((sourcesAmt && needsAmt) || (needsDur && sourcesDur)) msg += " et ";
+      if (needsAmt || needsDur) msg += "'Besoins de revenu'";
+      if (msg !== "") msg += " étaient ajusté";
+    }
+    this.setState({ showPopupMessage: msg });
+
     return newStateCandidateInput;
   };
 
@@ -2301,7 +2444,7 @@ export class NA extends Component {
 
   loadStorage = () => {
     //await this.checkAndCallInitialFetch();
-    
+
     let storageKey = APPLET_INA ? "INAData" : "EPData";
 
     const objJSONData = JSON.parse(localStorage.getItem(storageKey));
@@ -2311,7 +2454,7 @@ export class NA extends Component {
   updateStateFromJSon = async (objJSONData) => {
     if (objJSONData !== null && objJSONData !== undefined) {
       // put loaded data to quote and show
-      
+
       this.setState({ loading: true });
       //  console.log(objJSONData)
       this.caseFromFile = true;
@@ -2341,9 +2484,9 @@ export class NA extends Component {
     hideRecover();
   };
 
-  loadFromFile =  (e) => {
-   // await this.checkAndCallInitialFetch();
-    
+  loadFromFile = (e) => {
+    // await this.checkAndCallInitialFetch();
+
     const fileTarget = e.target.files[0];
     if (!fileTarget) {
       return;
@@ -2370,7 +2513,6 @@ export class NA extends Component {
       if (encrptedSave === true) {
         // file is saved a s querystring
         this.handleInitilizeQuoteFromQueryString(contentsFile);
-
       } else {
         // name changes
         contentsFile = contentsFile.split("Amount").join("amount");
@@ -2482,7 +2624,7 @@ export class NA extends Component {
     this.setState({ loading: false });
   };
 
-  respondToSaveRequest = (fileName) => {
+  respondToSaveRequest = (OK, fileName) => {
     this.setState({ promptForSave: false });
     let blob;
     if (versionDetails().saveEncrypt === false)
@@ -2494,7 +2636,7 @@ export class NA extends Component {
 
     // iphone
     var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    if (fileName !== "") {
+    if (OK && fileName !== "") {
       if (iOS === false) {
         // works on IE and Edge to save file, would also work on Chrome, Firedox for desktop
         saveAs(
@@ -2516,6 +2658,10 @@ export class NA extends Component {
     }
   };
 
+  respondToMessage = () => {
+    this.setState({ showPopupMessage: "" });
+  };
+
   saveToFile_OLD = () => {
     const blob = new Blob([JSON.stringify(this.state.dataInput)], {
       type: "text/plain;charset=utf-8",
@@ -2524,7 +2670,7 @@ export class NA extends Component {
   };
 
   headerCommand = async (command) => {
-    await this.checkAndCallInitialFetch()
+    await this.checkAndCallInitialFetch();
     if (command === SAVETO_FILE) this.saveToFile();
     else if (command === LOAD_FILE) this.loadFromFile();
     else if (command === LOAD_STORAGE) this.loadStorage();
@@ -2540,8 +2686,7 @@ export class NA extends Component {
       // regular text file
       this.respondToSaveRequest("fileINA");
     else {
-     
-      console.log(this.state.dataInput, this.state.loading)
+      //console.log(this.state.dataInput, this.state.loading);
 
       this.handleEncryptedDataModes(
         MODE_SAVE,
@@ -2549,7 +2694,6 @@ export class NA extends Component {
         this.state.dataOutput
       );
     }
-    
   };
 
   loadData = () => {
@@ -2577,10 +2721,10 @@ export class NA extends Component {
     }
   };
 
-  EmailINA =  () => {
+  EmailINA = () => {
     // test
     //await this.checkAndCallInitialFetch();
-    
+
     this.handleEncryptedDataModes(
       MODE_EMAIL,
       this.state.dataInput,
@@ -2751,15 +2895,12 @@ export class NA extends Component {
     let l = 1;
     let n = 1;
 
-
-
     const showInput = this.state.promptForSave;
 
     const dataInput = this.state.dataInput;
     const lang = dataInput.Presentations[0].language;
 
     const dataOutput = this.state.dataOutput;
-
 
     const insuranceNeeds = this.state.dataOutput.dataInsuranceNeeds;
     const periodOption = dataInput.Presentations[0].periodOption;
@@ -2873,7 +3014,7 @@ export class NA extends Component {
         dataOutput.probate
       );
 
-      console.log(totalLiabProjections)
+      //console.log(totalLiabProjections);
 
       dataAges = dataOutput.dataNAAges.slice(0, noProjectYrs);
       dataGov = dataOutput.dataCashFlowGov.slice(0, noProjectYrs);
@@ -2913,9 +3054,7 @@ export class NA extends Component {
     const altRow = "#F8F8F8";
 
     const graphs = (
-      <Suspense
-        fallback={<Spinner/>}
-      >
+      <Suspense fallback={<Spinner />}>
         <OutputGraphs
           insuranceNeed={insNeed}
           projectEnd={projectEnd}
@@ -2943,13 +3082,11 @@ export class NA extends Component {
       </Suspense>
     );
     const graphsEP = (
-      <Suspense
-        fallback={<Spinner/>}
-      >
+      <Suspense fallback={<Spinner />}>
         <OutputGraphsEP
           insuranceNeed={insNeedLE3}
           projectEnd={projectEnd} // try this now // always to the end
-         // dataEstateLiability={dataEstateLiability}
+          // dataEstateLiability={dataEstateLiability}
           dataInput={dataInput}
           dataNAAges={dataAges}
           lifeExp={dataOutput.lifeExpectancy.joint} // client or if spouse JLTD
@@ -2977,9 +3114,7 @@ export class NA extends Component {
           paddingLeft: "5px",
         }}
       >
-        <Suspense
-          fallback={<Spinner/>}
-        >
+        <Suspense fallback={<Spinner />}>
           <AnalysisGraphs
             insuranceNeed={insNeedLE3}
             projectEnd={projectEnd} // try this now // always to the end
@@ -3016,43 +3151,76 @@ export class NA extends Component {
       </div>
     );
 
-    
-    if (this.state.initialLoading === true) {
-      return null;
-    } else {
+    /* if(this.state.initialQSParsing===-1)
+      return (<div >
+      <br/> None
+    </div>
+  
+    )
+    console.log("in NA: "this.props.language) 
+
+    else  */
+    if (this.state.promptShowCases && this.state.initialQSParsing === 0)
       return (
-        <div
-          id="main"
-          className={
-            (this.state.initialLoading === true || this.state.loading === true ) ? "mainDivBlocked" : "mainDiv"
-          }
-        >
-          <style>{`@media print {display: none;}`}</style>
-          <Header
-            title={
-              this.INAOption === DISPLAY_INCOME
-                ? TITLES[lang].appletINA
-                : TITLES[lang].appletEP
+        <div>
+          <br /> DB
+        </div>
+      );
+    else if (
+      this.state.promptShowFeedback > 0 &&
+      this.state.initialQSParsing === 0
+    )
+      return (
+        <div>
+          <br />{" "}
+          <TKDFeedback
+            language={this.state.promptShowFeedback === 1 ? "en" : "fr"}
+            email={this.userEmail}
+          />
+        </div>
+      );
+    else {
+      if (this.state.initialLoading === true) {
+        return (
+          <div>
+            <br /> loading
+          </div>
+        );
+      } else {
+        return (
+          <div
+            id="main"
+            className={
+              this.state.initialLoading === true || this.state.loading === true
+                ? "mainDivBlocked"
+                : "mainDiv"
             }
-             
-        
-            saveToFile={this.saveToFile}
-            loadFromFile={this.loadFromFile}
-            loadStorage={this.loadStorage}
-            EmailINA={this.EmailINA}
-            changeLang={this.changeLang}
-            saveAsDefaultCase={this.saveAsDefaultCase} 
-            /* saveToFile={() => this.headerCommand(SAVETO_FILE)}
+          >
+            <style>{`@media print {display: none;}`}</style>
+            <Header
+              title={
+                this.INAOption === DISPLAY_INCOME
+                  ? TITLES[lang].appletINA
+                  : TITLES[lang].appletEP
+              }
+              saveToFile={this.saveToFile}
+              loadFromFile={this.loadFromFile}
+              loadStorage={this.loadStorage}
+              EmailINA={this.EmailINA}
+              changeLang={this.changeLang}
+              saveAsDefaultCase={this.saveAsDefaultCase}
+              /* saveToFile={() => this.headerCommand(SAVETO_FILE)}
             loadFromFile={() => this.headerCommand(LOAD_FILE)}
             loadStorage={() => this.headerCommand(LOAD_STORAGE)}
             EmailINA={() => this.headerCommand(EMAIL_FILE)}
             changeLang={() => this.headerCommand(CHANGE_LANG)}
             saveAsDefaultCase={() => this.headerCommand(DEFAULT)} */
 
-            language={lang}
-          />
-          {  (this.state.initialLoading === true || this.state.loading === true ) && <Spinner/> }
-          {/* <div style={{marginTop:'15px'}} ><MultiButtons
+              language={lang}
+            />
+            {(this.state.initialLoading === true ||
+              this.state.loading === true) && <Spinner />}
+            {/* <div style={{marginTop:'15px'}} ><MultiButtons
         
           noButtons={2}
           buttonCaption={["Income Protection", "Estate Protection"]}
@@ -3060,473 +3228,463 @@ export class NA extends Component {
         /></div>
          */}
 
-          <div className="topMargin" />
+            <div className="topMargin" />
 
-          <div style={{ height: "0px" }}>
-            <PopupUserinputDialog
-              openDialog={showInput === true}
-              language={lang}
-              respondToInput={this.respondToSaveRequest}
-            />
-          </div>
-          {/* {this.state.initialLazyLoaded === false ? <span>{lang === "en" ? "loading..." : "attendez..."}</span> : "" } */}
-          <Collapsible
-            id={COLLAPSIBLE_PRESENTATION}
-            title={TITLES[lang].presentations}
-            openParent={this.openParent}
-            openCollapsible={this.openCollapsible[COLLAPSIBLE_PRESENTATION]}
-            handleCollapsibleClick={this.handleCollapsibleClick}
-          >
-            {dataInput.Presentations.map((presentation) => (
-              <Suspense
-                fallback={
-                   <Spinner/>
-                }
-              >
-                <Presentation
-                  key={presentation.id}
-                  id={1}
-                  provinceKey={presentation.provinceKey}
-                  presentationCurr={presentation}
-                  language={lang}
-                  presentationsNo={1}
-                  //saveAsDefaultCase={this.saveAsDefaultCase}
-                  handleUpdate={this.handleUpdatePresentation}
-                />
-              </Suspense>
-            ))}
-          </Collapsible>
-          <Collapsible
-            id={COLLAPSIBLE_CLIENTS}
-            title={singlePerson ? TITLES[lang].clients_1 : TITLES[lang].clients}
-            openParent={this.openParent}
-            openForce={this.openForce}
-            handleCollapsibleClick={this.handleCollapsibleClick}
-            openCollapsible={this.openCollapsible[COLLAPSIBLE_CLIENTS]}
-            infoIcon={APPLET_EP ? getInfoIconPYE_JLTD(lang) : undefined}
-          >
-            {dataInput.Clients.map((client) => (
-              <Client
-                key={client.id}
-                id={i++}
-                clientCurr={client}
-                singleFamily={singleFamily}
-                isTheSurvivor={
-                  (this.survIdx !== undefined &&
-                    dataInput.Clients[this.survIdx].memberKey ===
-                      client.memberKey) ||
-                  (singleFamily && client.id > 1)
-                    ? true
-                    : false
-                }
-                themeColor={i % 2 && isMobileDevice() ? altRow : "white"}
+            <div style={{ height: "0px" }}>
+              <PopupUserinputDialog
+                openDialog={showInput === true}
+                mainMessage={lang==="en"?"Save to File":"Enregistrer dans un fichier"}
+                formMessage={lang==="en"?"file name":"nom de fichier"}
                 language={lang}
-                isQC={dataInput.Presentations[0].provinceKey === "QC"}
-                clientsNo={dataInput.Clients.length} //clientsNo}
-                handleUpdate={this.handleUpdateClient}
-                handleAddClient={this.handleAddClient}
-                handleRemoveClient={this.handleRemoveClient}
-                switchClients={this.switchClients}
-                disableAddRemove={this.state.loading}
+                infoIcon = {getInfoSave(lang)}
+                respondToInput={this.respondToSaveRequest}
               />
-            ))}
-          </Collapsible>
-
-          <Collapsible
-            id={COLLAPSIBLE_ASSETS}
-            title={TITLES[lang].assets}
-            openParent={this.openParent}
-            openCollapsible={this.openCollapsible[COLLAPSIBLE_ASSETS]}
-            handleCollapsibleClick={this.handleCollapsibleClick}
-          >
-            {dataInput.Assets.map((asset) => (
-              <Suspense
-                fallback={
-                  <Spinner/>
-                  
-                }
-              >
-                <Asset
-                  key={asset.id}
-                  assetCurr={asset}
-                  id={j++}
-                  language={lang}
-                  themeColor={j % 2 && isMobileDevice() ? altRow : "white"}
-                  assetsNo={dataInput.Assets.length} //.assetsNo}
-                  clientsNo={dataInput.Clients.length} //.assetsNo}
-                  handleUpdate={this.handleUpdateAsset}
-                  handleAddAsset={this.handleAddAsset}
-                  handleRemoveAsset={this.handleRemoveAsset}
-                  // handleAddAssetTaxLiability={this.handleAddAssetTaxLiability}
-                  adjustVisibleOutputSection={this.adjustVisibleOutputSection}
-                  hasPersonalResidenceAlready={this.hasPersonalResidenceAlready()}
-                  projection={dataOutput.assetProjections}
-                  disableAddRemove={this.state.loading}
-                />
-              </Suspense>
-            ))}
-            {/* allow zero rows */}
-            {dataInput.Assets.length === 0 ? ( //).assetsNo === 0 ? (
-              <AddRemove
-                currentID={0}
-                minComps={0}
-                numberComps={0}
-                handleDoAdd={this.handleAddAsset}
-                handleDoRemove={this.handleRemoveAsset}
-              />
-            ) : (
-              ""
-            )}
-          </Collapsible>
-          <Collapsible
-            id={COLLAPSIBLE_LIABS}
-            title={TITLES[lang].liabilities}
-            openParent={this.openParent}
-            openCollapsible={this.openCollapsible[COLLAPSIBLE_LIABS]}
-            handleCollapsibleClick={this.handleCollapsibleClick}
-          >
-            {dataInput.Liabilitys.map((liability) => (
-              <Suspense
-                fallback={
-                  <Spinner/>
-                  
-                }
-              >
-                <Liability
-                  key={liability.id}
-                  liabilityCurr={liability}
-                  probate={dataOutput.probate}
-                  language={lang}
-                  liabilitysNo={dataInput.Liabilitys.length} //.liabilitysNo}
-                  themeColor={k % 2 && isMobileDevice() ? altRow : "white"}
-                  handleUpdate={this.handleUpdateLiability}
-                  handleAddLiability={this.handleAddLiability}
-                  handleRemoveLiability={this.handleRemoveLiability}
-                  overwriteProbate={
-                    dataInput.Presentations[0].overwriteProbate && APPLET_INA
-                  }
-                  // handleAddAssetTaxCredit={this.handleAddAssetTaxCredit}
-                  disableAddRemove={this.state.loading}
-                />
-              </Suspense>
-            ))}
-            {/* allow zero rows */}
-            {dataInput.Liabilitys.length === 0 ? ( //).liabilitysNo === 0 ? (
-              <AddRemove
-                currentID={0}
-                minComps={0}
-                numberComps={0}
-                handleDoAdd={this.handleAddLiability}
-                handleDoRemove={this.handleRemoveLiability}
-              />
-            ) : (
-              ""
-            )}
-          </Collapsible>
-
-          {this.INAOption === DISPLAY_INCOME && (
+            </div>
+            {/* {this.state.initialLazyLoaded === false ? <span>{lang === "en" ? "loading..." : "attendez..."}</span> : "" } */}
             <Collapsible
-              id={COLLAPSIBLE_SOURCES}
+              id={COLLAPSIBLE_PRESENTATION}
+              title={TITLES[lang].presentations}
+              openParent={this.openParent}
+              openCollapsible={this.openCollapsible[COLLAPSIBLE_PRESENTATION]}
+              handleCollapsibleClick={this.handleCollapsibleClick}
+            >
+              {dataInput.Presentations.map((presentation) => (
+                <Suspense fallback={<Spinner />}>
+                  <Presentation
+                    key={presentation.id}
+                    id={1}
+                    provinceKey={presentation.provinceKey}
+                    presentationCurr={presentation}
+                    language={lang}
+                    presentationsNo={1}
+                    //saveAsDefaultCase={this.saveAsDefaultCase}
+                    handleUpdate={this.handleUpdatePresentation}
+                  />
+                </Suspense>
+              ))}
+            </Collapsible>
+            <Collapsible
+              id={COLLAPSIBLE_CLIENTS}
               title={
-                singlePerson ? TITLES[lang].sources_1 : TITLES[lang].sources
+                singlePerson ? TITLES[lang].clients_1 : TITLES[lang].clients
               }
               openParent={this.openParent}
-              openCollapsible={this.openCollapsible[COLLAPSIBLE_SOURCES]}
+              openForce={this.openForce}
               handleCollapsibleClick={this.handleCollapsibleClick}
-              infoIcon={getInfoIconInflationGrowth(lang)}
+              openCollapsible={this.openCollapsible[COLLAPSIBLE_CLIENTS]}
+              infoIcon={APPLET_EP ? getInfoIconPYE_JLTD(lang) : undefined}
             >
-              {govPopup}
-              {dataInput.Sources.map((source) => {
-                let OrphanAges;
-                let maxOrphanDur;
-                if (
-                  source.sourceTypeKey === INCOMESOURCES.GOV_ORPHANS_BENEFIT.Key
-                ) {
-                  OrphanAges = dataInput.Clients.filter(function (item) {
-                    return source.ownerID === item.id;
-                  });
-
-                  if (OrphanAges.length > 0)
-                    maxOrphanDur =
-                      (dataInput.Presentations[0].provinceKey === "QC"
-                        ? MAX_ORPHAN_DUR_QC
-                        : MAX_ORPHAN_DUR_NON_QC) - OrphanAges[0].Age;
-                }
-                return (
-                  /* !(source.amount === 0 && source.id < noSources && source.sourceTypeKey === INCOMESOURCES.SURVIVORS_INCOME.Key) && */
-                  <Suspense
-                    fallback={
-                      <Spinner/>
-                      
-                    }
-                  >
-                    <Source
-                      key={source.id}
-                      id={n++}
-                      sourceCurr={
-                        source.sourceTypeKey ===
-                        INCOMESOURCES.GOV_ORPHANS_BENEFIT.Key
-                          ? {
-                              ...source,
-                              maxOrphan: this.orphan,
-                              maxOrphanDur: maxOrphanDur,
-                            }
-                          : source
-                      }
-                      /* Type={source.Type}
-              amount={source.amount}
-              startYear={source.startYear}
-              duration={source.duration}
-              ownerID={source.ownerID} */
-                      includeGovOrphanBenefit={this.areThereChildren()}
-                      language={lang}
-                      sourcesNo={dataInput.Sources.length} //sourcesNo}
-                      themeColor={n % 2 && isMobileDevice() ? altRow : "white"}
-                      handleUpdate={this.handleUpdateSource}
-                      handleAddSource={this.handleAddSource}
-                      handleRemoveSource={this.handleRemoveSource}
-                      disableAddRemove={this.state.loading}
-                    />
-                  </Suspense>
-                );
-              })}
-            </Collapsible>
-          )}
-          {this.INAOption === DISPLAY_INCOME && (
-            <Collapsible
-              id={COLLAPSIBLE_NEEDS}
-              title={singlePerson ? TITLES[lang].needs_1 : TITLES[lang].needs}
-              openParent={this.openParent}
-              openCollapsible={this.openCollapsible[COLLAPSIBLE_NEEDS]}
-              handleCollapsibleClick={this.handleCollapsibleClick}
-              infoIcon={getInfoIconNeedGrowth(lang)}
-            >
-              {dataInput.Needs.map((need) => (
-                <Suspense
-                  fallback={
-                    <Spinner/>
-                    
+              {dataInput.Clients.map((client) => (
+                <Client
+                  key={client.id}
+                  id={i++}
+                  clientCurr={client}
+                  singleFamily={singleFamily}
+                  isTheSurvivor={
+                    (this.survIdx !== undefined &&
+                      dataInput.Clients[this.survIdx].memberKey ===
+                        client.memberKey) ||
+                    (singleFamily && client.id > 1)
+                      ? true
+                      : false
                   }
-                >
-                  <Need
-                    key={need.id}
-                    id={l++}
-                    needCurr={need}
+                  themeColor={i % 2 && isMobileDevice() ? altRow : "white"}
+                  language={lang}
+                  isQC={dataInput.Presentations[0].provinceKey === "QC"}
+                  clientsNo={dataInput.Clients.length} //clientsNo}
+                  handleUpdate={this.handleUpdateClient}
+                  handleAddClient={this.handleAddClient}
+                  handleRemoveClient={this.handleRemoveClient}
+                  switchClients={this.switchClients}
+                  disableAddRemove={this.state.loading}
+                />
+              ))}
+            </Collapsible>
+
+            <Collapsible
+              id={COLLAPSIBLE_ASSETS}
+              title={TITLES[lang].assets}
+              openParent={this.openParent}
+              openCollapsible={this.openCollapsible[COLLAPSIBLE_ASSETS]}
+              handleCollapsibleClick={this.handleCollapsibleClick}
+            >
+              {dataInput.Assets.map((asset) => (
+                <Suspense fallback={<Spinner />}>
+                  <Asset
+                    key={asset.id}
+                    assetCurr={asset}
+                    id={j++}
                     language={lang}
-                    needsNo={dataInput.Needs.length} //needsNo}
-                    afterTaxTotalIncome={this.getAfterTaxTotalIncome(dataInput)}
-                    themeColor={l % 2 && isMobileDevice() ? altRow : "white"}
-                    handleUpdate={this.handleUpdateNeed}
-                    handleAddNeed={this.handleAddNeed}
-                    handleRemoveNeed={this.handleRemoveNeed}
+                    themeColor={j % 2 && isMobileDevice() ? altRow : "white"}
+                    assetsNo={dataInput.Assets.length} //.assetsNo}
+                    clientsNo={dataInput.Clients.length} //.assetsNo}
+                    handleUpdate={this.handleUpdateAsset}
+                    handleAddAsset={this.handleAddAsset}
+                    handleRemoveAsset={this.handleRemoveAsset}
+                    // handleAddAssetTaxLiability={this.handleAddAssetTaxLiability}
+                    adjustVisibleOutputSection={this.adjustVisibleOutputSection}
+                    hasPersonalResidenceAlready={this.hasPersonalResidenceAlready()}
+                    projection={dataOutput.assetProjections}
                     disableAddRemove={this.state.loading}
                   />
                 </Suspense>
               ))}
               {/* allow zero rows */}
-              {dataInput.Needs.length === 0 ? ( //).liabilitysNo === 0 ? (
+              {dataInput.Assets.length === 0 ? ( //).assetsNo === 0 ? (
                 <AddRemove
                   currentID={0}
+                  lang={lang}
                   minComps={0}
                   numberComps={0}
-                  handleDoAdd={this.handleAddNeed}
-                  handleDoRemove={this.handleRemoveNeed}
+                  handleDoAdd={this.handleAddAsset}
+                  handleDoRemove={this.handleRemoveAsset}
                 />
               ) : (
                 ""
               )}
             </Collapsible>
-          )}
-          {/*<Collapsible id="8" title={TITLES[lang].settings} openParent={this.openParent}  handleCollapsibleClick
+            <Collapsible
+              id={COLLAPSIBLE_LIABS}
+              title={TITLES[lang].liabilities}
+              openParent={this.openParent}
+              openCollapsible={this.openCollapsible[COLLAPSIBLE_LIABS]}
+              handleCollapsibleClick={this.handleCollapsibleClick}
+            >
+              {dataInput.Liabilitys.map((liability) => (
+                <Suspense fallback={<Spinner />}>
+                  <Liability
+                    key={liability.id}
+                    liabilityCurr={liability}
+                    probate={dataOutput.probate}
+                    language={lang}
+                    liabilitysNo={dataInput.Liabilitys.length} //.liabilitysNo}
+                    themeColor={k % 2 && isMobileDevice() ? altRow : "white"}
+                    handleUpdate={this.handleUpdateLiability}
+                    handleAddLiability={this.handleAddLiability}
+                    handleRemoveLiability={this.handleRemoveLiability}
+                    overwriteProbate={
+                      dataInput.Presentations[0].overwriteProbate && APPLET_INA
+                    }
+                    // handleAddAssetTaxCredit={this.handleAddAssetTaxCredit}
+                    disableAddRemove={this.state.loading}
+                  />
+                </Suspense>
+              ))}
+              {/* allow zero rows */}
+              {dataInput.Liabilitys.length === 0 ? ( //).liabilitysNo === 0 ? (
+                <AddRemove
+                  currentID={0}
+                  lang={lang}
+                  minComps={0}
+                  numberComps={0}
+                  handleDoAdd={this.handleAddLiability}
+                  handleDoRemove={this.handleRemoveLiability}
+                />
+              ) : (
+                ""
+              )}
+            </Collapsible>
+
+            {this.INAOption === DISPLAY_INCOME && (
+              <Collapsible
+                id={COLLAPSIBLE_SOURCES}
+                title={
+                  singlePerson ? TITLES[lang].sources_1 : TITLES[lang].sources
+                }
+                openParent={this.openParent}
+                openCollapsible={this.openCollapsible[COLLAPSIBLE_SOURCES]}
+                handleCollapsibleClick={this.handleCollapsibleClick}
+                infoIcon={getInfoIconInflationGrowth(lang)}
+              >
+                {govPopup}
+                {dataInput.Sources.map((source) => {
+                  let OrphanAges;
+                  let maxOrphanDur;
+                  if (
+                    source.sourceTypeKey ===
+                    INCOMESOURCES.GOV_ORPHANS_BENEFIT.Key
+                  ) {
+                    OrphanAges = dataInput.Clients.filter(function (item) {
+                      return source.ownerID === item.id;
+                    });
+
+                    if (OrphanAges.length > 0)
+                      maxOrphanDur =
+                        (dataInput.Presentations[0].provinceKey === "QC"
+                          ? MAX_ORPHAN_DUR_QC
+                          : MAX_ORPHAN_DUR_NON_QC) - OrphanAges[0].Age;
+                  }
+                  return (
+                    /* !(source.amount === 0 && source.id < noSources && source.sourceTypeKey === INCOMESOURCES.SURVIVORS_INCOME.Key) && */
+                    <Suspense fallback={<Spinner />}>
+                      <Source
+                        key={source.id}
+                        id={n++}
+                        sourceCurr={
+                          source.sourceTypeKey ===
+                          INCOMESOURCES.GOV_ORPHANS_BENEFIT.Key
+                            ? {
+                                ...source,
+                                maxOrphan: this.orphan,
+                                maxOrphanDur: maxOrphanDur,
+                              }
+                            : source
+                        }
+                        /* Type={source.Type}
+              amount={source.amount}
+              startYear={source.startYear}
+              duration={source.duration}
+              ownerID={source.ownerID} */
+                        includeGovOrphanBenefit={this.areThereChildren()}
+                        language={lang}
+                        sourcesNo={dataInput.Sources.length} //sourcesNo}
+                        themeColor={
+                          n % 2 && isMobileDevice() ? altRow : "white"
+                        }
+                        handleUpdate={this.handleUpdateSource}
+                        handleAddSource={this.handleAddSource}
+                        handleRemoveSource={this.handleRemoveSource}
+                        disableAddRemove={this.state.loading}
+                      />
+                    </Suspense>
+                  );
+                })}
+              </Collapsible>
+            )}
+            {this.INAOption === DISPLAY_INCOME && (
+              <Collapsible
+                id={COLLAPSIBLE_NEEDS}
+                title={singlePerson ? TITLES[lang].needs_1 : TITLES[lang].needs}
+                openParent={this.openParent}
+                openCollapsible={this.openCollapsible[COLLAPSIBLE_NEEDS]}
+                handleCollapsibleClick={this.handleCollapsibleClick}
+                infoIcon={getInfoIconNeedGrowth(lang)}
+              >
+                {dataInput.Needs.map((need) => (
+                  <Suspense fallback={<Spinner />}>
+                    <Need
+                      key={need.id}
+                      id={l++}
+                      needCurr={need}
+                      language={lang}
+                      needsNo={dataInput.Needs.length} //needsNo}
+                      afterTaxTotalIncome={this.getAfterTaxTotalIncome(
+                        dataInput
+                      )}
+                      themeColor={l % 2 && isMobileDevice() ? altRow : "white"}
+                      handleUpdate={this.handleUpdateNeed}
+                      handleAddNeed={this.handleAddNeed}
+                      handleRemoveNeed={this.handleRemoveNeed}
+                      disableAddRemove={this.state.loading}
+                    />
+                  </Suspense>
+                ))}
+                {/* allow zero rows */}
+                {dataInput.Needs.length === 0 ? ( //).liabilitysNo === 0 ? (
+                  <AddRemove
+                    currentID={0}
+                    lang={lang}
+                    minComps={0}
+                    numberComps={0}
+                    handleDoAdd={this.handleAddNeed}
+                    handleDoRemove={this.handleRemoveNeed}
+                  />
+                ) : (
+                  ""
+                )}
+              </Collapsible>
+            )}
+            {/*<Collapsible id="8" title={TITLES[lang].settings} openParent={this.openParent}  handleCollapsibleClick
 ={this. handleCollapsibleClick
 }>
 					<Setting key={this.state.dataSettings.Settings.id} index={1} Province={this.state.dataSettings.Settings.Province} invRate={this.state.dataSettings.Settings.invRate} inflation={this.state.dataSettings.Settings.inflation} taxRate={this.state.dataSettings.Settings.taxRate} language={lang}  handleUpdate={this.handleUpdateSetting} />
 					
 				</Collapsible>*/}
 
-          {this.state.failedAPI ? (
-            <div style={{ paddingLeft: "40%" }}>
-              <Info
-                infoIcon={getInfoNoInternetAccess(lang)}
-                respondToPopUp={this.respondToPopUp}
-                ref={(Info) => (this.dlgLogin = Info)}
-              />
-            </div>
-          ) : (
-            ""
-          )}
-
-          {
-            /* this.state.loading===false &&  */ <Collapsible
-              id={COLLAPSIBLE_RESULTS}
-              title={TITLES[lang].results}
-              enabled={this.state.loading === false}
-              openParent={this.openParent}
-              openCollapsible={this.openCollapsible[COLLAPSIBLE_RESULTS]}
-              handleCollapsibleClick={this.handleCollapsibleClick}
-            >
-              <div style={{ width: "100%", float: "left", clear: "left" }}>
-                {versionDetails().allowAnalysis === true && !APPLET_INA ? (
-                  <MultiButtons
-                    noButtons={4}
-                    buttonCaption={buttonCaption}
-                    selected={dataInput.Presentations[0].resultsOption}
-                    selectMultiButton={this.selectMultiButton}
-                  />
-                ) : (
-                  <MultiButtons
-                    noButtons={3}
-                    buttonCaption={buttonCaption3}
-                    selected={dataInput.Presentations[0].resultsOption}
-                    selectMultiButton={this.selectMultiButton}
-                  />
-                )}
+            {this.state.failedAPI ? (
+              <div style={{ paddingLeft: "40%" }}>
+                <Info
+                  infoIcon={getInfoNoInternetAccess(lang)}
+                  respondToPopUp={this.respondToPopUp}
+                  ref={(Info) => (this.dlgLogin = Info)}
+                />
               </div>
+            ) : (
+              ""
+            )}
 
-              <div style={{ width: "100%", float: "left", clear: "left" }}>
-                {/* <MultiButtons
+            {
+              /* this.state.loading===false &&  */ <Collapsible
+                id={COLLAPSIBLE_RESULTS}
+                title={TITLES[lang].results}
+                enabled={this.state.loading === false}
+                openParent={this.openParent}
+                openCollapsible={this.openCollapsible[COLLAPSIBLE_RESULTS]}
+                handleCollapsibleClick={this.handleCollapsibleClick}
+              >
+                <div style={{ width: "100%", float: "left", clear: "left" }}>
+                  {versionDetails().allowAnalysis === true && !APPLET_INA ? (
+                    <MultiButtons
+                      noButtons={4}
+                      buttonCaption={buttonCaption}
+                      selected={dataInput.Presentations[0].resultsOption}
+                      selectMultiButton={this.selectMultiButton}
+                    />
+                  ) : (
+                    <MultiButtons
+                      noButtons={3}
+                      buttonCaption={buttonCaption3}
+                      selected={dataInput.Presentations[0].resultsOption}
+                      selectMultiButton={this.selectMultiButton}
+                    />
+                  )}
+                </div>
+
+                <div style={{ width: "100%", float: "left", clear: "left" }}>
+                  {/* <MultiButtons
               button1={ret}
               button2={le}
               buttonActive={this.toRetirement ? 1 : 2}
               selectButton={this.setInsDuration}
             /> */}
-                {this.INAOption === DISPLAY_INCOME &&
-                  dataInput.Presentations[0].resultsOption !==
-                    DISPLAY_ANALYSIS &&
-                  !singleFamily && (
-                    <MultiButtons
-                      noButtons={3}
-                      buttonCaption={buttonCaptionPeriod}
-                      selected={dataInput.Presentations[0].periodOption + 1}
-                      selectMultiButton={this.selectMultiButtonPeriod}
-                    />
-                  )}
-
-                {periodOption !== DISPLAY_RETIREMENT &&
-                  dataInput.Presentations[0].resultsOption !==
-                    DISPLAY_ANALYSIS && (
-                    <span style={{ fontSize: "10px", fontColor: "grey" }}>
-                      {/* <Info iconName="infoRed.png" id="warning" msg={msg1} /> */}
-                    </span>
-                  )}
-              </div>
-              {dataOutput.dataCashFlowPersonal.length === 0 ? (
-                ""
-              ) : dataInput.Presentations[0].resultsOption ===
-                DISPLAY_GRAPHS ? (
-                APPLET_INA ? (
-                  graphs
-                ) : (
-                  graphsEP
-                )
-              ) : dataInput.Presentations[0].resultsOption ===
-                DISPLAY_SPREADSHEET ? (
-                //<div style={{ width: tableWidth }}>
-                <div>
-                  {/* {APPLET_INA && this.state.dataOutput.aggregateGrid !== null && this.state.dataOutput.aggregateGrid !== undefined ? */}
-                  {dataOutput.aggregateGrid !== null &&
-                    dataOutput.aggregateGrid !== undefined && (
-                      /* !showSinglePerson && */ <Suspense
-                        fallback={
-                          <Spinner/>
-                          
-                        }
-                      >
-                        <AggregateGrid
-                          aggregateGrid={dataOutput.aggregateGrid}
-                          LE={
-                            APPLET_INA
-                              ? dataOutput.lifeExpectancy.spouse
-                              : dataOutput.lifeExpectancy.joint
-                          }
-                          lang={lang}
-                          insNeedLine={insNeedLine}
-                        />
-                      </Suspense>
+                  {this.INAOption === DISPLAY_INCOME &&
+                    dataInput.Presentations[0].resultsOption !==
+                      DISPLAY_ANALYSIS &&
+                    !singleFamily && (
+                      <MultiButtons
+                        noButtons={3}
+                        buttonCaption={buttonCaptionPeriod}
+                        selected={dataInput.Presentations[0].periodOption + 1}
+                        selectMultiButton={this.selectMultiButtonPeriod}
+                      />
                     )}
 
-                  {/* : APPLET_EP && <ExcelSpreadsheetEP input={this.state} noProjectYrs={noProjectYrs} />} */}
+                  {periodOption !== DISPLAY_RETIREMENT &&
+                    dataInput.Presentations[0].resultsOption !==
+                      DISPLAY_ANALYSIS && (
+                      <span style={{ fontSize: "10px", fontColor: "grey" }}>
+                        {/* <Info iconName="infoRed.png" id="warning" msg={msg1} /> */}
+                      </span>
+                    )}
                 </div>
-              ) : dataInput.Presentations[0].resultsOption ===
-                DISPLAY_ANALYSIS ? (
-                analysis
-              ) : this.INAOption === DISPLAY_INCOME ? (
-                <Suspense
-                  fallback={
-                    <Spinner/>
-                    
-                  }
-                >
-                  <OutputPresentation
-                    insuranceNeed={insNeed}
-                    insuranceNeedRet={insNeedRet}
-                    insuranceNeedLE={insNeedLE}
-                    insuranceNeedEAge={insNeedEAge}
-                    projectEnd={projectEnd}
-                    insNeedLine={insNeedLine}
-                    LE={dataOutput.lifeExpectancy}
-                    dataInput={dataInput}
-                    INAOption={this.INAOption}
-                    dataShortfall={dataShort}
-                    imageRemove={this.imageRemove}
-                    imageAdjust={this.imageAdjust}
-                    encryptedInputLife1AndSpouse={
-                      dataOutput.encryptedInputLife1AndSpouse
-                    }
-                    encryptedInputLife1={dataOutput.encryptedInputLife1}
-                    //periodOption={periodOption}
-                    yrsCoverageIfCashAll={parseInt(dataOutput.yrsCoverageIfCashAll-1) + (dataOutput.yrsCoverageIfCashAll===2?" year":" years")}
-                    getSpouseINA={this.getSwitchClientsState}
-                  />
-                </Suspense>
-              ) : (
-                <Suspense
-                  fallback={
-                    <Spinner/>
-                    
-                  }
-                >
-                  <OutputPresentationEP
-                    //insuranceNeed={insNeed}
-                    insuranceNeedRet={insNeedRet}
-                    insuranceNeedLE={insNeedLE}
-                    //insuranceNeedEAge={insNeedEAge}
-                    //projectEnd={projectEnd}
-                    LE={dataOutput.lifeExpectancy.joint} //client} //{dataOutput.lifeExpectancy.spouse + survAge}
-                    dataInput={dataInput}
-                    assetProjections={dataOutput.assetProjections}
-                    aggregateGrid={dataOutput.aggregateGrid}
-                    probate={dataOutput.probate}
-                    taxLiability={dataOutput.dataTaxLiability}
-                    INAOption={this.INAOption}
-                    dataEstateLiability={dataEstateLiability} //getDataFutureEstateLiability(this.dataTaxLiability.numericValues, totalLiabProjections)}
-                    dataShortfall={dataShort}
-                    appSiteParent={appSiteParent}
-                    imageRemove={this.imageRemove}
-                    imageAdjust={this.imageAdjust}
-                    //periodOption={periodOption}
-                    encryptedInputLife1AndSpouse={
-                      dataOutput.encryptedInputLife1AndSpouse
-                    }
-                    encryptedInputLife1={dataOutput.encryptedInputLife1}
-                  />
-                </Suspense>
-              )}
-            </Collapsible>
-          }
+                {dataOutput.dataCashFlowPersonal.length === 0 ? (
+                  ""
+                ) : dataInput.Presentations[0].resultsOption ===
+                  DISPLAY_GRAPHS ? (
+                  APPLET_INA ? (
+                    graphs
+                  ) : (
+                    graphsEP
+                  )
+                ) : dataInput.Presentations[0].resultsOption ===
+                  DISPLAY_SPREADSHEET ? (
+                  //<div style={{ width: tableWidth }}>
+                  <div>
+                    {/* {APPLET_INA && this.state.dataOutput.aggregateGrid !== null && this.state.dataOutput.aggregateGrid !== undefined ? */}
+                    {dataOutput.aggregateGrid !== null &&
+                      dataOutput.aggregateGrid !== undefined && (
+                        /* !showSinglePerson && */ <Suspense
+                          fallback={<Spinner />}
+                        >
+                          <AggregateGrid
+                            aggregateGrid={dataOutput.aggregateGrid}
+                            LE={
+                              APPLET_INA
+                                ? dataOutput.lifeExpectancy.spouse
+                                : dataOutput.lifeExpectancy.joint
+                            }
+                            lang={lang}
+                            insNeedLine={insNeedLine}
+                          />
+                        </Suspense>
+                      )}
 
-          {/*  {this.state.initialLoading === true && (
+                    {/* : APPLET_EP && <ExcelSpreadsheetEP input={this.state} noProjectYrs={noProjectYrs} />} */}
+                  </div>
+                ) : dataInput.Presentations[0].resultsOption ===
+                  DISPLAY_ANALYSIS ? (
+                  analysis
+                ) : this.INAOption === DISPLAY_INCOME ? (
+                  <Suspense fallback={<Spinner />}>
+                    <OutputPresentation
+                      insuranceNeed={insNeed}
+                      insuranceNeedRet={insNeedRet}
+                      insuranceNeedLE={insNeedLE}
+                      insuranceNeedEAge={insNeedEAge}
+                      projectEnd={projectEnd}
+                      insNeedLine={insNeedLine}
+                      LE={dataOutput.lifeExpectancy}
+                      dataInput={dataInput}
+                      INAOption={this.INAOption}
+                      dataShortfall={dataShort}
+                      imageRemove={this.imageRemove}
+                      imageAdjust={this.imageAdjust}
+                      encryptedInputLife1AndSpouse={
+                        dataOutput.encryptedInputLife1AndSpouse
+                      }
+                      encryptedInputLife1={dataOutput.encryptedInputLife1}
+                      //periodOption={periodOption}
+                      yrsCoverageIfCashAll={
+                        parseInt(dataOutput.yrsCoverageIfCashAll - 1) /* +
+                      (dataOutput.yrsCoverageIfCashAll === 2
+                        ? " year"
+                        : " years") */
+                      }
+                      getSpouseINA={this.getSwitchClientsState}
+                    />
+                  </Suspense>
+                ) : (
+                  <Suspense fallback={<Spinner />}>
+                    <OutputPresentationEP
+                      //insuranceNeed={insNeed}
+                      insuranceNeedRet={insNeedRet}
+                      insuranceNeedLE={insNeedLE}
+                      //insuranceNeedEAge={insNeedEAge}
+                      //projectEnd={projectEnd}
+                      LE={dataOutput.lifeExpectancy.joint} //client} //{dataOutput.lifeExpectancy.spouse + survAge}
+                      dataInput={dataInput}
+                      assetProjections={dataOutput.assetProjections}
+                      aggregateGrid={dataOutput.aggregateGrid}
+                      probate={dataOutput.probate}
+                      taxLiability={dataOutput.dataTaxLiability}
+                      INAOption={this.INAOption}
+                      dataEstateLiability={dataEstateLiability} //getDataFutureEstateLiability(this.dataTaxLiability.numericValues, totalLiabProjections)}
+                      dataShortfall={dataShort}
+                      appSiteParent={appSiteParent}
+                      imageRemove={this.imageRemove}
+                      imageAdjust={this.imageAdjust}
+                      //periodOption={periodOption}
+                      encryptedInputLife1AndSpouse={
+                        dataOutput.encryptedInputLife1AndSpouse
+                      }
+                      encryptedInputLife1={dataOutput.encryptedInputLife1}
+                    />
+                  </Suspense>
+                )}
+              </Collapsible>
+            }
+
+            {this.state.loading===false && this.state.showPopupMessage !== "" && (
+              <PopupMessage
+                severity={"warning"}
+                messageTitle={this.state.showPopupMessage}
+                openDialog={this.state.showPopupMessage !== ""}
+                respondToMessage={this.respondToMessage}
+              ></PopupMessage>
+            )}
+            {/*  {this.state.initialLoading === true && (
           <div style={{ marginTop: "20px", marginLeft: "90px" }}>
             <Loader type="TailSpin" color="black" height={30} width={30} />
           </div>
         )} */}
 
-          {this.state.SnapImport ? <PasteClients /> : ""}
-          <div id="copyDiv" style={{ paddingBottom: "40px" }}></div>
+            {this.state.SnapImport ? <PasteClients /> : ""}
+            <div id="copyDiv" style={{ paddingBottom: "40px" }}></div>
 
-          <br />
-        </div>
-      );
+            <br />
+          </div>
+        );
+      }
     }
   }
 }

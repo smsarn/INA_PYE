@@ -4,39 +4,10 @@ import { DialogActions, DialogContent, DialogContentText, DialogTitle, TextField
 import { makeStyles } from '@material-ui/core/styles';
 
 import { Info } from "./Info";
-import {
+/* import {
   getInfoSave
 } from "../definitions/infoIconsDefinitions.js";
-
-
-const MESSAGES = {
-  en: {
-  saveAs1: "To save files in your desired location: ",
-  saveAs2: " - Microsoft Edge: select 'SaveAs' when prompted ",
-  saveAs3: " - Google Chrome: make a one time change: ",
-  saveAs4: "go to Settings - Advanced - Downloads and turn on ",
-  saveAs5: "'Ask where to save each file before downloading"
-  
-  },
-  fr: {
-  saveAs1: "To save files in your desired location: ^F",
-  saveAs2: " - Microsoft Edge: select 'SaveAs' when prompted  ^F",
-  saveAs3: " - Google Chrome: make a one time change:  ^F",
-  saveAs4: "go to Settings - Advanced - Downloads and turn on  ^F",
-  saveAs5: "'Ask where to save each file before downloading  ^F"
-  
-  }
-};
-
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    '& > *': {
-      margin: theme.spacing(1),
-    },
-  },
-}));
-
+ */
 
 export class PopupUserinputDialog extends Component {
   constructor(props) {
@@ -59,7 +30,7 @@ export class PopupUserinputDialog extends Component {
   }
 
   handleOK = () => {
-    this.props.respondToInput(this.state.name)
+    this.props.respondToInput(true, this.state.name)
     this.setState({
       open: !this.state.open
     })
@@ -67,7 +38,7 @@ export class PopupUserinputDialog extends Component {
 
 
   handleCancel = () => {
-    this.props.respondToInput("")
+    this.props.respondToInput(false, "")
     this.setState({
       open: !this.state.open
     })
@@ -80,12 +51,9 @@ export class PopupUserinputDialog extends Component {
     })
   }
 
-
-
   render() {
 
     const handleChange = evt => {
-
 
       this.setState({
         name: evt.target.value
@@ -93,79 +61,42 @@ export class PopupUserinputDialog extends Component {
 
       )
 
-
     }
-    const infoIcon = getInfoSave(this.props.language);
-    var sourceEdge = require('../images/chooseButton.png');
-    var sourceChrome = require('../images/chooseButtonChrome.png');
-    var optionsEdge = require('../images/optionsEdge.png');
-    var optionsChrome = require('../images/optionsChrome.png');
-
-    const message=MESSAGES[this.props.language]
-
+    /* const infoIcon = getInfoSave(this.props.language); */
+    const infoIcon = this.props.infoIcon;
     
     return (
 
       <div>
-
-       {/*  <Button/> */}
         <Dialog
           open={this.state.open}
           onClose={this.handleToggle}
-          aria-labelledby="confirm-dialog"
-
-        >
+          aria-labelledby="confirm-dialog">
           <DialogTitle id="confirm-dialog"></DialogTitle>
           <DialogContent >
-            <DialogContentText><span className="dialog">Save to File</span>
+            {/* <DialogContentText><span className="dialog">{this.props.language==="en"?"Save to File":"Enregistrer dans un fichier"}</span>   */}
+            <DialogContentText><span className="dialog">{this.props.mainMessage}</span>  
             </DialogContentText>
-
-            <form>
+            {this.props.formMessage!== undefined && <form>
               <TextField
                 id="1"
-                label="file name"
+               /*  label={this.props.language==="en"?"file name":"nom de fichier"} */
+                label={this.props.formMessage}
                 value={this.state.name}
                 onChange={handleChange}
                 margin="normal">
               </TextField>
-
-
-            </form>
+            </form>}
           </DialogContent>
            
           <DialogActions style={{ paddingRight: '12px', paddingBottom: '10px' }}>
-          <div  style={{ marginLeft: '10px'}}><Info  infoIcon={infoIcon}/>
+          {infoIcon!==undefined && <span  style={{ height:"50px", marginLeft: '10px'}}><Info  infoIcon={infoIcon}/></span>}<br/>
           {/* <Button onClick={this.handleInfo} variant="contained"> <span className="dialog"> Instructions </span></Button> */}
-          <Button onClick={this.handleCancel} variant="contained"   style={{ marginLeft: '222px', marginRight: '8px'}} > <span className="dialog"> Cancel </span></Button>
-            <Button onClick={this.handleOK} variant="contained"> <span className="dialog"> OK </span></Button></div>
+          <Button onClick={this.handleCancel} variant="contained"   style={{marginLeft: this.props.language==="en"?"222px":"340px", marginRight:"8px"}} > <span className="dialog"> {this.props.language==="en"?"Cancel":"Annuler"} </span></Button>
+          <Button onClick={this.handleOK} variant="contained"> <span className="dialog"> OK </span></Button>
             
           </DialogActions>
-          {this.state.showInfo &&
-            <Card> <CardContent>
-              <Typography variant="body2" color="textSecondary" component="p">
-                <div>
-                To save files in your desired location:<ul><li>Microsofrft Edge:
-              <ul>
-                <li>Go to Options {this.state.showInfo && <img  alt="info" src={optionsEdge}  />} </li>
-                <li>Click Downlods - Click Download settings</li>
-                <li>Turn on "Ask where to save each file before downloading" {this.state.showInfo && <img  alt="info" src={sourceEdge}  />}
-              </li>
-               </ul>
-               </li><li>Google Chrome:
-               <ul>
-               <li>Go to Options {this.state.showInfo && <img  alt="info" src={optionsChrome}  />} </li>
-                <li>Click Settings - Advanced - Downloads</li>
-                <li>Turn on "Ask where to save each file before downloading" {this.state.showInfo && <img  alt="info" src={sourceChrome}  />}
-                </li>
-               </ul>
-              
-              </li></ul></div>
-             
-          </Typography>
-         
-        </CardContent></Card>}
-         
-        </Dialog>
+          </Dialog>
 
       </div >
 

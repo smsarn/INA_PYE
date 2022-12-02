@@ -411,10 +411,13 @@ input[type="text"][disabled] {
 }
 
 .Text {
+
 	text-align: left;
 	width: 182px;
 	padding-left: 8px;
 	margin-top: 4px;
+	font-family: 'Trebuchet MS';
+	font-size: 14px;
 }
 .textarea
 {

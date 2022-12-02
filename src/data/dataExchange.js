@@ -1091,3 +1091,6 @@ function findMatchingKey(objValues, nameFromFile) {
           )
   )[0].Key;
 }
+
+export function sendToReloadINA()
+{}

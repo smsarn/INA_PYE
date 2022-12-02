@@ -208,8 +208,10 @@ export class InputField extends Component {
     let inputColorStyle =
       this.props.colorDiv === undefined
         ? {}
-        : { border: "1px solid " + this.props.colorDiv };
+        : { border: "3px solid " + this.props.colorDiv };
 
+
+        
     //iOS=false;
     var iOS2 = false;
 
@@ -245,7 +247,8 @@ export class InputField extends Component {
           {iOS2 ? (
             "" //<input type="text" inputmode="decimal" min="0.0" max={max} step={step} className={styleClass} isDisabled={disable} onFocus={this.handleFocus} onClick={this.select} value={displayValue} onChange={evt => this.updateInputValue(evt)}  />
           ) : (
-            <div className={styleClass}>
+            <div className={styleClass}  style={inputColorStyle}
+            >
               <span>
                 <input
                   type="text"

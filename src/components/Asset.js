@@ -776,7 +776,13 @@ let i;
       (rrsp ||
         assetCurr.assetTypeKey === ASSETS.INTEREST_BEARING.Key || //value[language] ||
         assetCurr.assetTypeKey === ASSETS.STOCKS_BONDS.Key ||
+        assetCurr.assetTypeKey === ASSETS.SMALL_BUSINESS_SHARES.Key ||
         assetCurr.assetTypeKey === ASSETS.TFSA.Key); //value[language];
+    
+    let showContributionStart =
+        APPLET_EP  && assetCurr.assetTypeKey === ASSETS.SMALL_BUSINESS_SHARES.Key
+       
+
     let showWithdrawal =
       (APPLET_EP ||
         (APPLET_INA && assetCurr.withdrawalAmt > 0) ||
@@ -1052,34 +1058,35 @@ let i;
           {showContribution && (
             <div>
               <InputField
-                inputName={CONTROLTITLE[language].contributionAmt}
+                inputName={this.props.assetCurr.assetTypeKey === ASSETS.SMALL_BUSINESS_SHARES.Key? CONTROLTITLE[language].contributionAmtSB:CONTROLTITLE[language].contributionAmt}
                 id={6}
                 format={2}
                 Count={assetsNo}
                 language={language}
                 inputValue={assetCurr.contributionAmt}
                 infoIcon={getInfoIconDepositWithd(this.props.language)}
-                colorDiv={"green"}
+                colorDiv={"#399147"}
                 handleUpdateInput={this.handleUpdateInput}
               />
-              {/* <InputField
+              {showContributionStart && (<InputField
               inputName={CONTROLTITLE[language].contributionStartYr}
               id={7}
               format={1}
               //info={MESSAGES[language].infoYr0}
               Count={assetsNo}
               language={language}
+              colorDiv={"#399147"}
               inputValue={assetCurr.contributionStartYr}
               handleUpdateInput={this.handleUpdateInput}
-            />  */}
-              <InputField
+            />)}
+               <InputField
                 inputName={CONTROLTITLE[language].contributionDur}
                 id={8}
                 format={1}
                 Count={assetsNo}
                 language={language}
                 inputValue={assetCurr.contributionDur}
-                colorDiv={"green"}
+                colorDiv={"#399147"}
                 handleUpdateInput={this.handleUpdateInput}
               />
             </div>
@@ -1094,7 +1101,7 @@ let i;
                 Count={assetsNo}
                 language={language}
                 inputValue={assetCurr.withdrawalAmt}
-                colorDiv={"red"}
+                colorDiv={"#fa5757"}
                 handleUpdateInput={this.handleUpdateInput}
               />
               <InputField
@@ -1106,7 +1113,7 @@ let i;
                 language={language}
                 inputValue={assetCurr.withdrawalStartYr}
                 minValue={1}
-                colorDiv={"red"}
+                colorDiv={"#fa5757"}
                 handleUpdateInput={this.handleUpdateInput}
               />
               <InputField
@@ -1116,7 +1123,7 @@ let i;
                 Count={assetsNo}
                 language={language}
                 inputValue={assetCurr.withdrawalDur}
-                colorDiv={"red"}
+                colorDiv={"#fa5757"}
                 handleUpdateInput={this.handleUpdateInput}
               />
             </div>
@@ -1149,7 +1156,7 @@ let i;
           <AddRemove
             currentID={id}
             minComps={0}
-            //currentIndex={index}
+            lang={language}
             id={assetID}
             numberComps={assetsNo}
             disabled={this.props.disableAddRemove}

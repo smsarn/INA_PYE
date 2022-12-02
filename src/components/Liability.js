@@ -655,6 +655,7 @@ class Liability extends Component {
           <AddRemove
             currentID={this.props.liabilityCurr.id}
             minComps={0}
+            lang={this.props.language}
             id={this.props.liabilityCurr.liabTypeKey}
             numberComps={this.props.liabilitysNo}
             handleDoAdd={this.handleDoAdd}

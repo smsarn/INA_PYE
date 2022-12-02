@@ -1,13 +1,13 @@
 {
   "name": "toolkitdirect",
-  "version": "1.0.21",
-  "buildMode": 1,
+  "version": "1.0.22",
+  "buildMode": 0,
   "comments": {
     "buildModeGuide": "0 is for local, 1 for test-tkdirect, 2 for production toolkitdirect  1 or 2 both work as proxy takes care",
     "proxyGuide": "for test-tkdirect use https://test-tkdirectapi.ppi.ca, for production toolkitdirect use https://privateapi.ppi.ca/ToolkitDirect",
     "proxyReason": "having same URL as the caller of the API via this proxy, makes it same-origin (hence no preflight call). Proxy Server wrapper redirects to the proper API site "
   },
-  "appletMode": "INA",
+  "appletMode": "EP",
   "comments2": {
     "INA": "for INA",
     "EP": "for estate protection"
@@ -16,6 +16,7 @@
   "dependencies": {
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.61",
     "chart.js": "^2.9.3",
     "file-saver": "^2.0.2",
     "isomorphic-fetch": "^2.2.1",

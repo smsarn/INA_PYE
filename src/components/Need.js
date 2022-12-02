@@ -247,6 +247,7 @@ export default class Need extends Component {
         <AddRemove
           currentID={this.props.needCurr.id}
           minComps={0}
+          lang={this.props.language}
           id={this.props.needCurr.needTypeKey}
           numberComps={this.props.needsNo}
           handleDoAdd={this.handleDoAdd}

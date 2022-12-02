@@ -1,44 +1,58 @@
-﻿import React, { Component } from "react";
+import React, { Component } from "react";
+import { PopupUserinputDialog } from "./PopupUserInput";
 
 export class AddRemove extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      showConfirm: false,
+    };
+    this.confirmedID=-1;
     this.doAdd = this.doAdd.bind(this);
     this.doRemove = this.doRemove.bind(this);
   }
 
+  respondToConfirmRemove = (OK) => {
+    this.setState({ showConfirm: false });
+    if(OK)
+    {
+      this.props.handleDoRemove(this.confirmedID);      
+    } 
+  };
+
   doRemove = (id) => {
-    if (!this.props.disabled && !this.props.disabledRemove )
-      this.props.handleDoRemove(id);
+    if (!this.props.disabled && !this.props.disabledRemove) {
+      this.confirmedID = id;
+      this.setState({ showConfirm: true });
+    }
   };
 
   doAdd = () => {
-    if (!this.props.disabled)
-      this.props.handleDoAdd();
+    if (!this.props.disabled) this.props.handleDoAdd();
   };
 
   render() {
+    const lang=this.props.lang;
     const noRow = 0; //this.props.minComps === 2 ? 2 : 0;
-    let className="addRemove";
-    let classNameRemove="addRemove";
-    if(this.props.disabled)
-    {
-      className="addRemove addRemoveDisabled";
-      classNameRemove="addRemove addRemoveDisabled";
-    }  
-    if(this.props.disabledRemove)
-      classNameRemove="addRemove addRemoveDisabledRemove";
-    
-	let minRows = this.props.minComps;
-    const maxRows=this.props.maxRows === undefined?100:this.props.maxRows;
-    
+    let className = "addRemove";
+    let classNameRemove = "addRemove";
+    if (this.props.disabled) {
+      className = "addRemove addRemoveDisabled";
+      classNameRemove = "addRemove addRemoveDisabled";
+    }
+    if (this.props.disabledRemove)
+      classNameRemove = "addRemove addRemoveDisabledRemove";
+
+    let minRows = this.props.minComps;
+    const maxRows = this.props.maxRows === undefined ? 100 : this.props.maxRows;
+
     if (minRows === undefined) minRows = 1;
     var returnAR = "";
 
-    
     if (
       (this.props.currentID >= this.props.numberComps ||
-      this.props.numberComps === 0) && this.props.currentID < maxRows
+        this.props.numberComps === 0) &&
+      this.props.currentID < maxRows
     ) {
       returnAR = (
         <span>
@@ -82,6 +96,16 @@ export class AddRemove extends React.Component {
           </button>
         </span>
       );
-    return returnAR;
+    return    <div>
+      {returnAR}
+      <div style={{ height: "0px" }}>
+        <PopupUserinputDialog
+          openDialog={this.state.showConfirm === true}
+          mainMessage={lang==="en"?"Please Confirm ... ":"Veuillez confirmer ... "}
+          language={lang}
+          respondToInput={this.respondToConfirmRemove}
+        />
+      </div>
+    </div>;
   }
 }

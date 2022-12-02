@@ -21,6 +21,7 @@ import {
   ASSETS,
   ASSET_TAX,
 } from "../definitions/generalDefinitions";
+import { INAMCCQuote } from "./helper";
 
 export function fetchTimerAPICheck() {
   let fails = parseInt(localStorage.getItem("INAAPIFails"));
@@ -367,7 +368,7 @@ export async function handleFetchInsuranceNeedsNew(dataNA, dataInput) {
     });
 
     let dataINA = await data.json();
-    console.log(JSON.stringify(dataNA))
+    //console.log(JSON.stringify(dataNA))
 
     let dataDetails = await fetchInsuranceNeedsData(
       dataNA,
@@ -586,20 +587,18 @@ export async function handleFetchPDF(){
 
 
 export async function fetchValidateTokenGetAgentEmailRecordAppletLogin(authToken, applet){
-  /* 
-  try {
+   
+  /* try {
     const url = appSiteAPI + "/api/TKD_ValidateJWT?authToken=" + authToken;
     console.log(url)
     
     let agentInfo = {email:"",guid:""} 
     agentInfo = await fetch(url);
-    
-    
     return (agentInfo.json());
   } catch (error) {
     console.log("error, fetchGetAgentEmailFromDB failed", error);
-  }
- */
+  } */
+ 
 
   try {
     const url = appSiteAPI + "/api/TKD_ValidateJWT";//?authToken=";
@@ -623,3 +622,77 @@ export async function fetchValidateTokenGetAgentEmailRecordAppletLogin(authToken
     console.log("fetchValidateTokenGetAgentEmailRecordAppletLogin", error);
   }
 }
+
+
+
+
+    export async function fetchAppletNamesAndCodes(){
+      let applets=[]
+      applets.push({name:"INA", code:"INA"})
+      applets.push({name:"PYE", code:"EP"})
+
+      return applets
+      /* try {
+        const url = appSiteAPI + "/api/TKD_ValidateJWT";//?authToken=";
+        let jwt = {"authToken": authToken, "applet":applet} 
+    
+        let fetchData = await fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(jwt)
+      })
+       let data = await fetchData.json();
+      if (data !== undefined)
+      {
+        //console.log(data,JSON.stringify(jwt))
+        return data;
+      }
+     } catch (error) {
+        console.log("fetchValidateTokenGetAgentEmailRecordAppletLogin", error);
+      } */
+    }
+
+
+    
+
+    export async function fetchAppletDetails() {
+      try {
+        let AppletDetails = await fetch(
+          appSiteAPI + "/api/TKD_AppletDetails"
+        );
+        let data = await AppletDetails.json();
+        console.log(data)
+
+        return data;
+      } catch (error) {
+        console.log("error, AppletDetails API failed", error);
+      }
+    }
+    
+    export async function fetchSaveComment(fb_json){
+      try {
+        const url = appSiteAPI + "/api/TKD_AddFeedback";//?authToken=";
+        //console.log(fb_json)
+         
+          let fetchData = await fetch(url, {
+          method: "POST",
+          headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          },
+          body: JSON.stringify(fb_json)
+      })
+      let data = await fetchData.json();
+      if (data !== undefined)
+      {
+         // console.log(data, fb_json)
+          return data;
+      }
+      } catch (error) {
+      console.log("fetchSaveComment", error);
+    }
+  }
+  

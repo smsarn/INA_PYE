@@ -6,6 +6,7 @@ export const OUTPUTTEXT = {
     insNeedsRetLE: "Insurance Needs to life expectancy (age ",
     insNeedsSingleFamily: "Insurance Needs for a Single Parent with Protection Period of ",
     insNeedsSinglePerson: "Insurance Needs for a Single Person with Protection Period of ",
+    
     years: " years",
     addSurvivor: "Survivors need to be added under Family Profile. Single Person 'Insurance Needs' is coming soon!",
     pg1T: "Insurance Needs Analysis - Estate",
@@ -27,13 +28,18 @@ export const OUTPUTTEXT = {
     pg2Tab2_1: "Needs Analysis is always done for 'Client'",
     pg2Tab3: "Using these factors the total capital required to generate an inflation indexed income thus depleting all capital at the end of the desired insurance time period is calculated. This amount is based on the present value of shortfalls, discounted at the after tax investment rate. It is adjusted, if necessary to make sure early shortfalls are provided for",
     pg2T3: "Financial Summary",
+    pg2T4: "Insurance Analysis",
+    pg2T5: "Insurance Analysis for your Spouse",
     pg2P5:"Total Assets (excluding insurance)",
     pg2P6: "Total Liabilities (excluding death related)",//OUTPUTTEXT[lang].pg7TabRow4,
     pg2P7: "Net Worth",//OUTPUTTEXT[lang].pg7TabRow4,
     pg2P8: "Total insurance available at death, yyy of which is taxable",//OUTPUTTEXT[lang].pg7TabRow4, //  + output.govDB already part of totalassets
     pg2P9: "Total death related liabilities",
-    pg2P10: "Additional Life Insurance for Client",
-    pg2P12: "This is a good opportunity to consider life insurance for Spouse as well (survivor now changes)",
+    pg2P10: "Additional Insurance for Client",
+    pg2P101:"yrs",
+    pg2P102:"insurance",
+    pg2P103: "No Insurance: How long does cashing all assets last?",
+    pg2P12: "This is a good opportunity to consider additional insurance for your spouse as well",
     pg2P11: "Life Insurance for Spouse NAME in addition to:",
     
     pg3T: "Family Cash and Income Needs",
@@ -141,24 +147,23 @@ export const OUTPUTTEXT = {
       INASummaryTableC12:"To Retirement",
       INASummaryTableC13:"To Life Expectancy",
       INASummaryTableC14:"To Age 100",
-      INASummaryTableC15:"Smart Choice:",
+      INASummaryTableC15:"No Insurance: Cash All Assets",
+      INASummaryTableC16:"Smart Choice:",
       INASummaryTableC21:"to cover Survivors' Life Style:",
-      INASummaryTableC25Closed: (
+      INASummaryTableC26Closed: (
         <span> Type of insurance based on <b><i>Shortfall</i></b> ... </span>)  ,
-      INASummaryTableC25Open: (
-        <span> Graph of <b><i>Shortfall</i></b> can be helpful in mapping out the type of insurance that covers shortfalls: Term if needs are temporary, Permanent if needs are long term and Permamnent with Term riders if both.  </span>),
+      INASummaryTableC26Open: (
+        <span> Graph of <b><i>Shortfall</i></b> can be helpful in mapping out the type of insurance that covers shortfalls: Term, if needs are temporary, Permanent, if needs are long term, and Permanent with Term riders if both.  </span>),
         INASummaryTableC31:"Number of coverage years:",
       
-        INASummaryTableC35Closed: (
+        INASummaryTableC36Closed: (
         <span> Advantages of insurance over cashing all Assets ...</span> ) ,
         INASummaryTableC35:"  ... with no insurance if all Assets had to be cashed today",
-        INASummaryTableC35Open: (
+        INASummaryTableC36Open: (
           <ul><li> Assets continue to work for survivors efficiently</li>
           <li>Probate is reduced or postponed</li>
           <li>            
-            Insurance proceeds and Assets take care of any liabilities
-            and/or maintain life style of survivors for as long as
-            necessary
+          Adding insurance coverage to existing assets provides the flexibility to cover survivor needs for as long as necessary.
           </li></ul>
         ),
         
@@ -201,13 +206,19 @@ export const OUTPUTTEXT = {
     pg2TabT6: "Taux marginal d'imposition",
    /*  pg3T: "Besoin de liquidités pour la famille au décès", */
     pg2T3: "Résumé financier ",
+    pg2T4: "Analyse des assurances",
+    pg2T5: "Analyse de l’assurance pour votre conjoint",
+    
     pg2P5:"Total des actifs (hors assurance)",
     pg2P6: "Total des passifs (non liés au décès)",//OUTPUTTEXT[lang].pg7TabRow4,
     pg2P7: "Valeur nette",//OUTPUTTEXT[lang].pg7TabRow4,
     pg2P8: "Assurance totale disponible au décès, dont yyy imposables",//OUTPUTTEXT[lang].pg7TabRow4, //  + output.govDB already part of totalassets
     pg2P9: "Total des passifs liés au décès",
-    pg2P10: "Client d'assurance vie supplémentaire",
-    pg2P12: "C'est aussi une bonne occasion d'envisager une assurance-vie pour le conjoint également (le survivant change maintenant)",
+    pg2P10: "Assurance supplémentaire pour le client",
+    pg2P101:"an.",
+    pg2P102:"assurance",
+    pg2P103: "Pas d'assurance: Combien de temps dure l'encaissement de tous les actifs",
+    pg2P12: "C'est une bonne occasion d'envisager une assurance supplémentaire pour votre conjoint également",
     pg2P11: "Assurance vie pour NOM du conjoint en plus de : ",
     
     pg3T: "Besoins familiaux en matière de liquidités et de revenus",
@@ -320,7 +331,30 @@ export const OUTPUTTEXT = {
       pgAppendixP1: "Flux de trésorerie entrants (+) et sortants (-)",
       pgAppendixP2: "Le manque à gagner = flux de trésorerie entrants - sortants et est financé par l'assurance",
       pgAppendixP3 : "Situation financière actuelle",
-
+      INASummaryTableC11:"Besoins en assurance",
+      INASummaryTableC12:"À la retraite",
+      INASummaryTableC13:"À l’espérance de vie",
+      INASummaryTableC14:"Jusqu’à 100 ans",
+      INASummaryTableC15:"Pas d’assurance : encaisser tous les actifs",
+      INASummaryTableC16:"Choix intelligent",
+      INASummaryTableC21:"Couvrir le style de vie des survivants",
+      INASummaryTableC26Closed: (
+        <span> Type d’assurance en fonction du <b><i>Manque à gagner</i></b> ... </span>)  ,
+      INASummaryTableC26Open: (
+        <span> Le graphique du <b><i>manque à gagner</i></b> peut être utile pour cartographier le type d’assurance qui couvre les manques à gagner : temporaire, si les besoins sont temporaires, permanente, si les besoins sont à long terme et permanente avec avenants temporaires au cas des deux</span>),
+        INASummaryTableC31:"Nombre d’années de couverture",
+      
+        INASummaryTableC36Closed: (
+        <span> Avantages de l’assurance par rapport à l’encaissement de tous les actifs ... </span> ) ,
+        INASummaryTableC35:"  ... with no insurance if all Assets had to be cashed today ^F",
+        INASummaryTableC36Open: (
+          <ul><li> Les actifs continuent de fonctionner efficacement pour les survivants</li>
+          <li>L’homolgation est réduite ou reportée</li>
+          <li>            
+          L’ajout d’une couverture d’assurance aux actifs existants offre la flexibilité nécessaire pour couvrir les besoins du survivant aussi longtemps que nécessaire
+          </li></ul>
+        ),
+      
 
 
       exportData: "Exporter des données vers:",

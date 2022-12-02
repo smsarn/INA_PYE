@@ -67,9 +67,11 @@ async function getSpouseINA(props)
   data= await props.getSpouseINA();
   const spouseInsRet=data.dataOutput.dataInsuranceNeeds[0].Value;
   const spouseInsLE=data.dataOutput.dataInsuranceNeeds[1].Value;
+  // roles reversed so index 1 is now Client ie spouse means client!!
   const LESpouse=data.dataOutput.lifeExpectancy.spouse+data.dataInput.Clients[1].Age
+  
 
-  return {spouseInsRet:spouseInsRet,spouseInsLE:spouseInsLE, LESpouse:LESpouse};
+  return {spouseInsRet:spouseInsRet,spouseInsLE:spouseInsLE, LEIfClientisSurvivor:LESpouse};
 }
 
 function formattedMoneyString(value,lang){
@@ -97,7 +99,9 @@ export async function doSavePdfAction(props) {
   const assets = props.dataInput.Assets;
   const singleFamily = isSingleFamily(clients);
   const labelsBilingual = OUTPUTTEXT[lang];
-
+  const LEIfSpouseisSurvivor =  props.LE.spouse + props.dataInput.Clients[1].Age
+  const toRetYears =  props.dataInput.Clients[1].retirementAge - props.dataInput.Clients[1].Age
+  
   const singlePerson = props.dataInput.Clients.length === 1 ? true : false;
   const thereAfterText=singlePerson ? OUTPUTTEXT[lang].pgTabRowThereAfter_1:OUTPUTTEXT[lang].pgTabRowThereAfter;
   const thereAfterTextSF= singlePerson ? OUTPUTTEXT[lang].pg5TabRow7_1:OUTPUTTEXT[lang].pg5TabRow7
@@ -130,6 +134,7 @@ export async function doSavePdfAction(props) {
     InToPt(5.54),
     InToPt(2.76) // max height
   ); */
+
   const image = props.dataInput.Presentations[0].adviserLogo;
   const top = props.dataInput.Presentations[0].adviserLogo.top;
   const pg1ImageID=props.dataInput.Presentations[0].adviserLogo.ID;
@@ -364,21 +369,61 @@ export async function doSavePdfAction(props) {
     ];
     y += incTableY;
     pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
-    pdf.DrawLine(InToPt(1.5), InToPt(y + incY), InToPt(PARA_WIDTH));
+    
+    
+    //pdf.DrawLine(InToPt(1.5), InToPt(y + incY), InToPt(PARA_WIDTH));
+    y += incTableY;
 
     // ins
-    y += 1.2*incY;
+    // add title
+    pdf.SetFont(TIMES, NORMAL);
+    pdf.SetFontSize(PxToPt(16));
+    pdf.SetTextColor(0x45, 0x55, 0x60);
+
+    y += incTableY-.05;
+    fill = [115, 153, 198];
+    textColor = [255, 255, 255];
+    Widths = [4.3, 1.2]; // add up to PARA_WIDTH=5.5
+    values2 = [OUTPUTTEXT[lang].pg2T4, ""];
+
+    pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
+
+    fill = [255, 255, 255];
+    textColor = [0x45, 0x55, 0x60];
+
+
+    y += 1*incY;
     values2 =  OUTPUTTEXT[lang].pg2P10 + getName(clients[0].Name,lang) +":"
     pdf.tableRowSingle(fill, textColor, x, y, values2, height, [PARA_WIDTH],false);
     
+    values2 = [
+      OUTPUTTEXT[lang].pg2P101 ,
+      ""
+    ];    
+    pdf.tableRow(fill, textColor, x+3.9, y+.16, values2, .18, Widths);
+    values2 = [
+      OUTPUTTEXT[lang].pg2P102 ,
+      ""
+    ];    
+    pdf.tableRow(fill, textColor, x+4.3, y+.16, values2, .18, Widths);
+
+
     if(!singleFamily)
     {
     values2 = [
-      OUTPUTTEXT[lang].pg8TabRow3 + props.LE + ")",
+      OUTPUTTEXT[lang].pg8TabRow3 + LEIfSpouseisSurvivor + ")",
       ""
     ];
     y += incColourdRowsY;
     pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
+
+    values2 = [
+      props.LE.spouse+"" ,
+          ""
+        ];    
+        pdf.tableRow(fill, textColor, x+3.9, y+.11, values2, .18, Widths);
+    
+  
 
     values2 = (
       formattedMoneyString(output.insNeedLE,lang)
@@ -401,6 +446,13 @@ export async function doSavePdfAction(props) {
     y += incColourdRowsY;
     pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
     
+    values2 = [
+      toRetYears+"" ,
+      ""
+    ];    
+    pdf.tableRow(fill, textColor, x+3.9,  y+.11, values2, .18, Widths);
+
+
     values2 =(
       formattedMoneyString(output.insNeedRet,lang)
         /* "$" + formatMoney(output.insNeedRet, 0, decimalChar, thousands) */)
@@ -408,17 +460,59 @@ export async function doSavePdfAction(props) {
     pdf.tableRowSingle(fill, textColor, x+4.3, y, values2, height, Widths, true);
     fill = [255, 255, 255];
     
+    values2 = [
+      OUTPUTTEXT[lang].pg2P103
+      
+      ,
+      "",
+    ];
+    y += incColourdRowsY;
+    pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
+    
+    values2 = [
+      props.yrsCoverageIfCashAll+""
+       ,
+      ""
+    ];    
+    pdf.tableRow(fill, textColor, x+3.9,  y+.11, values2, .18, Widths);
+    values2 =(
+      formattedMoneyString(0,lang)
+        /* "$" + formatMoney(output.insNeedRet, 0, decimalChar, thousands) */)
+    fill = [196, 223, 224];
+    pdf.tableRowSingle(fill, textColor, x+4.3, y, values2, height, Widths, true);
+    fill = [255, 255, 255];
+    if(lang!=="en") y += 0.7*incY; // long Fr text
+
     // spouse ins
     if(!singleFamily)
     {
         const spouseSwitched= await getSpouseINA(props)
         const spouseInsRet=cleanFormat(spouseSwitched.spouseInsRet, lang);
         const spouseInsLE=cleanFormat(spouseSwitched.spouseInsLE, lang);
-        const LESpouse=spouseSwitched.LESpouse
-        pdf.DrawLine(InToPt(1.5), InToPt(y + incY), InToPt(PARA_WIDTH));
-    
+        const LEIfClientisSurvivor=spouseSwitched.LEIfClientisSurvivor
 
-        y += 1.2*incY;
+//        pdf.DrawLine(InToPt(1.5), InToPt(y + incY), InToPt(PARA_WIDTH));
+    
+y += incTableY;
+
+        // add title
+    pdf.SetFont(TIMES, NORMAL);
+    pdf.SetFontSize(PxToPt(16));
+    pdf.SetTextColor(0x45, 0x55, 0x60);
+
+    y += incTableY-.05;
+    fill = [115, 153, 198];
+    textColor = [255, 255, 255];
+    Widths = [4.3, 1.2]; // add up to PARA_WIDTH=5.5
+    values2 = [OUTPUTTEXT[lang].pg2T5, ""];
+
+    pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
+
+    fill = [255, 255, 255];
+    textColor = [0x45, 0x55, 0x60];
+
+
+        y += 1*incY;
         pdf.tableRow(fill, textColor, x, y, [OUTPUTTEXT[lang].pg2P12], height, Widths);
    
         y += 1.35*incY;
@@ -438,12 +532,13 @@ export async function doSavePdfAction(props) {
           pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
         
         values2 = [
-          OUTPUTTEXT[lang].pg8TabRow3 + LESpouse + ")",
+          OUTPUTTEXT[lang].pg8TabRow3 + LEIfClientisSurvivor + ")",
           ""
         ];
         y += incColourdRowsY;
         pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
     
+        
         values2 = (
           formattedMoneyString(spouseInsLE,lang)
         /* "$" + formatMoney( spouseInsLE, 0, decimalChar, thousands) */)
@@ -462,6 +557,8 @@ export async function doSavePdfAction(props) {
         y += incColourdRowsY;
         pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
         
+          
+
         values2 =(
           formattedMoneyString(spouseInsRet,lang)
         /* "$" + formatMoney( spouseInsRet, 0, decimalChar, thousands) */)
@@ -1690,7 +1787,7 @@ export async function doSavePdfAction(props) {
     if(!singleFamily)
     {
     values = [
-      OUTPUTTEXT[lang].pg8TabRow3 + props.LE + ")",
+      OUTPUTTEXT[lang].pg8TabRow3 + LEIfSpouseisSurvivor + ")",
       (
         formattedMoneyString(output.insNeedLE,lang)
         /* "$" + formatMoney(output.insNeedLE, 0, decimalChar, thousands) */

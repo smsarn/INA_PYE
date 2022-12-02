@@ -832,10 +832,10 @@ export function getInfoSave(lang) {
     popupOpenByProps: false,
     popupBorderColor: POPUP_BORDER_INFO,
     position: {
-      marginLeft: DEFAULT_MARGIN_LEFT + 105,
-      marginTop: DEFAULT_MARGIN_TOP - 172,
-      width: DEFAULT_WIDTH + 225,
-      height: DEFAULT_HEIGHT - 280,
+      marginLeft: DEFAULT_MARGIN_LEFT+ 95,
+      marginTop: DEFAULT_MARGIN_TOP-168,
+      width: DEFAULT_WIDTH +(lang==="en"?240:355),
+      height: DEFAULT_HEIGHT,
     },
   };
 }
@@ -848,9 +848,9 @@ export function getInfoExcelcapFund(lang) {
     popupOpenByProps: false,
     popupBorderColor: POPUP_BORDER_INFO,
     position: {
-      marginLeft: DEFAULT_MARGIN_LEFT - 88,
-      marginTop: DEFAULT_MARGIN_TOP+35,
-      width: DEFAULT_WIDTH + 110,
+      marginLeft: DEFAULT_MARGIN_LEFT -115,
+      marginTop: DEFAULT_MARGIN_TOP+38,
+      width: DEFAULT_WIDTH + 100,
       height: DEFAULT_HEIGHT,
     },
   };

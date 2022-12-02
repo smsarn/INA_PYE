@@ -359,6 +359,7 @@ export default class Source extends Component {
 
         <AddRemove
           currentID={this.props.sourceCurr.id}
+          lang={this.props.language}
           numberComps={this.props.sourcesNo}
           handleDoAdd={this.handleDoAdd}
           handleDoRemove={this.handleDoRemove}
