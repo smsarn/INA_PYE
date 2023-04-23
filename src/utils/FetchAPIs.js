@@ -22,6 +22,7 @@ import {
   ASSET_TAX,
 } from "../definitions/generalDefinitions";
 import { INAMCCQuote } from "./helper";
+import { handleResponseBuffer } from "./apiUtils";
 
 export function fetchTimerAPICheck() {
   let fails = parseInt(localStorage.getItem("INAAPIFails"));
@@ -184,7 +185,7 @@ export async function fetchInsuranceNeedsData(dataNA, provincekey) {
       body: JSON.stringify(dataNA),
     });
     let data = await insuranceNeedsData.json();
-    console.log(dataNA, data)
+    //console.log(dataNA, data)
 
     return {
       ages: data[1],
@@ -615,7 +616,7 @@ export async function fetchValidateTokenGetAgentEmailRecordAppletLogin(authToken
    let data = await fetchData.json();
   if (data !== undefined)
   {
-    //console.log(data,JSON.stringify(jwt))
+    console.log(data,JSON.stringify(jwt))
     return data;
   }
  } catch (error) {
@@ -664,7 +665,7 @@ export async function fetchValidateTokenGetAgentEmailRecordAppletLogin(authToken
           appSiteAPI + "/api/TKD_AppletDetails"
         );
         let data = await AppletDetails.json();
-        console.log(data)
+        //console.log(data)
 
         return data;
       } catch (error) {
@@ -696,3 +697,176 @@ export async function fetchValidateTokenGetAgentEmailRecordAppletLogin(authToken
     }
   }
   
+
+  /* export async function handleFetchHtmlToPDF (html,css, footer, hasHeader,width, orientation){ */
+    export async function handleFetchHtmlToPDF (pdfSections){
+      try {
+      
+      /* let pdfSections=[]
+      let pdfSection={html:html,css:css, footer:footer, hasHeader:hasHeader,width:width, orientation:orientation}
+      pdfSections.push(pdfSection)
+      pdfSection={html:html,css:css, footer:footer, hasHeader:hasHeader,width:width, orientation:"landscape"}
+      pdfSections.push(pdfSection)
+       */
+      let mergeItems=[]      
+      for(let i=0;i<pdfSections.length;i++)
+        mergeItems.push({"html": pdfSections[i].html, "css": null, APIOptionItems:
+        {
+          footerText:pdfSections[i].footer,
+          TopMargin:pdfSections[i].hasHeader?10:10,
+         // HtmlViewerWidth: 1024,    
+          X:50,
+          Width :pdfSections[i].width, 
+          footerHeight:60,
+          PageBreakBeforeHtmlElementsSelectors: "pagebreak",
+          MediaTypePrint :true,
+         // HtmlViewerZoom : pdfSections[i].hasHeader?200:180, 
+        },
+        HtmlViewerWidth:window.screen.width/window.innerWidth,
+        PdfPageOrientation :pdfSections[i].orientation
+        })
+
+        console.log(mergeItems)
+      const url = appSiteAPI + "/api/TKD_PDFGenerator";//?authToken=";
+      let js = { MergeItems:mergeItems, css:pdfSections[0].css}
+
+
+      return fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "Referrer-Policy": "no-referrer",
+        },
+        body: JSON.stringify(js)
+       
+      })
+        .then(handleResponseBuffer)
+    } catch (error) {
+    console.log("handleFetchHtmlToPDF", error);
+  }
+}
+
+export async function handleFetchHtmlToPDF2 (pdfSections,cssInline){
+  try {
+  
+  let mergeItems=[]      
+  for(let i=0;i<pdfSections.length;i++)
+    mergeItems.push({"html": pdfSections[i].html, "css": null, APIOptionItems: null,
+    HtmlViewerWidth:null,
+    PdfPageOrientation :pdfSections[i].orientation
+    })
+
+  const url = appSiteAPI + "/api/TKD_PDFGenerator";//?authToken=";
+  let js = { MergeItems:mergeItems, css:cssInline}
+
+
+  return fetch(url, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "no-referrer",
+    },
+    body: JSON.stringify(js)
+   
+  })
+    .then(handleResponseBuffer)
+} catch (error) {
+console.log("handleFetchHtmlToPDF", error);
+}
+}
+
+
+export async function handleFetchEditPres(pdfSections,css, lang){
+  try {
+  
+  /* let mergeItems=[]      
+  for(let i=0;i<pdfSections.length;i++)
+    mergeItems.push({"html": pdfSections[i].html, "css": pdfSections[0].css, APIOptionItems: {
+      footerText:"",
+      TopMargin:0,
+     // HtmlViewerWidth: 1024,    
+      X:0,
+      Width :0, 
+      footerHeight:0,
+      PageBreakBeforeHtmlElementsSelectors: "",
+      MediaTypePrint :true,
+     // HtmlViewerZoom : pdfSections[i].hasHeader?200:180, 
+    },
+    HtmlViewerWidth:null,
+    PdfPageOrientation :pdfSections[i].orientation
+    })
+
+ */
+let mergeItems=[]      
+  for(let i=0;i<pdfSections.length;i++)
+    mergeItems.push({"html": pdfSections[i].html , APIOptionItems: {},
+    HtmlViewerWidth:null,
+    PdfPageOrientation :pdfSections[i].orientation
+    })
+
+  const url = appSiteAPI + "/api/TKD_PresentationEditor";//?authToken=";
+  let js = {appletName:"INA", mergeItems: mergeItems,html:"", css: css, language:lang}
+
+
+  return fetch(url, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "no-referrer",
+    },
+    body: JSON.stringify(js)
+   
+  })
+    .then(handleResponseBuffer)
+} catch (error) {
+console.log("handleFetchHtmlToPDF", error);
+}
+}
+
+export function handleFetchAdvisorPortfolio4(email) {
+  var myHeaders = new Headers();
+myHeaders.append("Content-Type", "application/json");
+myHeaders.append("Accept", "application/json");
+
+//email="bruce.ewart@gmail.com";//bruce.ewart@gmail.com";//bruce.ewart@gmail.com";//sjoseph@ppi.ca";//msamiei@telus.net"
+  
+var raw = "";
+var requestOptions = {
+  method: 'GET',
+  headers: myHeaders,
+};
+
+fetch(appSiteAPI + "/api/AdvisorPortfolio?email=" + email, requestOptions)
+  .then(response => response.json())
+  .then(result => {console.log(result);  
+    alert("Email: " + email + "  -   ".concat(result.lastname === undefined?"No YLB" : "YLB last name: " + result.lastname));
+  return result;})
+  .catch(error => console.log('error', error));
+
+}
+
+export async function handleFetchAdvisorPortfolio(token) {
+  try {
+    var myHeaders = new Headers();
+myHeaders.append("Content-Type", "application/json");
+myHeaders.append("Accept", "application/json");
+    //email="msamiei@telus.net";//bruce.ewart@gmail.com";//sjoseph@ppi.ca";//msamiei@telus.net"
+
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+    };
+
+
+    let aboutMe = await fetch(
+      appSiteAPI + "/api/AdvisorPortfolio?authToken=" + token, requestOptions)
+    
+      let jsonData= await aboutMe.json();//parseXmlToJson(data)
+    return jsonData;
+  } catch (error) {
+    console.log("error, AboutMe API failed", error);
+  }
+}
