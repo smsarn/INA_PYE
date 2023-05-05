@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Dialog, Button, Card, CardContent, Typography } from '@material-ui/core'
 import { DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
+import Alert from '@material-ui/lab/Alert';
 
 import { Info } from "./Info";
 /* import {
@@ -72,10 +73,10 @@ export class PopupUserinputDialog extends Component {
           open={this.state.open}
           onClose={this.handleToggle}
           aria-labelledby="confirm-dialog">
-          <DialogTitle id="confirm-dialog"></DialogTitle>
+          <DialogTitle id="confirm-dialog">{this.props.title!==undefined && this.props.title}</DialogTitle>
           <DialogContent >
             {/* <DialogContentText><span className="dialog">{this.props.language==="en"?"Save to File":"Enregistrer dans un fichier"}</span>   */}
-            <DialogContentText><span className="dialog">{this.props.mainMessage}</span>  
+          <DialogContentText><span className="dialog">{this.props.severity!==undefined?<Alert style={{fontSize:"16px"}} severity={this.props.severity} >{this.props.mainMessage}</Alert>:this.props.mainMessage}</span>  
             </DialogContentText>
             {this.props.formMessage!== undefined && <form>
               <TextField
@@ -92,7 +93,7 @@ export class PopupUserinputDialog extends Component {
           <DialogActions style={{ paddingRight: '12px', paddingBottom: '10px' }}>
           {infoIcon!==undefined && <span  style={{ height:"50px", marginLeft: '10px'}}><Info  infoIcon={infoIcon}/></span>}<br/>
           {/* <Button onClick={this.handleInfo} variant="contained"> <span className="dialog"> Instructions </span></Button> */}
-          <Button onClick={this.handleCancel} variant="contained"   style={{marginLeft: this.props.language==="en"?"222px":"340px", marginRight:"8px"}} > <span className="dialog"> {this.props.language==="en"?"Cancel":"Annuler"} </span></Button>
+          {(this.props.OKOnly === undefined || this.props.OKOnly===false) && <Button onClick={this.handleCancel} variant="contained"   style={{marginLeft: this.props.language==="en"?"222px":"340px", marginRight:"8px"}} > <span className="dialog"> {this.props.language==="en"?"Cancel":"Annuler"} </span></Button>}
           <Button onClick={this.handleOK} variant="contained"> <span className="dialog"> OK </span></Button>
             
           </DialogActions>

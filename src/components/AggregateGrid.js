@@ -16,7 +16,7 @@ export default class AggregateGrid extends Component {
       <div>
         <h3 className="ppi1">
           {APPLET_INA ?this.props.insNeedLine:""}
-          {APPLET_INA &&
+          {APPLET_INA && this.props.GridForPDF===false && 
           <Info
               infoIcon={getInfoINA(this.props.lang)}
           />}
@@ -33,6 +33,7 @@ export default class AggregateGrid extends Component {
           gridIcons={this.props.aggregateGrid.gridIcons}
           specialRow={this.props.LE}
           language={this.props.lang}
+          GridForPDF={this.props.GridForPDF}
         />
       </div>
     );

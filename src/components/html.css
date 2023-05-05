@@ -1,0 +1,83 @@
+/* .Trebuchet {
+    font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
+  }
+  .Georgia {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+  }
+  
+  .h3AboutMe{
+    font-weight: 100;
+    color: #455560;
+    font-size: .9em;
+    margin: 0;
+    padding: .5em 0;
+  }
+  
+  .h4AboutMe {
+    font-weight: 100;
+    color: #455560;
+    font-size: .9em;
+    margin: 0;
+    padding: .5em 0;
+  }
+  
+  .p {
+    font-size: .9em;
+    margin: .5em 0;
+  }
+  
+  .bold {
+    font-weight: bold;
+  }
+  
+  .link {
+    color: #4775af;
+    text-decoration: none;
+  }
+  
+  .headingColor {
+    color: #455560;
+  }
+   */
+
+   .Trebuchet {
+    font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
+  }
+  .Georgia {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+  }
+  
+  .h3 {
+    font-weight: 100;
+    color: #455560;
+    font-size: 20px;
+    margin: 0;
+    padding: 8px 0;
+  }
+  
+  .h4 {
+    font-weight: 100;
+    color: #455560;
+    font-size: 18px;
+    margin: 0;
+    padding: 8px 0;
+  }
+  
+  .p {
+    font-size: 16px;
+    margin: 8px 0;
+  }
+  
+  .bold {
+    font-weight: bold;
+  }
+  
+  .link {
+    color: #4775af;
+    text-decoration: none;
+  }
+  
+  .headingColor {
+    color: #455560;
+  }
+  

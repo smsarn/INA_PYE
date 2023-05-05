@@ -40,13 +40,13 @@
 }
 
 .canvas-containerINAGraphs {
-	height: 400px;
+	height: 320px;
 	display: grid;
   	grid-template-columns: 1fr 1fr;
   	grid-gap: 1em;
 	  position: "relative";
+	  
 }
-
 
 /* 
 @media only screen and (max-width: 1024px) {
@@ -96,7 +96,7 @@
 
 .headerTitle {
 	color: #282e31;
-	margin-bottom: 8px;
+	margin-bottom: 10px;
 
 }
 .headerIcon {
@@ -138,7 +138,7 @@
 		margin: 0px 15px 7px 25px;
 	}
 }*/
-.logo {
+/* .logo {
 	float: right;
 	margin-top: 22px;
 	margin-right: 2px;
@@ -151,7 +151,7 @@
 	font-weight: 700;
 	background-color: #7399C6;
 	border-style: none;
-}
+} */
 
 .addRemove {
 	float: right;
@@ -491,6 +491,7 @@ html {
 	height: 100%;
 	width: 100%;
 	/*//-webkit-overflow-scrolling: touch;*/
+	
 }
 
 
@@ -538,7 +539,7 @@ label.titleButtons input[type="file"] {
 }
 .topCommandLine {
 	margin-right: 0px;
-	margin-top: -16px;
+	margin-top: -2px;
 	float: right;
 } 
 @media only screen and (max-width: 600px) {
@@ -557,13 +558,15 @@ label.titleButtons input[type="file"] {
 	/* position: fixed; 
 	right:1.6%;
 	left:1.6%;*/	
-	height: 58px;
+	/* height: 58px; */
 	top: 0;
 	z-index:100;
 	background-color: white;
 	border-bottom: 1px solid #B1CAE6;
+	/* padding-top: 20px; */
 /* 	-webkit-sticky: true; */
-	position:sticky;
+	position: sticky;
+	contain: layout;
 }
 
 .headerBarIOS{
@@ -581,7 +584,7 @@ label.titleButtons input[type="file"] {
 
 .INAPie
 	{
-		float: left; height: 400px; width: 60%;
+		float: left; height: 320px; width: 48%;
 	}
 
 .EPGraphDiv1{
@@ -606,11 +609,11 @@ label.titleButtons input[type="file"] {
 	.headerBar {
 	/* 	position: relative; */
 		/* margin-right: 3%; */
-	padding-top: 25px;
+	/* padding-top: 25px; */
 
 	} 
 	.INAPie {
-		height: 200px; width: 100%;
+		height: 250px; width: 100%;
 	}
 }
 

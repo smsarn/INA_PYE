@@ -20,7 +20,9 @@ import { DROPDOWN_WIDE } from "../definitions/generalDefinitions";
 import {
   getInfoIconSourcesGov,
   getInfoIconAssetsYr0,
-  getInfoIconInflationGrowth
+  getInfoIconInflationGrowth,
+  getInfoIconSourcesTaxRefund,
+  getInfoIconSourcesTaxSaving
 } from "../definitions/infoIconsDefinitions";
 
 export default class Source extends Component {
@@ -68,7 +70,8 @@ export default class Source extends Component {
     this.dataValues.DD[0].disableOptionValue[INCOMESOURCES.GOV_DEATH_BENEFIT.ID]=true;
     this.dataValues.DD[0].disableOptionValue[INCOMESOURCES.GOV_SURVIVORS_PENSION.ID]=true;
     this.dataValues.DD[0].disableOptionValue[INCOMESOURCES.GOV_ORPHANS_BENEFIT.ID]=true;
-
+    
+    
   }
 
   componentWillReceiveProps(nextProps) {
@@ -164,7 +167,11 @@ export default class Source extends Component {
     };
     if (sourceNextKey === INCOMESOURCES.DIVIDEND_INCOME.Key)
       source.taxRate = DEFAULT_DIVIDEND_TAX_RATE;
+    if (sourceNextKey === INCOMESOURCES.TAX_CREDIT.Key)
+    // Amount*(1-1-txrate)=refund, so as if tax rate is 1-margTaxrate 
+      source.taxRate =0;// 100-this.props.marginalTaxRate; // refund adj
     // console.log(source)
+
     this.props.handleAddSource(source);
   }
   };
@@ -178,12 +185,21 @@ export default class Source extends Component {
       startYear: this.props.sourceCurr.startYear,
       duration: this.props.sourceCurr.duration,
       taxRate: this.props.sourceCurr.taxRate,
-      annualGrowth: this.props.sourceCurr.annualGrowth,
+      growthRate: this.props.sourceCurr.growthRate,
     };
 
+
     if (id === 1)
+    {
       source.sourceTypeKey = getListItemKeyFromName(INCOMESOURCES, selection);
+      
+      //Amount*(1-1-txrate)=refund, so as if tax rate is 1-margTaxrate 
+      if(source.sourceTypeKey === INCOMESOURCES.TAX_CREDIT.Key)
+        source.taxRate= 0;//100-this.props.marginalTaxRate; // refund adj;
+    }
     else if (id === 2) source.ownerID = selection;
+    
+
     this.props.handleUpdate(source);
   };
 
@@ -197,7 +213,8 @@ export default class Source extends Component {
       duration: this.props.sourceCurr.duration,
       ownerID: this.props.sourceCurr.ownerID,
       taxRate: this.props.sourceCurr.taxRate,
-      annualGrowth: this.props.sourceCurr.annualGrowth,
+      growthRate: this.props.sourceCurr.growthRate,
+
     };
 
 //    s1 =copyFromAnotherObject(this.props.sourceCurr)
@@ -217,22 +234,23 @@ export default class Source extends Component {
       changed = s1.duration !== value ? true : false;
       s1.duration = value;
     } else if (id === 4) {
+      
       changed =
         s1.taxRate !==
-        parseInt(100 * valueClean) / 100
+        parseInt(10000 * valueClean) / 10000
           ? true
           : false;
       s1.taxRate =
-        parseInt(100 * valueClean) / 100;
+      parseInt(10000 * valueClean) / 10000;
     } else if (id === 5) {
-      changed =
-        s1.annualGrowth !==
-        parseInt(100 * valueClean) / 100
+        changed =s1.growthRate !==
+        parseInt(10000 * valueClean) / 10000
           ? true
           : false;
-      s1.annualGrowth =
-        parseInt(100 * valueClean) / 100;
+        s1.growthRate =
+            parseInt(10000 * valueClean) / 10000; 
     }
+    console.log(s1)
     if (changed){
        this.props.handleUpdate(s1);
        this.setState({ loading: this.props.disableAddRemove });
@@ -247,10 +265,12 @@ export default class Source extends Component {
       this.props.sourceCurr.sourceTypeKey
     );
     const dividend = this.isDividendIncome(this.props.sourceCurr.sourceTypeKey);
+    const taxCredit = this.props.sourceCurr.sourceTypeKey === INCOMESOURCES.TAX_CREDIT.Key;
     const RRIF = this.props.sourceCurr.sourceTypeKey === INCOMESOURCES.RRIF.Key;
     // console.log(this.props.sourceCurr,govOrphan,this.props.sourceCurr.maxOrphan)
-    
-    
+   const refundFactor =1;//this.props.marginalTaxRate/ 100;
+
+ 
     let unlistedGreyedOption;
     if (RRIF) {
       unlistedGreyedOption = [];
@@ -281,6 +301,7 @@ export default class Source extends Component {
             disableOption={dd.disableOptionValue}
             unlistedGreyedOption={unlistedGreyedOption}
             updateDDown={this.updateDDown}
+            infoIcon={taxCredit?getInfoIconSourcesTaxSaving(this.props.language): undefined}
           />
         ))}
         {!RRIF && (
@@ -288,17 +309,19 @@ export default class Source extends Component {
             format={2}
             id={1}
             key="amt"
-            inputName={CONTROLTITLE[this.props.language].amountGross}
+            
+            inputName={taxCredit?CONTROLTITLE[this.props.language].taxRefund:CONTROLTITLE[this.props.language].amountGross}
             readOnly={gov}
             Count={this.props.sourcesNo}
             language={this.props.language}
             infoIcon={
               gov || govOrphan// && !govOrphan
                 ? getInfoIconSourcesGov(this.props.language)
-                : undefined
+                : (taxCredit?getInfoIconSourcesTaxRefund(this.props.language): undefined)
             }
+
             maxValue={govOrphan ? this.props.sourceCurr.maxOrphan : undefined}
-            inputValue={this.props.sourceCurr.amount}
+            inputValue={this.props.sourceCurr.amount*(taxCredit?refundFactor:1)}
             inputTitle={this.props.sourceCurr.id}
             handleUpdateInput={this.handleUpdateInput}
           />
@@ -343,7 +366,7 @@ export default class Source extends Component {
           />
         )}
 
-        {dividend && (
+        {(dividend) && (
           <InputField
             id={4}
             inputName={CONTROLTITLE[this.props.language].dividendTaxRate}
@@ -355,6 +378,21 @@ export default class Source extends Component {
             inputTitle={this.props.sourceCurr.id}
             handleUpdateInput={this.handleUpdateInput}
           />
+        )}
+         {(taxCredit) && (
+          <InputField
+          format={3}
+          id={5}
+          key="growth"
+          inputName={CONTROLTITLE[this.props.language].growth}
+          /* readOnly={true} */
+          Count={this.props.sourcesNo}
+          language={this.props.language}
+          inputValue={this.props.sourceCurr.growthRate}
+          inputTitle={this.props.sourceCurr.id}
+          handleUpdateInput={this.handleUpdateInput}
+        
+        />
         )}
 
         <AddRemove

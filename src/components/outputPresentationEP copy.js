@@ -3,10 +3,6 @@ import "./Output.css";
 import { Table } from "react-bootstrap";
 import Spinner from "./Spinner";
 import { PopupUserinputDialog } from "./PopupUserInput";
-import OutputInfoGridEP from "./OutputInfoGridEP"
-import OutputExportGridEP from "./OutputExportGridEP"
-import {getEPPages
-} from "../utils/outputPresentationSections";
 
 import {
   ASSETS,
@@ -300,7 +296,7 @@ export default class OutputPresentationEP extends Component {
     let blobRes = await handleFetchHtmlToPDF(pdfSections);
 
     let blob = new Blob([blobRes], { type: "application/pdf" });
-    saveAs(blob, `PYEPDF`+Date.now());
+    saveAs(blob, `PYEPDF`);
   };
 
   doPDF3 = async () => {
@@ -358,7 +354,7 @@ export default class OutputPresentationEP extends Component {
     let blobRes = await handleFetchHtmlToPDF2(PDF.sections, PDF.css);
 
     let blob = new Blob([blobRes], { type: "application/pdf" });
-    saveAs(blob, `PYEPDF`+Date.now());
+    saveAs(blob, `testPDF`);
     this.setState({ pdfLoaded: true });
   };
 
@@ -1519,18 +1515,6 @@ export default class OutputPresentationEP extends Component {
         </div>
       );
 
-
-      let outputPages=getEPPages(this.props, this.state.appletImage,this.state.aboutMe,this.state.includeAboutMe, 
-        this.state.aboutMeImageConvertedToBase64,
-        this.state.stackedChartConvertedToBase64,
-        this.state.pieEstateLeakageConvertedToBase64,
-        this.state.pieEstateLeakage2ConvertedToBase64,
-        this.firstPageLogoWidth,this.state.showGrids,
-        this.graphEstateLeakageDone,this.graphEstateLeakageLEDone,this.graphStackedDone, this.clickMultiButton )
-      this.pages = outputPages.allPages;
-      this.refPage=outputPages.refPage
-    
-
     return (
       <div>
         {this.state.pdfLoaded === false && <Spinner />}
@@ -1546,7 +1530,7 @@ export default class OutputPresentationEP extends Component {
             defaltCover={this.props.dataInput.Presentations[0].appletImage.default}
             restoreCover={this.restoreCover}
             editPres = {this.doEditPres}
-            token={this.props.token}
+            email={this.props.email}
             updateAboutMe={this.updateAboutMe}
           />
           <div style={{ height: "0px" }}>
@@ -1601,7 +1585,7 @@ export default class OutputPresentationEP extends Component {
         <div style={{ width: "100%", paddingTop: "10px" }}>
           <div className="row">
             <div className="column">
-              {/* <table
+              <table
                 className="NeedsTable"
                 style={{
                   paddingLeft: "10px",
@@ -1688,9 +1672,7 @@ export default class OutputPresentationEP extends Component {
                     </td>
                   </tr>
                 </tbody>
-              </table> */}
-                <OutputInfoGridEP taxLiability={this.props.taxLiability} lang={lang} dataEstateLiability={this.props.dataEstateLiability} LE={this.props.LE}/>
-               
+              </table>
             </div>
             <div
               className="column"
@@ -1700,9 +1682,7 @@ export default class OutputPresentationEP extends Component {
                 float: "right",
               }}
             >
-              <OutputExportGridEP doEP={this.doEP} doLIFO={this.doLIFO} doCA={this.doCA} doEB={this.doEB} lang={lang}/>
-        
-              {/* <table
+              <table
                 className="EP"
                 style={{ paddingLeft: "10px", width: "100%" }}
               >
@@ -1808,7 +1788,7 @@ export default class OutputPresentationEP extends Component {
                     </td>
                   </tr>
                 </tbody>
-              </table> */}
+              </table>
             </div>
           </div>
         </div>
@@ -2859,7 +2839,7 @@ export default class OutputPresentationEP extends Component {
           /* className="presentationPrint" */
           /* o */
         >
-          {this.pages}
+          {allPages}
         </div>
       </div>
     );

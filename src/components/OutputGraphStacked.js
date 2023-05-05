@@ -36,11 +36,16 @@ export class OutputGraphStacked extends React.Component {
       }, */
       elements: { point: { radius: 0 } },
       responsive: true,
+      animation: {
+        onComplete: async ()=> {
+           this.props.graphStackedDone()
+        }
+     },
       title: {
         display: true,
         position: "top",
         text: OUTPUTTEXTEP[lang].pg4GT,
-        fontSize: 14, //8,
+        fontSize: 16, //8,
         fontColor: "#111",
       },
       legend: {
@@ -56,6 +61,7 @@ export class OutputGraphStacked extends React.Component {
           {
             stacked: true,
             ticks: {
+              fontSize: 12,
               beginAtZero: true,
               callback: function (value, index, values) {
                 let result =
@@ -76,6 +82,7 @@ export class OutputGraphStacked extends React.Component {
           {
             stacked: true,
             ticks: {
+              fontSize: 12,
               beginAtZero: true,
             },
           },
@@ -118,8 +125,6 @@ export class OutputGraphStacked extends React.Component {
       });
     }
 
-    
-
     function shadeColor(color, percent) {
       var R = parseInt(color.substring(1, 3), 16);
       var G = parseInt(color.substring(3, 5), 16);
@@ -151,22 +156,29 @@ export class OutputGraphStacked extends React.Component {
     return (
       <div style={{ width: "90%" }}>
         <div>
-          <article
+          {this.props.useNewPDFMethod && (
+            <div >
+              {this.props.stackedChartConvertedToBase64 !== null && (
+                <img src={this.props.stackedChartConvertedToBase64} />
+              )}
+            </div>
+          )}
+          {(this.props.stackedChartConvertedToBase64===undefined || this.props.stackedChartConvertedToBase64 === null) && <article
             id="stackedChart"
             className="canvas-containerWeb"
-            style={{ marginLeft: "25px", height: "450px" }}
+            style={{ marginLeft: "25px"}}
           >
             <div
               style={{
                 overflow: "hidden",
                 float: "left",
                 width: "100%",
-                height: "400px",
+                visibility:this.props.useNewPDFMethod && "hidden"
               }}
             >
               <Bar data={dataEstate} options={optionsEstate} />
             </div>
-          </article>
+          </article>}
         </div>
       </div>
     );

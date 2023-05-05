@@ -1,26 +1,57 @@
 import React from "react";
-import { MultiButtons } from "./MultiButtons";
 
-import { OUTPUT_WIDTH_PCT } from "../definitions/generalDefinitions";
+import { MultiButtons } from "./MultiButtons";
+import imageToBase64 from 'image-to-base64/browser'
+
+import { IMAGE_LOGO,
+  OUTPUT_WIDTH_PCT,COVER_IMAGE} from "../definitions/generalDefinitions";
+import { BorderRight } from "@material-ui/icons";
 
 export class AdjustibleImage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      imageSize: this.props.size,
+      imageSize: this.props.ID===IMAGE_LOGO?100:this.props.size,
       imageLeft: this.props.imageLeft,
       allPages: this.props.allPages,
       imageTop: this.props.top,
       showDetails: false,
       image: this.props.image,
+      undoImage: this.props.undoImage,
       undo: false,
     };
+    this.non64=true;    
+    
   }
 
+  convertimageToBase64=(image)=>{ 
+  imageToBase64(image) 
+  .then(
+      (response) => {
+        this.setState({image:response, undoImage:response}); 
+        
+      }
+  )
+  .catch(
+      (error) => {
+          console.log(error); // Logs an error if there was one
+      }
+ 
+      )
+    }
+    
   componentDidMount = () => {
+
+    
+    if(this.props.nonBase64)
+    {
+        this.convertimageToBase64(this.props.image)
+    }
     this.setState({ showDetails: false });
+   
   };
 
+  
   updateImage = () => {
     const image = {
       image: this.state.image,
@@ -29,6 +60,7 @@ export class AdjustibleImage extends React.Component {
       allPages: this.state.allPages,
       top: this.state.imageTop,
       showDetails: this.state.showDetails,
+      default: false,
     };
     this.props.imageAdjust(image, this.props.ID);
   };
@@ -43,6 +75,7 @@ export class AdjustibleImage extends React.Component {
   };
 
   imageSmaller = () => {
+    
     this.setState(
       (prevState) => ({
         imageSize: parseFloat(prevState.imageSize * 0.9),
@@ -52,21 +85,29 @@ export class AdjustibleImage extends React.Component {
   };
 
   imageLeft = () => {
-    this.setState(
+   {this.setState(
       (prevState) => ({
-        imageLeft: parseFloat(prevState.imageLeft - 2),
+        imageLeft: parseFloat(prevState.imageLeft - Math.min(2,prevState.imageLeft )),
       }),
       this.updateImage
-    );
+    );}
   };
 
   imageRight = () => {
-    this.setState(
+    const widthCont=document.getElementById(this.props.imagePackageID).clientWidth
+    let inc=2;
+    if(this.state.allPages===false &&  this.state.imageSize+(this.state.imageLeft+2)*widthCont/100>widthCont-25)
+        inc=(widthCont-this.state.imageSize-25)*100/widthCont-this.state.imageLeft
+    else if (this.state.allPages &&  this.state.imageSize/2-80+(this.state.imageLeft+2)*widthCont/100>widthCont)
+        inc=(widthCont-this.state.imageSize/2+80)*100/widthCont-this.state.imageLeft
+     { 
+      this.setState(
       (prevState) => ({
-        imageLeft: parseFloat(prevState.imageLeft + 2),
+        imageLeft: parseFloat(prevState.imageLeft + inc),
       }),
       this.updateImage
     );
+  }
   };
 
   imagePosition = (e) => {
@@ -95,13 +136,14 @@ export class AdjustibleImage extends React.Component {
       },
       this.updateImage
     );
+    document.getElementById(this.props.imagePackageID).style.display = "none";
   };
 
   showDetails = () => {
     const image = {
       image: this.state.image,
       left: this.state.imageLeft,
-      size: this.state.imageSize,
+      size: this.props.ID===IMAGE_LOGO?100:this.state.imageSize,
       allPages: this.state.allPages,
       imageTop: this.state.imageTop,
       showDetails: !this.state.showDetails,
@@ -110,6 +152,7 @@ export class AdjustibleImage extends React.Component {
   };
 
   undoImage = () => {
+    this.non64=true;
     const image = {
       image: this.state.image,
       left: this.state.imageLeft,
@@ -119,61 +162,86 @@ export class AdjustibleImage extends React.Component {
       showDetails: false,
     };
     
+
     if(this.props.undoImage!==undefined)
-      image.image=this.props.undoImage
+      
       this.setState(
       {
-        image: image,
-        undo: true
+        undo: true,
+        image:image
       },
     );
 
   };
 
   imageDone = () => {
-    this.setState({
-      showDetails: false,
-    });
+    this.setState(
+      (prevState) => ({
+        showDetails: false,      
+        imageSize: parseFloat(prevState.imageSize),
+      }),
+      this.updateImage
+    );    
+    document.getElementById(this.props.imagePackageID).style.display = "none";
+    this.props.updateImage(this.state.image, this.state.imageSize);
   };
 
+  
   loadImage = (e) => {
     let file = e.target.files[0];
 
     let reader = new FileReader();
     reader.readAsDataURL(file);
+    this.non64=false;
+    var image = new Image();
+    reader.onload = async () => {
 
-    let image;
-    reader.onload = () => {
-      image = reader.result;
 
+      image.onload = ()=>{
+        const widthImg = image.width;
+      
+     
       const imageObj = {
-        image: image,
-        left: this.state.imageLeft,
-        size: this.state.imageSize,
+        image: reader.result,
+        left: 0,//this.state.imageLeft,
+        size: widthImg,//this.state.imageSize,
         allPages: false,
         imageTop: this.state.imageTop,
         showDetails: this.props.showDetails,
       };
       this.setState(
         () => ({
-          image: image,
+          image: reader.result,
+          imageSize: widthImg,
+          imageLeft: 0,
           showDetails: this.props.showDetails,
           allPages: this.props.allPages,
           undo: false
         }),
-        this.props.imageAdjust(imageObj, this.props.ID)
-      );
+        this.props.ID===IMAGE_LOGO?this.props.imageAdjust(imageObj, this.props.ID):this.imageDone
+      )
+      };
+
+      image.src = reader.result;
+
+      
     };
   };
 
   render() {
+
+
     const styleImage = {
       float: "left",
-      width: OUTPUT_WIDTH_PCT + "%",
+      /* width: this.props.ID===IMAGE_LOGO?this.state.imageSize + "%":OUTPUT_COVER_IMAGE_WIDTH_PCT +"%", */
       display: "table-cell",
-      marginTop: "-3px",
-      marginBottom: "15px",
+      marginTop: "-.2em",
+      marginBottom: ".8em",
       marginLeft: this.state.imageLeft + "%",
+      clear:"both",
+      width: this.props.ID===IMAGE_LOGO?"max-content":"auto",
+      maxWidth:"100%",
+      maxHeight: "400px"
     };
     //console.log(this.state.image)
     const lang = this.props.language !== undefined ? this.props.language : "en";
@@ -182,20 +250,30 @@ export class AdjustibleImage extends React.Component {
         ? this.props.buttonText.length * (lang === "en" ? 10 : 14)
         : 0;
 
+    // image from file reader has the complete base64 format, images converted do not 
+
+
+    const completeImg64Formaat=this.state.image===null || this.state.image===undefined?false:this.state.image.toString().includes("data:image")
+
+    const buttonID= "button" +this.props.imagePackageID
     return (
       <div
-        id="image"
+        id={this.props.imagePackageID}
         style={{
           float: "left",
           marginTop: "12px",
           marginBottom: "12px",
-          width: OUTPUT_WIDTH_PCT + "%",
+          width:  OUTPUT_WIDTH_PCT +"%",
+          border: this.props.ID===IMAGE_LOGO ? "solid 2px lightgrey":"",
+          borderRight: this.props.ID===IMAGE_LOGO? (this.state.allPages?"dashed 2px lightblue":"solid 2px lightgrey"):""
         }}
       >
-        <div style={{ paddingLeft: "2.5%" }}>
+        
+        <div className="no-print" style={{ overflow: "hidden", paddingLeft: "2.5%" }}>
           {this.state.showDetails === false && cmdWidth > 0 && (
             <label className="roundedCornerCmd">
               <input
+                id={buttonID}
                 type="file"
                 required
                 style={{ display: "none" }}
@@ -218,12 +296,19 @@ export class AdjustibleImage extends React.Component {
               type="button"
               value={lang === "en" ? "Undo":"Annuler"}
             />}
+            {this.props.undoImage!==undefined && <input
+             className="roundedCornerCmd"
+              style={{marginLeft:"10px"}}
+              onClick={this.imageDone}
+              type="button"
+              value={lang === "en" ? "done" : "terminé"}
+            />}
         </div>
         <br /> <br />
-        <hr className="ppi1" />
+       {/*  <hr className="ppi1 no-print" /> */}
         {this.state.showDetails && (
           <>
-            <div style={{ marginLeft: "20px" }}>
+            <div className="no-print" style={{ marginLeft: "20px" }}>
               <MultiButtons
                 width={"80px"}
                 noButtons={2}
@@ -293,16 +378,21 @@ export class AdjustibleImage extends React.Component {
             </div>
           </>
         )}
-        <p />
+        {/* don't show image adj controls if cover image */}
         <div style={styleImage}>
+         
           {this.state.image === null ? (
             ""
           ) : (
             <img
               className="ppi1"
+             
               id={this.props.ID}
-              src={this.state.undo?this.state.image.image: this.state.image}
-              width={this.state.imageSize + "%"}
+/*               src={this.state.undo?this.state.image.image: this.state.image} */
+              src={this.state.undo?"data:image/png;base64, "+this.state.undoImage: completeImg64Formaat?this.state.image:"data:image/png;base64, "+this.state.image}
+              /* src={this.non64===false && this.props.nonBase64===undefined ? this.state.image:(this.state.undo?"data:image/png;base64, "+this.state.undoImage: "data:image/png;base64, "+this.state.image)} */
+              
+              width={this.props.ID===IMAGE_LOGO?this.state.imageSize:OUTPUT_WIDTH_PCT  +"%"}
             />
           )}
         </div>

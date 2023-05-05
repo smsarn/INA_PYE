@@ -33,7 +33,7 @@ export const HEADER_TEXT_G: number = 0xff;
 export const HEADER_TEXT_B: number = 0xff;
 
 export const FOOTER_TEXT_PT_SIZE: number = 8;
-export const FOOTER_TEXT_IN_X: number = 1.5;
+export const FOOTER_TEXT_IN_X: number = 1.2;//5;
 export const FOOTER_TEXT_IN_Y: number = 11 - 3 * 0.125;
 export const FOOTER_TEXT_IN_Y_L: number = 8 - 3 * 0.125;
 

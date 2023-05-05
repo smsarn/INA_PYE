@@ -70,6 +70,10 @@ const MESSAGES = {
         <span style={infoHighlightStyle}>Client's "CPP/QPP Eligibility"</span>
       </div>
     ),
+    taxSaving:
+    "Example: RRSP contributions",
+    taxRefund:
+    "This amount is non-taxable",//calculated by changing 'Deductible Amount' and uses marginal tax rate",
     assetTax:
       "Please use after tax asset values until Tax Method becomes available",
     internet:
@@ -115,7 +119,7 @@ const MESSAGES = {
       </div>
     ),
     infoINA:
-      "This amount is based on the present value of shortfalls, discounted at the after tax investment rate. It is adjusted if necessary, to make sure early shortfalls are provided for",
+      "This amount is based on the present value of shortfalls, discounted at the after tax investment rate. It is adjusted if necessary, to make sure early shortfalls are provided for.",
       infoBOYEOY: "BOY stands for Beginning of Year and EOY for End of Year",
       infoAvgGrowth:  <div>Average Growth = ( <br/>EOY Balance + Sale Proceeds <br/> - BOY Balance <br/>) / BOY Balance </div>,
       infoPDF:
@@ -203,6 +207,11 @@ const MESSAGES = {
         <span style={infoHighlightStyle}>l'admissibilité du client</span>
       </div>
     ),
+    taxSaving:
+    "Exemple : Cotisations au REER",
+    taxRefund:
+    "Ce montant est non imposable",
+  
     assetTax:
       "Veuillez utiliser les valeurs des actifs après impôt jusqu'à ce que la méthode d'imposition devienne disponibl",
     internet:
@@ -255,7 +264,7 @@ const MESSAGES = {
       </div>
     ),
     infoINA:
-      "Ce montant est basé sur la valeur actualisée des manques à gagner en matière de revenus, actualisée au taux de rendement après impôt. Il est ajusté, si nécessaire, pour s'assurer que des manque à gagner précoces sont prévus",
+      "Ce montant est basé sur la valeur actualisée des manques à gagner en matière de revenus, actualisée au taux de rendement après impôt. Il est ajusté, si nécessaire, pour s'assurer que des manque à gagner précoces sont prévus.",
       infoBOYEOY: "DDA signifie Début d'année et FDA, Fin d'année",
       infoAvgGrowth:  <div>Croissance moyenne = ( <br/>Valeur FDA + Produits de la vente <br/> - Valeur en début d'année <br/>)/Valeur en début d'année </div>,
       infoPDF:
@@ -325,6 +334,40 @@ export function getInfoIconSourcesGov(lang) {
     iconMode: SHOW_STANDARD_RED,
     popupOpenByProps: false,
     popupBorderColor: POPUP_BORDER_ALERT,
+    position: {
+      marginLeft: DEFAULT_MARGIN_LEFT + 12,
+      marginTop: DEFAULT_MARGIN_TOP,
+      width: DEFAULT_WIDTH,
+      height: DEFAULT_HEIGHT,
+    },
+  };
+}
+
+
+
+export function getInfoIconSourcesTaxSaving(lang) {
+  return {
+    infoID: "infotaxSaving",
+    infoText: MESSAGES[lang].taxSaving,
+    iconMode:  SHOW_STANDARD,
+    popupOpenByProps: false,
+    popupBorderColor: POPUP_BORDER_INFO,
+    position: {
+      marginLeft: DEFAULT_MARGIN_LEFT + 12,
+      marginTop: DEFAULT_MARGIN_TOP,
+      width: DEFAULT_WIDTH,
+      height: DEFAULT_HEIGHT,
+    },
+  };
+}
+
+export function getInfoIconSourcesTaxRefund(lang) {
+  return {
+    infoID: "infotaxRefund",
+    infoText: MESSAGES[lang].taxRefund,
+    iconMode:  SHOW_STANDARD,
+    popupOpenByProps: false,
+    popupBorderColor: POPUP_BORDER_INFO,
     position: {
       marginLeft: DEFAULT_MARGIN_LEFT + 12,
       marginTop: DEFAULT_MARGIN_TOP,
@@ -506,7 +549,7 @@ export function getInfoPDF(lang) {
     popupOpenByProps: false,
     popupBorderColor: POPUP_BORDER_INFO,
     position: {
-      marginLeft: DEFAULT_MARGIN_LEFT,
+      marginLeft: DEFAULT_MARGIN_LEFT-80,
       marginTop: DEFAULT_MARGIN_TOP,
       width: DEFAULT_WIDTH + 30,
       height: DEFAULT_HEIGHT,

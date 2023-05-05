@@ -29,16 +29,18 @@ import {
   OUTPUT_WIDTH_PCT,
   IMAGE_LOGO_OTHERPAGES,
   IMAGE_LOGO,
+  LOGO_IMAGE_WITH_CTRLS,
   IMAGE_APPLET_INA,
   IMAGE_APPLET_EP,
   TITLES,
+  MAX_LOGO_HEIGHT,
+  PAGE_HEIGHT
 } from "../definitions/generalDefinitions";
 import { AdjustibleImage } from "../components/AdjustibleImage";
 
 // copy instead re lazyloading
 //import { MAX_LOGO_HEIGHT, PAGE_HEIGHT } from "../components/PDF";
-const PAGE_HEIGHT = 11;
-const MAX_LOGO_HEIGHT = 0.38;
+
 
 global.langFr =
   (
@@ -773,6 +775,7 @@ export function getDefaultImages() {
       allPages: false,
       top: true,
       showDetails: false,
+      default: true,
     },
   };
 }
@@ -1115,12 +1118,15 @@ export function getLeakageGraphs(
   //optionsPieEstateLeakage.legend.labels.boxWidth = 20;
   //optionsPieEstateLeakage.plugins.display = true;
 
+ 
+
+
   let optionsPieEstateLeakageLE = JSON.parse(JSON.stringify(optionsPie));
   optionsPieEstateLeakageLE.title.text =
     OUTPUTTEXTEP[lang].graphsLeakageT3 + space; // needTo += +this.props.projectEnd + ")";
   // optionsPieEstateLeakageLE.legend.labels.boxWidth = 20;
   //optionsPieEstateLeakageLE.plugins.display = true;
-
+  
   // asset info
   let assetsTotalNow = 0;
   let assetsTotalLE3 = 0;
@@ -1239,7 +1245,7 @@ export function getLeakageGraphs(
   };
 }
 
-export function getLogoAndAppletImage(dataInput, imageRemove, imageAdjust) {
+export function getLogoAndAppletImage(dataInput, imageRemove, imageAdjust, updateImageApplet, updateImageLogo) {
   const lang = dataInput.Presentations[0].language;
   const allPages =
     dataInput.Presentations[0].adviserLogo.image !== null &&
@@ -1260,6 +1266,8 @@ export function getLogoAndAppletImage(dataInput, imageRemove, imageAdjust) {
         OUTPUT_WIDTH_PCT
     )
   );
+
+
   const logoLeft =
     dataInput.Presentations[0].adviserLogo.size / 2 +
     dataInput.Presentations[0].adviserLogo.left -
@@ -1271,19 +1279,29 @@ export function getLogoAndAppletImage(dataInput, imageRemove, imageAdjust) {
       size={logoSize}
       imageLeft={logoLeft}
       ID={IMAGE_LOGO_OTHERPAGES}
+      imagePackageID= "imagePackageIDLogoAll"
     />
   );
   const top = dataInput.Presentations[0].adviserLogo.top;
   /* const logoTop = dataInput.Presentations[0].adviserLogo.top && logo
   const logoBottom = !dataInput.Presentations[0].adviserLogo.top && logo
    */
+  let log1stPageLeft=dataInput.Presentations[0].adviserLogo.left
+  var logoDiv = document.getElementById(LOGO_IMAGE_WITH_CTRLS);
+ 
+  if(logoDiv!==null && log1stPageLeft*logoDiv.clientWidth/100+dataInput.Presentations[0].adviserLogo.size>logoDiv.clientWidth-25)
+   {   
+     log1stPageLeft=(logoDiv.clientWidth-25-dataInput.Presentations[0].adviserLogo.size)*100/logoDiv.clientWidth
+
+  }
+  console.log(log1stPageLeft, dataInput.Presentations[0].adviserLogo.left)
   const logo1stPage = dataInput.Presentations[0].adviserLogo.image !==
     undefined && ( // from older files not null but undefined
     <AdjustibleImage
       image={dataInput.Presentations[0].adviserLogo.image}
       showDetails={true}
       size={dataInput.Presentations[0].adviserLogo.size}
-      imageLeft={dataInput.Presentations[0].adviserLogo.left}
+      imageLeft={log1stPageLeft}
       allPages={dataInput.Presentations[0].adviserLogo.allPages}
       top={dataInput.Presentations[0].adviserLogo.top}
       imageRemove={imageRemove}
@@ -1291,8 +1309,11 @@ export function getLogoAndAppletImage(dataInput, imageRemove, imageAdjust) {
       buttonText={lang === "en" ? "Add/Edit logo" : "Ajouter/modifier le logo"}
       ID={IMAGE_LOGO}
       language={lang}
+      imagePackageID= {LOGO_IMAGE_WITH_CTRLS}
+      updateImage={updateImageLogo}
     />
   );
+
   const applet = (
     <div>
       <AdjustibleImage
@@ -1309,46 +1330,75 @@ export function getLogoAndAppletImage(dataInput, imageRemove, imageAdjust) {
         }
         language={lang}
         top={true}
+        nonBase64={true}
         ID={APPLET_INA ? IMAGE_APPLET_INA : IMAGE_APPLET_EP}
-        undoImage={
-          APPLET_INA
-            ? require("../images/INA.png")
-            : require("../images/estate.protection.applet.cover.graphic.png")
-        }
+        undoImage={appletImage}
+        imagePackageID= "imagePackageIDApplet"
+        updateImage={updateImageApplet}
+
       />
-    </div>
+    </div>)
+
+const appletImageOnly = (
+  <div>
+    <AdjustibleImage
+      image={appletImage}
+      showDetails={false}
+      size={OUTPUT_WIDTH_PCT}
+      imageLeft={0}
+      imageAdjust={imageAdjust}
+      //newImagethis.props.loadImage
+      buttonText=""
+      language={lang}
+      top={true}
+      nonBase64={true}
+      ID={APPLET_INA ? IMAGE_APPLET_INA : IMAGE_APPLET_EP}
+      key={"cover"}
+      imagePackageID= "imagePackageIDAppletOnly"
+
+    />
+  </div>
+
   );
+
+  var img = document.getElementById(IMAGE_LOGO);
+    let smallLogoAdj=0;  
+    let marginLeft1stPg=dataInput.Presentations[0].adviserLogo.left
+
+    let logoOnly =""
+    let logoFirstPg1=""
+    
+    if(img!==null && logoDiv!==null)
+    {
+      smallLogoAdj=0;//dataInput.Presentations[0].adviserLogo.left===0?0:(img.width/2)/logoDiv.clientWidth
+      marginLeft1stPg= log1stPageLeft;//Math.min(dataInput.Presentations[0].adviserLogo.left, 100*(logoDiv.clientWidth-img.width)/logoDiv.clientWidth)
+      
+      if(logoDiv.clientWidth>0 && img.width>0 && 100*img.width/logoDiv.clientWidth+ dataInput.Presentations[0].adviserLogo.left>100)
+          smallLogoAdj=0//.92-dataInput.Presentations[0].adviserLogo.left/100
+        logoOnly =<div style={{float:"left",marginLeft:parseFloat(100*smallLogoAdj+dataInput.Presentations[0].adviserLogo.left)  + "%"}}><img className="logo" src={dataInput.Presentations[0].adviserLogo.image} /></div>;
+        logoFirstPg1 = <div style={{marginLeft:marginLeft1stPg + "%"}}><img width={img.width} src={dataInput.Presentations[0].adviserLogo.image} /></div>;
+    } 
+
+
   return {
     //appletImage: appletImage,
     logoSize: logoSize,
     logoLeft: logoLeft,
+    logoOnTop: top,
+    logoOnly: logoOnly,
     logoTop: top ? logo : "",
     logoBottom: !top ? logo : "",
     logo1stPage: logo1stPage,
+    logo1stPage1: logoFirstPg1,
+    logoAllPages:allPages,
     applet: applet,
+    appletImageOnly: appletImageOnly,
+    imagePackageIDLogo: "imagePackageIDLogo",
+    imagePackageIDApplet: "imagePackageIDApplet" ,
+    defaultCover:{appletImage}
   };
 }
 
-export function extractCSS() {
-  const allCSS = Object.values(document.styleSheets)
-    // eslint-disable-next-line array-callback-return
-    .map((styleSheet) => {
-      try {
-        return Object.values(styleSheet.cssRules)
-          .map((rule) => rule.cssText)
-          .join("");
-      } catch (e) {
-        console.log(
-          "Access to stylesheet %s is denied. Ignoring...",
-          styleSheet.href
-        );
-      }
-    })
-    .filter(Boolean)
-    .join("");
-
-  return allCSS;
-}
 
 export function doCompuLife(
   lang,
@@ -1385,19 +1435,19 @@ export function doCompuLife(
     designedBy +
     "&prov=";
 
-  if (province === PROVINCE.AB) provinceCode = "1";
-  else if (province === PROVINCE.BC) provinceCode = "2";
-  else if (province === PROVINCE.MB) provinceCode = "3";
-  else if (province === PROVINCE.NB) provinceCode = "4";
-  else if (province === PROVINCE.NF) provinceCode = "5";
-  else if (province === PROVINCE.NS) provinceCode = "6";
-  else if (province === PROVINCE.NT) provinceCode = "7";
-  else if (province === PROVINCE.NU) provinceCode = "8";
-  else if (province === PROVINCE.ON) provinceCode = "9";
-  else if (province === PROVINCE.PE) provinceCode = "10";
-  else if (province === PROVINCE.QC) provinceCode = "11";
-  else if (province === PROVINCE.SK) provinceCode = "12";
-  else if (province === PROVINCE.YU) provinceCode = "13";
+  if (province === PROVINCE.AB.Key) provinceCode = "1";
+  else if (province === PROVINCE.BC.Key) provinceCode = "2";
+  else if (province === PROVINCE.MB.Key) provinceCode = "3";
+  else if (province === PROVINCE.NB.Key) provinceCode = "4";
+  else if (province === PROVINCE.NF.Key) provinceCode = "5";
+  else if (province === PROVINCE.NS.Key) provinceCode = "6";
+  else if (province === PROVINCE.NT.Key) provinceCode = "7";
+  else if (province === PROVINCE.NU.Key) provinceCode = "8";
+  else if (province === PROVINCE.ON.Key) provinceCode = "9";
+  else if (province === PROVINCE.PE.Key) provinceCode = "10";
+  else if (province === PROVINCE.QC.Key) provinceCode = "11";
+  else if (province === PROVINCE.SK.Key) provinceCode = "12";
+  else if (province === PROVINCE.YU.Key) provinceCode = "13";
 
   url = url + provinceCode;
 
@@ -1423,3 +1473,111 @@ export function doCompuLife(
     window.open(url, "_blank");
   } catch (e) {} */
 }
+
+
+export async function chartToBase64Image(containerID) {
+  const CANVAS_CLASS_NAME = "chartjs-render-monitor";
+
+  let containerElement = document.getElementById(containerID);
+ 
+  let canvasElement = null;
+
+  if (containerElement !== null)
+    if (
+      containerElement.getElementsByClassName(CANVAS_CLASS_NAME).length === 1
+    )
+      canvasElement = containerElement.getElementsByClassName(
+        CANVAS_CLASS_NAME
+      )[0];
+
+  let dataUrl = canvasElement===null?null:canvasElement.toDataURL();
+
+  return dataUrl;
+};
+
+
+export async function getBase64AppletImage(imageID)
+{
+  var c = document.createElement('canvas');
+  var img = document.getElementById(imageID);
+  if (img!==null){
+    c.height = img.naturalHeight;
+    c.width = img.naturalWidth;
+    var ctx = c.getContext('2d');
+  
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    return c.toDataURL();
+  }
+  else
+   return ""
+
+}
+
+
+
+
+export function extractPageCSS(){
+    var css = [];
+    for (var i = 0; i < document.styleSheets.length; i++) {
+      var sheet = document.styleSheets[i];
+      var rules = "cssRules" in sheet ? sheet.cssRules : sheet.rules;
+      if (rules) {
+        css.push(
+          "\n/* Stylesheet : " + (sheet.href || "[inline styles]") + " */"
+        );
+        for (var j = 0; j < rules.length; j++) {
+          var rule = rules[j];
+          if ("cssText" in rule) css.push(rule.cssText);
+          else
+            css.push(
+              rule.selectorText + " {\n" + rule.style.cssText + "\n}\n"
+            );
+        }
+      }
+    }
+    var cssInline = css.join("\n") + "\n";
+    return cssInline;
+  }
+
+
+  export function buildSimpleAggregateGridEP(aggGrid)
+  
+  {
+    let rows = [];
+    let title=[];
+    for (var idx = 0; idx < aggGrid.dataColTitles.length; idx++){
+      let tID = `cell${i}-${idx}`
+      title.push(<td key={tID} id={tID}>{aggGrid.dataColTitles[idx]}</td>)
+    }
+  
+  for (var i = 0; i <aggGrid.dataProjection[0].length; i++){
+    let rowID = `row${i}`
+    let cell = []
+let upTo=25
+    if (i>upTo)
+    {
+      if(i%5===0)
+      {
+      for (var idx = 0; idx < aggGrid.dataColTitles.length; idx++){
+        let cellID = `cell${i}-${idx}`
+        cell.push(<td key={cellID} id={cellID}>{aggGrid.dataProjection[idx][i]}</td>)      }  
+    }
+  }
+    else{
+      for (var idx = 0; idx < aggGrid.dataColTitles.length; idx++){
+        let cellID = `cell${i}-${idx}`
+        cell.push(<td key={cellID} id={cellID}>{aggGrid.dataProjection[idx][i]}</td>)
+      }
+    }
+    console.log(cell)
+    rows.push(<tr key={i} id={rowID}>{cell}</tr>)
+  }
+
+      
+  console.log(aggGrid.dataProjection,rows,aggGrid.dataProjection[0].length )
+
+  return ({title:aggGrid.gridTitle, colTitles:title, rows:rows})
+  
+  }
+  
+  

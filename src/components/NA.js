@@ -26,6 +26,7 @@ import {
   handleFetchINADataFromQueryString,
   handleFetchQueryString,
   fetchValidateTokenGetAgentEmailRecordAppletLogin,
+  handleFetchAdvisorPortfolio,
 } from "../utils/FetchAPIs";
 import debounce from "lodash.debounce";
 import cloneDeep from "lodash.clonedeep";
@@ -117,7 +118,7 @@ import {
   getInfoIconInflationGrowth,
   getInfoIconPYE_JLTD,
   getInfoIconNeedGrowth,
-  getInfoSave
+  getInfoSave,
 } from "../definitions/infoIconsDefinitions";
 
 import { getAssetGridValues } from "../data/assetGridProjections";
@@ -223,7 +224,6 @@ export class NA extends Component {
     let defaultNeeds = [];
     defaultNeeds.push(createDefaultNeed(1));
     defaultNeeds.push(createDefaultNeed(2));
-    // const defaultPresentation = [createDefaultPres(1, this.provinceMargTax)];
 
     // build state with defaults
     this.state = {
@@ -233,6 +233,7 @@ export class NA extends Component {
       initialQSParsing: 1,
       failedAPI: false,
       promptForSave: false,
+      showLogout: false,
       promptShowCases: false,
       promptShowClients: false,
       showPopupMessage: "",
@@ -275,7 +276,7 @@ export class NA extends Component {
     this.graphs = false;
     this.caseFromFile = false;
     this.OKToRemove = true;
-    this.accessedAPI = false;
+    this.validToken = true;
     this.openParent = true;
     this.openForce = true;
     this.resultIsOpen = false;
@@ -285,7 +286,9 @@ export class NA extends Component {
     this.dataQS = "";
     this.intervalID = 0;
     this.INAOption = APPLET_INA ? DISPLAY_INCOME : DISPLAY_TAXLIAB;
-
+    this.agentAccessQuery = false;
+    this.aboutMe = null;
+    this.token="";
     //this.OutputPresentation = null;
     //this.OutputPresentationEP = null;
   }
@@ -367,12 +370,12 @@ export class NA extends Component {
 
   parseQSs = async (query) => {
     let caseID = "";
+    this.agentAccessQuery = false;
     if (query.caseGUID !== undefined) caseID = query.caseGUID;
     if (query.clientGUID !== undefined)
       this.clientIDToShowCasesFor = query.clientGUID;
-
     // Database
-    if (query.DBAction !== undefined) {
+    else if (query.DBAction !== undefined) {
       this.DBApplet = "";
       if (query.DBAction.toLowerCase() === "clients")
         this.setState({ promptShowClients: true });
@@ -432,6 +435,7 @@ export class NA extends Component {
     if (this.state.initialLoading === false) {
       window.parent.postMessage("FRAME_LOADED", "*");
     }
+
     // now UI is loaded call initiaal API calls async but dont await
     if (query.QS === undefined) {
       this.handleIntitalFetch(
@@ -459,10 +463,45 @@ export class NA extends Component {
     //await this.setToken(query.TKTOK, query.authToken);
 
     let validToken = false;
+    ;
     if (query.authToken !== undefined)
+    {
       validToken = await this.setToken(query.authToken);
+      this.token=query.authToken
+    }
     else if (query.TKTOK !== undefined)
+    {
       validToken = await this.setToken(query.TKTOK);
+      this.token=query.TKTOK
+    }
+
+    if(validToken===false)this.setState({ showLogout: true });
+
+    this.aboutMe = await handleFetchAdvisorPortfolio(this.token);
+
+    console.log(this.aboutMe, this.userEmail);
+
+    // agent access re colour or else
+    if (query.AgentAccessQuery === "1") {
+      this.agentAccessQuery = true;
+      if (query.authToken !== undefined || query.TKTOK !== undefined) {
+        let data = await fetchValidateTokenGetAgentEmailRecordAppletLogin(
+          query.authToken !== undefined ? query.authToken : query.TKTOK,
+          "INA"
+        );
+        await window.parent.postMessage(
+          "AGENT_ACCESS_" + data.accessLevel,
+          "*"
+        );
+      }
+
+      setTimeout(() => {}, 1000);
+      return;
+      // else
+      //  await window.parent.postMessage("AGENT_ACCESS_NONE", "*")
+    }
+
+    
 
     await this.parseQSs(query);
 
@@ -534,7 +573,7 @@ export class NA extends Component {
       //const decoded = jwt_decode(authToken);
 
       //this.userEmail = decoded.upn;
-      const email = sessionStorage.getItem("userEmail");
+      const email =null; //sessionStorage.getItem("userEmail");
       //console.log(email, this.userEmail, this.agentID);
       if (email === null || email === undefined || email === "") {
         const agentSpecs =
@@ -936,13 +975,15 @@ export class NA extends Component {
     itemToUpdateGroup,
     itemToUpdateID,
     debounce,
-    saveToStorage
+    saveToStorage,
+    doAlert
   ) => {
     try {
       // reSync
       newStateCandidateInput = await this.syncPanelsValues2(
         newStateCandidateInput,
-        itemToUpdateGroup
+        itemToUpdateGroup,
+        doAlert
       );
 
       let newStateCandidateOutput;
@@ -978,7 +1019,7 @@ export class NA extends Component {
         );
       }
 
-      if (this.state.SnapImport) this.setState({ SnapImport: false });
+      // if (this.state.SnapImport) this.setState({ SnapImport: false });
 
       if (saveToStorage !== false) this.debounceSaveToStorage();
       return {
@@ -999,7 +1040,6 @@ export class NA extends Component {
       let dataShort;
 
       //    let hasSurivor = false;
-
       let aggregateGrid;
 
       /*       const spKey = APPLET_INA ? MEMBER.SPOUSE.Key : MEMBER.CLIENT.Key;
@@ -1064,6 +1104,7 @@ export class NA extends Component {
           noProjectYrs
         );
 
+
         if (APPLET_INA) {
           aggregateGrid = await getINAGridData(
             insNeed,
@@ -1076,6 +1117,7 @@ export class NA extends Component {
             dataGov,
             dataShort,
             newStateCandidateInput.Presentations[0].inflation,
+            newStateCandidateInput.Presentations[0].contribsGrowByInflation,
             newStateCandidateInput.Presentations[0].language,
             newStateCandidateInput.Presentations[0].invRate,
             newStateCandidateInput.Sources,
@@ -1096,6 +1138,11 @@ export class NA extends Component {
   };
 
   switchClients = async () => {
+    console.log(
+      this.state.dataInput.Clients.find(
+        (x) => x.memberKey === MEMBER.SPOUSE.Key
+      )
+    );
     if (
       this.state.dataInput.Clients.find(
         (x) => x.memberKey === MEMBER.SPOUSE.Key
@@ -1151,16 +1198,21 @@ export class NA extends Component {
 
     // keep member
     newDataInput.Clients[QUOTE_CLIENT].memberKey = MEMBER.CLIENT.Key;
-    newDataInput.Clients[QUOTE_SPOUSE].memberKey = MEMBER.SPOUSE.Key;
+    if (newDataInput.Clients.length > 1)
+      newDataInput.Clients[QUOTE_SPOUSE].memberKey = MEMBER.SPOUSE.Key;
 
     newDataInput.Clients[QUOTE_CLIENT].id = QUOTE_CLIENT + 1;
-    newDataInput.Clients[QUOTE_SPOUSE].id = QUOTE_SPOUSE + 1;
+    if (newDataInput.Clients.length > 1)
+      newDataInput.Clients[QUOTE_SPOUSE].id = QUOTE_SPOUSE + 1;
 
     const newState = await this.reSync_reCalculate_reRender(
       newDataInput,
       newDataOutput,
       COLLAPSIBLE_UPDATE_ALL, // to updateAll
-      0
+      0,
+      undefined,
+      undefined,
+      false
     );
 
     return newState;
@@ -1241,6 +1293,12 @@ export class NA extends Component {
     let { dataInput, dataOutput } = this.state;
     const newDataInput = cloneDeep(dataInput);
     const newDataOutput = cloneDeep(dataOutput);
+
+    if (source.sourceTypeKey!==INCOMESOURCES.TAX_CREDIT.Key)
+        source.growthRate=newDataInput.Presentations[0].inflation;
+        
+    console.log(source);
+
     newDataInput.Sources[source.id - 1] = source;
 
     // before updating state, resync, recalcuate, then update state to re_render
@@ -1586,13 +1644,17 @@ export class NA extends Component {
     if (source === undefined) {
       source = createDefaultSource();
     }
+
     // duration, growthRate,ownerID,taxRate depends on clients
     source.ownerID = 2; // spouse or 1st child if single family57
     source.duration = newDataInput.Sources[0].duration;
     source.growthRate = newDataInput.Presentations[0].inflation;
     source.taxRate =
       newDataInput.Clients.length > 1
-        ? newDataInput.Clients[1].avgTaxRate
+        ? source.sourceTypeKey ===
+          (INCOMESOURCES.TAX_CREDIT.Key || INCOMESOURCES.DIVIDEND_INCOME.Key)
+          ? source.taxRate
+          : newDataInput.Clients[1].avgTaxRate
         : newDataInput.Clients[0].avgTaxRate; // first survivor
 
     newDataInput.Sources.push(source);
@@ -2204,9 +2266,10 @@ export class NA extends Component {
     return Survivor.id - 1; // id is 1-based
   };
 
-  syncPanelsValues2 = (newStateCandidateInput, itemToUpdateGroup) => {
+  syncPanelsValues2 = (newStateCandidateInput, itemToUpdateGroup, doAlert) => {
     // EP dosent have needs and sources to sync
 
+    
     let needsDur = false;
     let sourcesDur = false;
     let needsAmt = false;
@@ -2222,6 +2285,20 @@ export class NA extends Component {
       protectionPeriod = yrs.noProjectionYrs;
     }
 
+    // NOTE: not written to state yet so check potential changes
+    let curDurBeforeUpdate=0;
+    try {
+      if (singleFamily) {
+        curDurBeforeUpdate= singleFamilyProjectionYears(this.state.dataInput.Clients).noProjectionYrs;
+      } 
+      else
+          curDurBeforeUpdate=this.state.dataInput.Clients[this.survIdx].retirementAge-this.state.dataInput.Clients[this.survIdx].Age
+        
+    } catch (error) {
+      
+    }
+    
+
     newStateCandidateInput = this.handleAddAssetTaxCredit2(
       newStateCandidateInput
     );
@@ -2236,6 +2313,12 @@ export class NA extends Component {
           );
 
           const dur = protectionPeriod;
+
+          console.log(
+            newStateCandidateInput.Needs[i].duration,
+            newStateCandidateInput.Needs,
+            this.state.dataInput.Needs
+          );
           //const dur = 100 - newStateCandidateInput.Clients[this.survIdx].Age;
           if (
             this.caseFromFile === false &&
@@ -2257,11 +2340,10 @@ export class NA extends Component {
               newStateCandidateInput.Clients.length !== 1
             ) {
               // change duration of % of income
+              // adjust it if it is the default based on old age and retAge, ie it is not a delibrate input duration
+      
               if (
-                (singleFamily &&
-                  newStateCandidateInput.Needs[i].startYear === 0) ||
-                (dur !== newStateCandidateInput.Needs[i].duration &&
-                  newStateCandidateInput.Needs[i].duration !== 100 &&
+                (newStateCandidateInput.Needs[i].duration===curDurBeforeUpdate && dur !==curDurBeforeUpdate && curDurBeforeUpdate>0 &&
                   dur > 0)
               ) {
                 newStateCandidateInput.Needs[i].duration = dur;
@@ -2306,13 +2388,23 @@ export class NA extends Component {
         }
 
         for (i = 0; i < newStateCandidateInput.Sources.length; i++) {
-          // all at income tax except divdend
+          // all at income tax except divdend & tax cred
           if (
             newStateCandidateInput.Sources[i].sourceTypeKey !==
-            INCOMESOURCES.DIVIDEND_INCOME.Key
+              INCOMESOURCES.DIVIDEND_INCOME.Key &&
+            newStateCandidateInput.Sources[i].sourceTypeKey !==
+              INCOMESOURCES.TAX_CREDIT.Key
           )
             newStateCandidateInput.Sources[i].taxRate =
               newStateCandidateInput.Clients[this.survIdx].avgTaxRate; // spouse
+
+          // adjust deductible tax rate if marg tax rate changes. Amount*(1-1-txrate)=refund, so as if tax rate is 1-margTaxrate
+          if (
+            newStateCandidateInput.Sources[i].sourceTypeKey ===
+            INCOMESOURCES.TAX_CREDIT.Key
+          )
+            newStateCandidateInput.Sources[i].taxRate =0;
+              /* 100 - newStateCandidateInput.Presentations[0].taxRate; */
 
           // allow a different surv income dur if they input directly
           if (
@@ -2324,8 +2416,9 @@ export class NA extends Component {
             if (
               newStateCandidateInput.Sources[i].sourceTypeKey ===
                 INCOMESOURCES.SURVIVORS_INCOME.Key &&
-              newStateCandidateInput.Sources[i].startYear === 0 &&
-              dur !== newStateCandidateInput.Sources[i].duration &&
+              newStateCandidateInput.Sources[i].startYear === 0 &&              
+              newStateCandidateInput.Sources[i].duration===curDurBeforeUpdate && dur !==curDurBeforeUpdate && curDurBeforeUpdate>0 &&
+              
               dur > 0
             ) {
               newStateCandidateInput.Sources[i].duration = dur;
@@ -2425,6 +2518,8 @@ export class NA extends Component {
       if (needsAmt || needsDur) msg += "'Besoins de revenu'";
       if (msg !== "") msg += " étaient ajusté";
     }
+    if (doAlert === false) msg = ""; // in case of Switch after PDF
+
     this.setState({ showPopupMessage: msg });
 
     return newStateCandidateInput;
@@ -2623,6 +2718,16 @@ export class NA extends Component {
     reader.readAsText(fileTarget);
     this.setState({ loading: false });
   };
+
+  respondToLogoutRequest = (OK) => {
+    this.setState({ showLogout: false });
+    window.parent.postMessage("TOKEN_FAILED_" +
+    this.state.dataInput.Presentations[0].language +
+    "_" +
+    this.state.encryptedInputLife1AndSpouse,
+  "*");
+  } 
+  
 
   respondToSaveRequest = (OK, fileName) => {
     this.setState({ promptForSave: false });
@@ -2862,6 +2967,7 @@ export class NA extends Component {
   };
 
   imageAdjust = (image, ID) => {
+    console.log(image);
     if (ID === IMAGE_LOGO)
       this.setState((prevState) => ({
         dataInput: {
@@ -3160,7 +3266,9 @@ export class NA extends Component {
     console.log("in NA: "this.props.language) 
 
     else  */
-    if (this.state.promptShowCases && this.state.initialQSParsing === 0)
+    console.log(dataInput.Needs);
+    if (this.agentAccessQuery) return "";
+    else if (this.state.promptShowCases && this.state.initialQSParsing === 0)
       return (
         <div>
           <br /> DB
@@ -3233,11 +3341,27 @@ export class NA extends Component {
             <div style={{ height: "0px" }}>
               <PopupUserinputDialog
                 openDialog={showInput === true}
-                mainMessage={lang==="en"?"Save to File":"Enregistrer dans un fichier"}
-                formMessage={lang==="en"?"file name":"nom de fichier"}
+                mainMessage={
+                  lang === "en" ? "Save to File" : "Enregistrer dans un fichier"
+                }
+                formMessage={lang === "en" ? "file name" : "nom de fichier"}
                 language={lang}
-                infoIcon = {getInfoSave(lang)}
+                infoIcon={getInfoSave(lang)}
                 respondToInput={this.respondToSaveRequest}
+              />
+            </div>
+            <div style={{ height: "0px" }}>
+              <PopupUserinputDialog
+                OKOnly={true}
+                severity={"error"}
+                openDialog={this.state.showLogout === true}
+                mainMessage={
+                  lang === "en" ? "Your Toolkit Direct session has expired. Toolkit Direct will now reload." : "Votre session ToolkitDirect a expiré. ToolkitDirect va maintenant se recharger."
+                }
+                
+                language={lang}
+                
+                respondToInput={this.respondToLogoutRequest}
               />
             </div>
             {/* {this.state.initialLazyLoaded === false ? <span>{lang === "en" ? "loading..." : "attendez..."}</span> : "" } */}
@@ -3437,6 +3561,7 @@ export class NA extends Component {
               ownerID={source.ownerID} */
                         includeGovOrphanBenefit={this.areThereChildren()}
                         language={lang}
+                        marginalTaxRate={dataInput.Presentations[0].taxRate} //singlePerson?dataInput.Clients[QUOTE_CLIENT].avgTaxRate:dataInput.Clients[QUOTE_SPOUSE].avgTaxRate}
                         sourcesNo={dataInput.Sources.length} //sourcesNo}
                         themeColor={
                           n % 2 && isMobileDevice() ? altRow : "white"
@@ -3631,6 +3756,8 @@ export class NA extends Component {
                         : " years") */
                       }
                       getSpouseINA={this.getSwitchClientsState}
+                      token={this.token}
+                      aboutMe={this.aboutMe}
                     />
                   </Suspense>
                 ) : (
@@ -3658,20 +3785,23 @@ export class NA extends Component {
                         dataOutput.encryptedInputLife1AndSpouse
                       }
                       encryptedInputLife1={dataOutput.encryptedInputLife1}
+                      aboutMe={this.aboutMe}
+                      token={this.token}
                     />
                   </Suspense>
                 )}
               </Collapsible>
             }
 
-            {this.state.loading===false && this.state.showPopupMessage !== "" && (
-              <PopupMessage
-                severity={"warning"}
-                messageTitle={this.state.showPopupMessage}
-                openDialog={this.state.showPopupMessage !== ""}
-                respondToMessage={this.respondToMessage}
-              ></PopupMessage>
-            )}
+            {this.state.loading === false &&
+              this.state.showPopupMessage !== "" && (
+                <PopupMessage
+                  severity={"warning"}
+                  messageTitle={this.state.showPopupMessage}
+                  openDialog={this.state.showPopupMessage !== ""}
+                  respondToMessage={this.respondToMessage}
+                ></PopupMessage>
+              )}
             {/*  {this.state.initialLoading === true && (
           <div style={{ marginTop: "20px", marginLeft: "90px" }}>
             <Loader type="TailSpin" color="black" height={30} width={30} />

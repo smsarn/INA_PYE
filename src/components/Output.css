@@ -1,14 +1,40 @@
 ﻿@charset "utf-8";
 
 
-.contentPres {
+
+.classPDF {
 	width: 800px;
+  min-width: 55%;
 }
 
-.pict {
+.newPage {
+  display:inline-block;
+  page-break-after: always;
+  width:100%;
+
+}
+
+.presentation {
+  width: 800px;
+  min-width: 55%;
+  font-size: 14px;
+  font-family: Trebuchet MS,Arial,Helvetica,sans-serif;
+  /* margin-left: 30px; */
+ 
+}
+
+.presentationG {
+	min-width: 50%;
+  font-size: 16px;
+  font-family: Trebuchet MS,Arial,Helvetica,sans-serif;
+}
+
+
+
+/* .pict {
 	width: 540px;
 	height: 247px;
-}
+} */
 .logo {
 	width: 540px;
 }
@@ -19,13 +45,27 @@
   clear: left;
 }
 
+.pageDiv {
+  position: relative;
+  display: block;
+  height:100%;
+}
+
+.pageDiv span {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
 @media only screen and (max-width: 768px)
 {
-	.contentPres {
+	.presentation {
 		width: 100%;
+    max-width: 100%;
     margin-top: 150px;
+    font-size: 1vmin;
 	}
-
+}
   .exportArea {
     width: 20%;
     float: right;
@@ -33,26 +73,10 @@
     margin-top: 35px;
   }
   
-	.pict {
-		width: 100%;
-	}
 
-	table.blueTable table.incomeNeeds table.cashSources table.incomeSources table.incomePosition {
-		width: 93%;
-		margin-left: 10px;
-	}
-	table.incomePosition {
-		width: 100%;
-		margin-left: 10px;
-	}
-}
-/* 
-table{
-  table-layout: fixed;
-  width: 40%;
-  margin-left: 3%;
-  margin-right : 3%;
-} */
+  
+	
+
 td{
   word-wrap:break-word;
 }
@@ -63,62 +87,6 @@ td{
   }
 }  
 
-.tableTitle{
-  font-size: 15px;
-  font-weight: bold;
-  color: #FFFFFF;
-  text-align: left;
-  border-left: 3px solid #FFFFFF;
-  border-left: none;
-  background: #7399C6;
-  background-color: #7399C6;
-  margin-left: 20px;
-  margin-bottom: 0px;
-  border: 1px solid #FFFFFF;
-  width: 88%;
-  padding: 8px 8px 6px;
-  height:25px;
-}
-
-.tableTitleEP{
-  font-size: 12px;
-  font-weight: bold;
-  
-  text-align: left;
-  border: 1px solid rgba(0, 0, 0, 0.514); 
-  border-bottom: none;
-  background: #d9d9d9;
-  
- 
-  padding: 10px 4px 10px 4px;
-  height:25px;
-}
-
-.tableNeedsEP{
-  font-size: 12px;
-  font-weight: bold;
-  
-  text-align: center;
-  border: 1px solid rgba(0, 0, 0, 0.514); 
-  border-bottom: none;
-  background: #d9d9d9;
-  
- 
-  padding: 10px 4px 10px 4px;
-  height:25px;
-}
-
-
-
-.tableEP, th, td {
-  font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
-  padding: 3px;
-  border: 1px solid rgba(0, 0, 0, 0.514); 
-  border-collapse: collapse;
-  }
-  .tableEP th {
-    font-family: Georgia, "Times New Roman", Times, serif;vertical-align: middle;
-  }
 
 p.ppi1 {
      font-family: Georgia, "Times New Roman", Times, serif;
@@ -126,8 +94,18 @@ p.ppi1 {
 	line-height: 1.5;
 	letter-spacing: 0px;
 	padding-top: 0px;
-	padding-left: 2.5%;/* 20px; */
+	/* padding-left: 2.5%; *//* 20px; */
 	padding-right: 30px;
+}
+p.ppi2 {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 1.1em;
+line-height: 1.5;
+/* letter-spacing: 0px; */
+/* padding-top: 0px; */
+/* padding-left: 1.2em;
+padding-right: 1.9em; */
+color: #455560;
 }
 
 .divppi1 {
@@ -136,7 +114,7 @@ p.ppi1 {
 line-height: 1.5;
 letter-spacing: 0px;
 padding-top: 0px;
-padding-left: 2.5%;/* 20px; */
+/* padding-left: 2.5%; *//* 20px; */
 padding-right: 30px;
 }
 
@@ -144,12 +122,22 @@ h1.ppi1 {
   /* font-family: Georgia, "Times New Roman", Times, serif; */
   font-family: Trebuchet MS, Arial, Helvetica, sans-serif; 
 	font-size: 36px; 
-	color: #455560;
 	text-align: left;
 	letter-spacing: 1px;
 	font-weight: 100;
-	padding-left: 2.5%;/* 20px; */
+	/* padding-left: 2.5%; *//* 20px; */
 	padding-right: 30px;
+	color: #455560;
+}
+h1.ppi2 {
+  /* font-family: Georgia, "Times New Roman", Times, serif; */
+  font-family: Trebuchet MS, Arial, Helvetica, sans-serif; 
+	font-size: 36px; 
+	text-align: left;
+	letter-spacing: .06em;
+	font-weight: 100;
+	/* padding-left: 2.5%; *//* 20px; */
+	padding-right: 1.9em;
 	color: #455560;
 }
 
@@ -162,8 +150,31 @@ h2.ppi1 {
 	line-height: 1.0;
 	font-weight: 100;
 	padding-top: 20px;
-	padding-left: 2.5%;/* 20px; */
+	/* padding-left: 2.5%; *//* 20px; */
 	padding-right: 30px;
+}
+h2.ppi2 {
+  /* font-family: Georgia, "Times New Roman", Times, serif; */
+   font-family: Trebuchet MS, Arial, Helvetica, sans-serif; 
+   font-size: 1.8em; 
+	color: #455560;
+	text-align: left;
+	line-height: 1.0;
+	font-weight: 100;
+	/* padding-top: 1.1em; */
+	/* padding-left: .73em;
+	padding-right: 1.1em; */
+}
+
+.outputSectionTitle {
+  font-family: Trebuchet MS, Arial, Helvetica, sans-serif; 
+  font-size: 1.8em; 
+ color: #455560;
+ text-align: left;
+ line-height: 1.0;
+ padding-top: 1em;
+ padding-bottom: .5em;
+ font-weight: 100;
 }
 
 h4.ppi1 {
@@ -175,8 +186,21 @@ h4.ppi1 {
 	/* line-height: 1.0; */
 	font-weight: 100;
 	/* padding-top: 10px; */
-	padding-left: 2.5%;/* 20px; */
+	/* padding-left: 2.5%; *//* 20px; */
 	padding-right: 30px;
+}
+
+h4.ppi2 {
+  /* font-family: Georgia, "Times New Roman", Times, serif; */
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 1.05em; 
+	color: #455560;
+	text-align: left;
+	/* line-height: 1.0; */
+	font-weight: 100;
+	/* padding-top: 10px; */
+	/* padding-left: 2.5%; *//* 20px; */
+	padding-right: 1.9em;
 }
 
 h3.ppi1 {
@@ -188,8 +212,20 @@ h3.ppi1 {
 	line-height: 1.0;
 	font-weight: 100;
 	padding-top: 20px;
-	padding-left: 2.5%;/* 20px; */
+	/* padding-left: 2.5%; *//* 20px; */
 	padding-right: 30px;
+}
+h3.ppi2 {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  /*  font-family: Trebuchet MS, Arial, Helvetica, sans-serif; */
+   font-size: 1.15em; 
+	color: #455560;
+	text-align: left;
+	line-height: 1.0;
+	font-weight: 100;
+	padding-top: 1.1em;
+	/* padding-left: 2.5%; *//* 20px; */
+	padding-right: 1.9em;
 }
 
 .EP {
@@ -203,9 +239,11 @@ h3.ppi1 {
   padding:10px
 
 }
-th, td {
+/* th, td {
   padding: 10px;
 }
+ */
+
 
 h5.ppi1 {
   font-family: Georgia, "Times New Roman", Times, serif;
@@ -215,20 +253,21 @@ h5.ppi1 {
 	text-align: left;
 	line-height: 1.0;
 	font-weight: 100;
-	padding-left: 2.5%;/* 20px; */
+	/* padding-left: 2.5%; *//* 20px; */
 	padding-right: 30px;
 }
 
 h5.ppi2 {
   font-family: Georgia, "Times New Roman", Times, serif;
   /*  font-family: Trebuchet MS, Arial, Helvetica, sans-serif; */
-   font-size: 18px; 
+   font-size: 1.1em; 
 	color: #455560;
 	text-align: left;
 	line-height: 1.5;
 	font-weight: 100;
-	padding-left:  2.5%;/* 20px; */
-	padding-right: 30px;
+	/* padding-left:  2.5%; *//* 20px; */
+	padding-right: 1.9em;
+  clear: both;
 }
 
 h6.ppi1 {
@@ -242,10 +281,21 @@ h6.ppi1 {
 	padding-left:  2.5%;/* 20px; */
 	padding-right: 30px;
 }
+h6.ppi2 {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  /*  font-family: Trebuchet MS, Arial, Helvetica, sans-serif; */
+   font-size: 1em; 
+	color: #455560;
+	text-align: left;
+	line-height: 1.0;
+	font-weight: 100;
+	/* padding-left:  2.5%; *//* 20px; */
+	padding-right: 1.9em;
+}
 
 hr.ppi1 {
     border: 0;
-    height: 1px;
+    height: .15em;
 	background-image: linear-gradient(to right, rgba(0, 0, 0, 0), #455560, rgba(0, 0, 0, 0));
 }
 
@@ -261,306 +311,150 @@ li.ppi1 {
 	line-height: 1.5;
 }
 
-img.ppi1 {
-	padding-left:  2.5%;/* 20px; */
-}
-
-img.ppi2 {
-	padding-left: 30px;
-}
-
-table.blueTable {
-  font-family: "Trebuchet MS", Helvetica, sans-serif;
-  border: 1px solid #FFFFFF;
-  background-color: #ECECEC;
-  width: 90%;
-  text-align: left;
-  border-collapse: collapse;
-  margin-left: 20px;
-}
-table.blueTable td, table.blueTable th {
-  border: 3px solid #FFFFFF;
-  padding: 6px 8px;
-}
-table.blueTable tbody td {
-  font-size: 15px;
-}
-table.blueTable tr:nth-child(even) {
-  background: #F3F7F4;
-}
-table.blueTable thead {
-  background: #7399C6;
-}
-table.blueTable thead th {
-  font-size: 15px;
+.outputSectionTitleEP{
   font-weight: bold;
-  color: #FFFFFF;
+  
+  text-align: left;
+  border-bottom: none;
+  background: #d9d9d9;
+  
+  padding: .7em .6em .7em .6em;
+  height:1.4em;
+}
+
+.tableNeedsEP{
+  font-weight: bold;
+  
   text-align: center;
-  border-left: 3px solid #FFFFFF;
-}
-table.blueTable thead th:first-child {
-  border-left: none;
-}
-
-table.blueTable tfoot td {
-  font-size: 15px;
-}
-table.blueTable tfoot .links {
-  text-align: right;
-}
-table.blueTable tfoot .links a{
-  display: inline-block;
-  background: #1C6EA4;
-  color: #FFFFFF;
-  padding: 2px 8px;
-  border-radius: 5px;
+  border-bottom: none;
+  background: #d9d9d9;
+  
+ 
+  padding: .7em .6em .7em .6em;
+  height:1.5em;
 }
 
 
-table.cashNeeds {
+
+table, thead, th, tfoot, tbody, td {
   font-family: "Trebuchet MS", Helvetica, sans-serif;
-  border: 1px solid #FFFFFF;
-  background-color: #F3F7F4;
-  width: 90%;
-  text-align: left;
+  font-size: 1em;
   border-collapse: collapse;
-  margin-left: 20px;
-}
-table.cashNeeds td, table.cashNeeds th {
-  border: 3px solid #FFFFFF;
-  padding: 6px 8px;
-}
-table.cashNeeds tbody td {
-  font-size: 15px;
-}
-table.cashNeeds tr:nth-child(even) {
-  background: #ececec;
-}
-table.cashNeeds thead {
-  background: #7399C6;
-}
-table.cashNeeds thead th {
-  font-size: 15px;
-  font-weight: bold;
-  color: #FFFFFF;
-  text-align: left;
-  border-left: 3px solid #FFFFFF;
-}
-table.cashNeeds thead th:first-child {
-  border-left: none;
 }
 
-table.cashNeeds tfoot td {
-  font-size: 15px;
-}
-table.cashNeeds tfoot .links {
-  text-align: right;
-}
-table.cashNeeds tfoot .links a{
-  display: inline-block;
-  background: #1C6EA4;
-  color: #FFFFFF;
-  padding: 2px 8px;
-  border-radius: 5px;
-}
-
-
-table.incomeNeeds {
-  font-family: "Trebuchet MS", Helvetica, sans-serif;
-  border: 1px solid #FFFFFF;
-  background-color: #F3F7F4;
-  width: 90%;
-  text-align: left;
+th, td, tr {
+  padding: .3em 0.6em 0.3em 0.6em;
+  border: 1px solid rgba(0, 0, 0, 0.514); 
   border-collapse: collapse;
-  margin-left: 20px;	
+  /* color: #404d55; */
 }
-table.incomeNeeds td, table.incomeNeeds th {
-  border: 3px solid #FFFFFF;
-  padding: 6px 8px;
+
+
+ table.EP {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  }
+
+table.customization td, table.customization tr {
+  background-color: rgb(226, 226, 226);
+  border: none
 }
-table.incomeNeeds tbody td {
-  font-size: 15px;
+
+table.INA {
+  border: .06em solid #FFFFFF;
+  background-color: #F3F7F4;
+  width: 100%;
+  text-align: left;
+ /*  margin-left: 1em; */
+  /* margin-left: 2.5%;;	 */
 }
-table.incomeNeeds tr:nth-child(even) {
+table.INA td, table.INA th {
+  border: .2em solid #FFFFFF;
+  
+}
+
+table.INA tr:nth-child(even) {
   background: #ECECEC;
 }
-table.incomeNeeds thead {
-  background: #7399C6;
-}
-table.incomeNeeds thead th {
+/* table.INA thead {
+  background: #062953;
+} */
+/* table.INA thead th {
   font-size: 15px;
   font-weight: bold;
   color: #FFFFFF;
   text-align: left;
   border-left: 3px solid #FFFFFF;
-}
-table.incomeNeeds thead th:first-child {
+} */
+table.INA thead th:first-child {
   border-left: none;
 }
 
-table.incomeNeeds tfoot td {
-  font-size: 15px;
-}
-table.incomeNeeds tfoot .links {
+table.INA tfoot .links {
   text-align: right;
-}
-table.incomeNeeds tfoot .links a{
   display: inline-block;
   background: #1C6EA4;
   color: #FFFFFF;
-  padding: 2px 8px;
-  border-radius: 5px;
+  padding: .12em .5em;
+  border-radius: .32em;
 }
 
 
-table.cashSources {
-  font-family: "Trebuchet MS", Helvetica, sans-serif;
-  border: 1px solid #FFFFFF;
-  background-color: #F3F7F4;
-  width: 90%;
-  table-layout: fixed;
-  border-collapse: collapse;
-  margin-left: 20px;	
-}
-table.cashSources td, table.cashSources th {
-  border: 3px solid #FFFFFF;
-  padding: 6px 8px;
-}
-table.cashSources tbody td {
-  font-size: 15px;
-}
-table.cashSources tr:nth-child(even) {
-  background: #ececec;
-}
-table.cashSources thead {
-  background: #7399C6;
-}
-table.cashSources thead th {
-  font-size: 15px;
+table.INA th{
+  font-size: 1.1em;
   font-weight: bold;
-  color: #FFFFFF;
+  color: white;
   text-align: left;
-  border-left: 3px solid #FFFFFF;
-}
-table.cashSources thead th:first-child {
+  border-left: .12em solid #FFFFFF;
   border-left: none;
+  background-color: #7399c6;
+  /* margin-left: 20px; */
+  margin-bottom: 0em;
+  width: 88%;
+  height: 1.2em;
+  
 }
 
-table.cashSources tfoot td {
-  font-size: 15px;
-}
-table.cashSources tfoot .links {
-  text-align: right;
-}
-table.cashSources tfoot .links a{
-  display: inline-block;
-  background: #1C6EA4;
-  color: #FFFFFF;
-  padding: 2px 8px;
-  border-radius: 5px;
+.NeedsTable {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  padding-left: 10px;
+  width: 100%;
+  min-width: 600px;
+ }
+
+ .customizationCmd {
+	font-family: 'Trebuchet MS';
+	font-size: 13px;
+	text-align: left;
+	padding: 4px 10px 4px 10px;
+	margin-top: 6px;	
+	margin-bottom: 8px;
+	margin-left: 8px;
+	/* border: 6px solid rgb(226, 226, 226);; */
+	float: left;
+	display: block;
+	cursor: pointer;color: #2F4755;/*#63879c; /*#395662;*/
+	-moz-border-radius: 3px;
+	box-shadow: 0px 1px 3px  #979797;
+	-moz-box-shadow: 0px 1px  3px  #979797;
+	-webkit-box-shadow: 0px 1px  3px  #979797;
+	-o-box-shadow: 0px 1px  3px  #979797;
+	background-color: #2F4755;
+	color: #FFF;
+	border-radius: 3px;
+	height:28px
 }
 
-table.incomeSources {
-  font-family: "Trebuchet MS", Helvetica, sans-serif;
-  border: 1px solid #FFFFFF;
-  background-color: #F3F7F4;
-  width: 90%;
-  text-align: left;
-  border-collapse: collapse;
-  margin-left: 20px;
+.customizationCmd:hover
+{
+	color: #b3b1b1;
+	
 }
-table.incomeSources td, table.incomeSources th {
-  border: 3px solid #FFFFFF;
-  padding: 6px 8px;
+.customizationCmdsDiv {
+	background-color:  rgb(226, 226, 226);
+	height: 42px;
+    border-radius: 3px;
+    padding-right: 8px;
 }
-table.incomeSources tbody td {
-  font-size: 15px;
-}
-table.incomeSources tr:nth-child(even) {
-  background: #ECECEC;
-}
-table.incomeSources thead {
-  background: #7399C6;
-}
-table.incomeSources thead th {
-  font-size: 15px;
-  font-weight: bold;
-  color: #FFFFFF;
-  text-align: left;
-  border-left: 3px solid #FFFFFF;
-}
-table.incomeSources thead th:first-child {
-  border-left: none;
-}
-
-table.incomeSources tfoot td {
-  font-size: 15px;
-}
-table.incomeSources tfoot .links {
-  text-align: right;
-}
-table.incomeSources tfoot .links a{
-  display: inline-block;
-  background: #1C6EA4;
-  color: #FFFFFF;
-  padding: 2px 8px;
-  border-radius: 5px;
-}
-
-table.incomePosition {
-  font-family: "Trebuchet MS", Helvetica, sans-serif;
-  border: 1px solid #FFFFFF;
-  background-color: #F3F7F4;
-  width: 90%;
-  text-align: left;
-  border-collapse: collapse;
-  margin-left: 20px;	
-}
-table.incomePosition td, table.incomePosition th {
-  border: 3px solid #FFFFFF;
-  padding: 6px 8px;
-}
-table.incomePosition tbody td {
-  font-size: 15px;
-}
-table.incomePosition tr:nth-child(even) {
-  background: #ECECEC;
-}
-table.incomePosition thead {
-  background: #7399C6;
-}
-table.incomePosition thead th {
-  font-size: 15px;
-  font-weight: bold;
-  color: #FFFFFF;
-  text-align: left;
-  border-left: 3px solid #FFFFFF;
-}
-table.incomePosition thead th:first-child {
-  border-left: none;
-}
-
-table.incomePosition tfoot td {
-  font-size: 15px;
-}
-table.incomePosition tfoot .links {
-  text-align: right;
-}
-table.incomePosition tfoot .links a{
-  display: inline-block;
-  background: #1C6EA4;
-  color: #FFFFFF;
-  padding: 2px 8px;
-  border-radius: 5px;
-}
-
-
-
-
-table thead th tfoot tbody td {
-  font-family: "Trebuchet MS", Helvetica, sans-serif;
-}
-
 
 
 
@@ -569,9 +463,7 @@ table thead th tfoot tbody td {
 }
 .textalignright {
 /*   font-family: Georgia, "Times New Roman", Times, serif; */
-  font-family: "Trebuchet MS", Helvetica, sans-serif;
-   
-	text-align: right;
+  text-align: right;
 }
 .backgroundcolorFFFFFF {
 	background-color: #FFFFFF;
@@ -594,20 +486,12 @@ background-color: #DCE5F0;
 	padding-right: 20px;
 }
 
-/* const StyledTable = styled.table`
-  table-layout: fixed;
-  width: 40%;
-  margin-left: ${props => props.margin};
-  margin-right : 3%;
-` */
-/* * {
-  box-sizing: border-box;
-} */
 /* Create a two-column layout */
 .column {
   float: left;
-  width: 50%;
-  padding: 5px;
+  width: 48%;
+  padding: 0px;
+  
 }
 
 /* Clearfix (clear floats) */
@@ -615,6 +499,7 @@ background-color: #DCE5F0;
   content: "";
   clear: both;
   display: table;
+  
 }
 
 @media only screen and (max-width:600px) {
@@ -629,3 +514,206 @@ background-color: #DCE5F0;
   border-top-style:hidden;
   height:25px;
 }
+
+
+
+
+.pdfHeader {
+  background-color: RGB(148,148,148);
+  color: white;
+  height: 1.75em;
+  display:none;
+  font-family: 'Times New Roman', Times, Arial, Helvetica, sans-serif;
+  font-size: 1.5em;
+  text-align: center;
+  padding-top: .4em;
+  width:95%;
+  /* margin-left: 2.5%; */
+  margin-top: 1.5%;
+  
+ }
+
+ .printOnly
+ {
+     display: none !important;
+ }
+
+ .presentationPrint
+{
+  display: none !important; 
+}
+ @media print{  body{    overflow:visible;  } }
+ @media print
+ {   
+    .presentation {
+		  width: 100%;
+      font-family: 'Times New Roman', Times, Arial, Helvetica, sans-serif;
+      font-size: 16px;
+	  }
+    
+    .no-print, .no-print *
+     {
+         display: none !important;
+     }
+     .pdfHeader {
+      display:inline-block;
+     }
+     .printOnly
+      {
+          display: block !important;
+      }
+      
+ }
+ 
+ .presentationItem {
+  /*   border: 1px solid #D11242; */
+/*     margin: 25px; */
+    font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
+}
+
+.page {
+    width: 100%;
+    height: auto;
+    clear:both;
+}
+/* 
+.page {
+  width: 816px;
+  height: 1056px;
+  overflow: hidden;
+  border:solid 1px red;
+}
+.pageLand {
+  width: 1056px;
+  height: auto;
+  overflow: hidden;
+  border:solid 1px red;
+}
+
+
+
+ */
+
+
+.page-wrapper {
+    height: inherit;
+    padding: 0px 30px;
+}
+
+.INA_MuiGrid-container {
+    box-sizing: border-box;
+    display: flex;
+
+    flex-wrap: wrap;
+    width: 100%;
+    flex-direction: column;
+}
+
+.INA_MuiGrid-container .INA_MuiGrid-item {
+    margin: 0;
+  /*   flex-direction: column; */
+  /*   display:flex */
+}
+
+.presentationHeader {    
+    flex-direction: row;
+    -webkit-box-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    align-items: center;
+    background-color: rgb(148, 156, 161);
+    color: white;
+   height:28px;
+   vertical-align: center;
+}
+
+
+h6.heading{
+    -webkit-print-color-adjust: exact;
+    color: white;
+    /* margin: 10px 0px; */
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 16.5px;
+    display: block;
+     margin: 3px;
+}
+
+.logo {
+  /* margin-bottom: 3px; */
+  max-width:250px;
+  max-height:50px;
+  width: auto;
+  height: auto;
+}
+
+@media print{
+  .logo {
+    margin-top: 2px;
+    max-height: 25px;;
+  } 
+}
+
+.logoFirstPg{
+  margin-bottom: 10px;
+  max-width:250px;
+  max-height:250px;
+  width: auto;
+  height: auto;
+}
+@media print{
+  
+}
+
+
+.presentationPageContent {   
+    font-size: 14px;     
+    flex-direction: row;
+    max-width: none;
+    margin-top: 15px;
+    flex: 1 0 auto;
+}
+
+.presentationFooterText {       
+  font-size: 10px;
+}
+
+
+
+@media print {
+.page {
+  width: 816px;
+  height: 1056px;
+  overflow: hidden;
+}
+
+.presentationItem {
+     margin: 25px;
+}
+
+.INA_MuiGrid-container {
+  flex-direction: row;
+}
+
+.INA_MuiGrid-item {
+  flex-direction: column;
+}
+
+.page-wrapper {
+  padding: 25px 60px;
+}
+.presentationPageContent {   
+  font-size: 12px;     
+}
+}
+
+.glow {
+  -webkit-animation: glow2 1s infinite alternate;
+  animation: glow2 1s infinite alternate;
+}
+@keyframes glow2 {
+  
+  0%{box-shadow: 0 0 -20px 5px #cf7f00;}
+  100%{box-shadow: 0 0 20px 5px #cf7f00;}
+}
+

@@ -9,7 +9,7 @@ export default function Spinner() {
         style={{
           display: "block",
           zIndex: "1000",
-          position: "absolute",
+          position: "fixed",
           left: "50%",
           top: "6px",
         }}

@@ -389,9 +389,13 @@ let i;
       );
       asset = this.setAssetValuesToDefault(asset);
     } else if (id === 3)
-      //asset.Tax = selection;
+     { //asset.Tax = selection;
       asset.assetTaxTypeKey = getListItemKeyFromName(ASSET_TAX, selection);
-
+       // dont allow annul tax for real estate
+    if(asset.assetTaxTypeKey === ASSET_TAX.CAPITAL_GAINS_ANNUAL.Key && asset.assetTypeKey === ASSETS.REAL_ESTATE.Key)
+      asset.assetTaxTypeKey = ASSET_TAX.CAPITAL_GAINS_DEFERRED.Key
+    
+     }
     /* asset = this.setAssetValuesToDefault(asset);  */
 
     this.props.handleUpdate(asset);
@@ -735,18 +739,21 @@ let i;
         assetCurr.assetTaxTypeKey === ASSET_TAX.CAPITAL_GAINS_ANNUAL.Key
       )
     );
+
+    const RRIFIncomegrowth=APPLET_INA &&  rrsp &&   assetCurr.ownerKey !== ASSET_OWNERSHIP_ACTION.CLIENT_LIQUIDATE.Key
     const showIncome =
     //  APPLET_INA &&
-      assetCurr.assetTaxTypeKey === ASSET_TAX.CAPITAL_GAINS_DEFERRED.Key;
+      assetCurr.assetTaxTypeKey === ASSET_TAX.CAPITAL_GAINS_DEFERRED.Key || RRIFIncomegrowth
     //assetCurr.Tax === ASSET_TAX.CAPITAL_GAINS_DEFERRED.value[language] ||
     /* (APPLET_EP &&
         (assetCurr.assetTaxTypeKey === ASSET_TAX.CAPITAL_GAINS_DEFERRED.Key ||
         assetCurr.assetTypeKey === ASSETS.OTHER_ASSETS.Key || //value[language] ||
-          rrsp)) ||
+          rrsp)) ||  
       (APPLET_INA &&
         rrsp &&
        assetCurr.ownerKey !== ASSET_OWNERSHIP_ACTION.CLIENT_LIQUIDATE.Key); //ASSET_OWNERSHIP.CLIENTLIQUIDATE.value[this.props.language]
-     */
+   */
+
 
     const showDur = !(
       rrsp ||
@@ -951,6 +958,7 @@ let i;
             }
             id={1}
             format={2}
+            readOnly={disableAll}
             Count={assetsNo}
             language={language}
             inputValue={assetCurr.currValue}
@@ -1022,7 +1030,7 @@ let i;
               format={3}
               id={9}
               Count={assetsNo}
-              infoIcon={getInfoIconAssetsIncomeRate(this.props.language)}
+              infoIcon={RRIFIncomegrowth ? undefined:getInfoIconAssetsIncomeRate(this.props.language)}
               language={language}
               inputValue={Math.round(10000 * assetCurr.incomeRate) / 10000}
               handleUpdateInput={this.handleUpdateInput}
@@ -1101,7 +1109,7 @@ let i;
                 Count={assetsNo}
                 language={language}
                 inputValue={assetCurr.withdrawalAmt}
-                colorDiv={"#fa5757"}
+                colorDiv={"rgb(101, 87, 87)"}
                 handleUpdateInput={this.handleUpdateInput}
               />
               <InputField
@@ -1113,7 +1121,7 @@ let i;
                 language={language}
                 inputValue={assetCurr.withdrawalStartYr}
                 minValue={1}
-                colorDiv={"#fa5757"}
+                colorDiv={"rgb(101, 87, 87)"}
                 handleUpdateInput={this.handleUpdateInput}
               />
               <InputField
@@ -1123,7 +1131,7 @@ let i;
                 Count={assetsNo}
                 language={language}
                 inputValue={assetCurr.withdrawalDur}
-                colorDiv={"#fa5757"}
+                colorDiv={"rgb(101, 87, 87)"}
                 handleUpdateInput={this.handleUpdateInput}
               />
             </div>

@@ -220,6 +220,7 @@ class Liability extends Component {
       growthDirKey: this.props.liabilityCurr.growthDirKey,
       exposureDur: this.props.liabilityCurr.exposureDur,
       repay: this.props.liabilityCurr.repay,
+      description: "",
     };
     if (id === 1) {
       //liability.Type = selection;
@@ -240,7 +241,7 @@ class Liability extends Component {
   updateDesc = (evt) => {
     //console.log(evt.target.value);
     let liab = JSON.parse(JSON.stringify(this.props.liabilityCurr));
-    liab.description = evt.target.value;
+    liab.description = evt.target.value!==undefined?evt.target.value:"";
     this.props.handleUpdate(liab);
   };
 
@@ -274,7 +275,7 @@ class Liability extends Component {
       changed = liability.exposureDur !== parseInt(value) ? true : false;
       liability.exposureDur = parseInt(value);
     } else if (id === 5) {
-      changed = liability.description !== value ? true : false;
+       changed = liability.description !== value ? true : false;
       liability.description = value;
     }
     if (id === 4) {
@@ -531,6 +532,7 @@ class Liability extends Component {
             inputName={CONTROLTITLE[this.props.language].amount}
             id={1}
             format={2}
+            
             Count={this.props.liabilitysNo}
             language={this.props.language}
             readOnly={probate && this.state.overWriteProbate === false}

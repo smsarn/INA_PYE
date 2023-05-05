@@ -10,6 +10,7 @@ export const OUTPUTTEXT = {
     years: " years",
     addSurvivor: "Survivors need to be added under Family Profile. Single Person 'Insurance Needs' is coming soon!",
     pg1T: "Insurance Needs Analysis - Estate",
+    pg1T_1: "Summary",
     pg1P1: "Designed for: ",
     pg1P2: "Designed by: ",
     pg1P3: "Date: ",
@@ -26,7 +27,7 @@ export const OUTPUTTEXT = {
     /* pg3T: "Family Cash Needs at Death", */
     pg2Tab2: "Needs Analysis is always done for the family member 'Client'",
     pg2Tab2_1: "Needs Analysis is always done for 'Client'",
-    pg2Tab3: "Using these factors the total capital required to generate an inflation indexed income thus depleting all capital at the end of the desired insurance time period is calculated. This amount is based on the present value of shortfalls, discounted at the after tax investment rate. It is adjusted, if necessary to make sure early shortfalls are provided for",
+    pg2Tab3: "Using these factors the total capital required to generate an inflation indexed income thus depleting all capital at the end of the desired insurance time period is calculated. This amount is based on the present value of shortfalls, discounted at the after tax investment rate. It is adjusted, if necessary to make sure early shortfalls are provided for.",
     pg2T3: "Financial Summary",
     pg2T4: "Insurance Analysis",
     pg2T5: "Insurance Analysis for your Spouse",
@@ -36,11 +37,12 @@ export const OUTPUTTEXT = {
     pg2P8: "Total insurance available at death, yyy of which is taxable",//OUTPUTTEXT[lang].pg7TabRow4, //  + output.govDB already part of totalassets
     pg2P9: "Total death related liabilities",
     pg2P10: "Additional Insurance for Client",
-    pg2P101:"yrs",
+    pg2P101:"insured years",
     pg2P102:"insurance",
     pg2P103: "No Insurance: How long does cashing all assets last?",
+    pg2P104: "Existing insurance + Government death benefit",
     pg2P12: "This is a good opportunity to consider additional insurance for your spouse as well",
-    pg2P11: "Life Insurance for Spouse NAME in addition to:",
+    pg2P11: "Additional Insurance for Spouse NAME:",
     
     pg3T: "Family Cash and Income Needs",
     pg3T_1: "Estate Cash and Income Needs",
@@ -49,6 +51,8 @@ export const OUTPUTTEXT = {
     pg3P1_1:
       "When you die, your Estate will face two important money needs, a need for Cash and a need for Income. While some cash needs are temporary, others are required at all stages of life.",
     pg3TabT: "Cash Needs",
+    pg3TabT2: "Description",
+    pg3TabT3: "Amount",
     pg3TabRTot: "Total",
     /* pg4T: "Family Income Needs", */
     pg4T: "",
@@ -61,8 +65,8 @@ export const OUTPUTTEXT = {
       "Percentage of this income you want your family to have to maintain your present standard of living for these time periods is:",
     pg4TabRow2_1:
       "Percentage of this income you want your Estate to have for these time periods is:",
-    //pg4TabRow3: "While more income is required",
-    //pg4TabRow4: "For survivor thereafter",
+    pg4TabRow3: "While more income is required",
+    pg4TabRow4: "For survivor thereafter",
     pg4TabRow5: "Therefore your desired after-tax income is:",
     pgTabRowMoreIncome: "While more income is required",
     pgTabRowThereAfter: "For the survivor thereafter",
@@ -70,10 +74,12 @@ export const OUTPUTTEXT = {
     //pgTabRowThereAfter: "For the survivor thereafter",
     pg5T: "Family Cash Sources",// at Death",
     pg5T_1: "Estate Cash Sources",// at Death",
+    pg5T_2: "Family Cash and Income Sources",// at Death",
+    pg5T_1_2: "Estate Cash and Income Sources",// at Death",
     pg5TabT: "Cash Sources",
     pg5TabT2: "All", 
     pg5TabT3: "At Death",
-    pg5TabRow1: "CPP/QPP Lump Sum Death Benefit",
+    pg5TabRow1: "CPP/QPP Death Benefit",
     pg5TabRow3: "Total Cash Available",
     pg5TabRow4: "Less Family Cash needs at Death",
     pg5TabRow4_1: "Less Estate Cash needs at Death",
@@ -86,7 +92,7 @@ export const OUTPUTTEXT = {
     pg6TabT: "Income Sources",
     pg6TabRow1:
       "Therefore the total annual income available for this time period is:",
-    //pg6TabRow2: "While more income is required",
+    pg6TabRow2: "While more income is required",
     //pg6TabRow3: "For survivor thereafter",
     pg5TabRow7: "For surviving members of the family",
     pg5TabRow7_1: "For the Estate",
@@ -168,15 +174,22 @@ export const OUTPUTTEXT = {
         ),
         
       exportData: "Export Data to:",
-        
+      toolCustomizeTitle:"Customize/Generate PDF"    ,
+      toolCustomizeCover: "Replace Cover Image",
+      toolCustomizeCoverRestore: "Restore Default Cover Image",
+      toolCustomizeIncludeAboutMe: "Include \"About Me\" Page?",
+      toolCustomizeAboutAdd: 'Add "About Me"',
+      toolCustomizeAboutRefresh: "Refresh \"About Me\"",
+      toolCustomizeAboutEdit: "Edit \"About Me\"",
+      toolCustomizeAboutRefreshMsg:"To view the latest information, please click the  Refresh \"About Me\"  button in the Results section." ,
+      toolCustomizeAdv: "Advanced Customization",
+      toolCustomizeLogo:"Add/Edit logo",
+      customizeAlert:"This client presentation has been designed to comply with industry regulations and includes a page with Some Important Notes for your protection. Responsibility for use of this document, whether or not it is edited, is solely yours.",
+      customizeAlertTitle:"Customize Presentation",
+      taxSavingToEP:"INA cases that include “Tax Savings” as a source of income cannot be exported to Protecting Your Estate until the next software update"
+                
+                        
       
-
-
-
-
-
-
-
   },
   fr: {
     insNeeds100: "Besoins en assurance jusqu'à l'âge de 100 ans",
@@ -187,6 +200,7 @@ export const OUTPUTTEXT = {
     years: " années",
     addSurvivor: "Les survivants doivent être ajoutés dans le profil familial. Besoins d'assurance pour un seul individu arrive bientôt!",
     pg1T: "Analyse des besoins en matière d'assurance - successorale",
+    pg1T_1: "Résumé",
     pg1P1: "Conçu pour : ",
     pg1P2: "Par: ",
     pg1P3: "Date: ",
@@ -215,11 +229,12 @@ export const OUTPUTTEXT = {
     pg2P8: "Assurance totale disponible au décès, dont yyy imposables",//OUTPUTTEXT[lang].pg7TabRow4, //  + output.govDB already part of totalassets
     pg2P9: "Total des passifs liés au décès",
     pg2P10: "Assurance supplémentaire pour le client",
-    pg2P101:"an.",
+    pg2P101:"années assurées",
     pg2P102:"assurance",
     pg2P103: "Pas d'assurance: Combien de temps dure l'encaissement de tous les actifs",
+    pg2P104: "Assurance existante + Prestation de décès du gouvernement",
     pg2P12: "C'est une bonne occasion d'envisager une assurance supplémentaire pour votre conjoint également",
-    pg2P11: "Assurance vie pour NOM du conjoint en plus de : ",
+    pg2P11: "Assurance supplémentaire pour le conjoint: ",
     
     pg3T: "Besoins familiaux en matière de liquidités et de revenus",
     pg3T_1: "Besoins la succession en matière de liquidités et de revenus",
@@ -231,6 +246,9 @@ export const OUTPUTTEXT = {
       /* "À votre décès, votre famille fera face à deux importants besoins financiers, soient d'obtenir des liquidités ainsi que des revenus. Bien que certains besoins de liquidités soient temporaires, d'autres sont nécessaires lors de toutes les étapes de la vie, ils sont donc identifiés comme 'Besoins de liquidités permanents'..", */
       "À votre décès, votre succession fera face à deux importants besoins financiers, soient d'obtenir des liquidités ainsi que des revenus. Bien que certains besoins de liquidités soient temporaires, d'autres sont nécessaires lors de toutes les étapes de la vie.",
     pg3TabT: "Besoins de liquidités",
+    pg3TabT2: "Description",
+    pg3TabT3: "Valeur",
+    
     pg3TabRTot: "Total",
     /* pg4T: "Besoin de revenus pour la famille au décès", */
     pg4T: "",
@@ -246,21 +264,23 @@ export const OUTPUTTEXT = {
     pg4TabRow2_1:
       "Pourcentage du revenu souhaité pour les besoins votre succession pendant la période:",
     //pg4TabRow3: "While more income is required",
-    //pg4TabRow3: "Un revenu plus élevé est requis",
+    pg4TabRow3: "Un revenu plus élevé est requis",
    
-    //pg4TabRow4: "Pour le survivant par la suite",
+    pg4TabRow4: "Pour le survivant par la suite",
     pg4TabRow5: "Le revenu souhaité s'élève donc à :",
     pgTabRowMoreIncome: "Un revenu plus élevé est requis",
     pgTabRowThereAfter: "Pour le survivant par la suite",
     pgTabRowThereAfter_1: "Pour la succession par la suite",
     pg5T: "Sources de liquidité pour la famille",// au décès",
     pg5T_1: "Sources de liquidité pour la succession",// au décès",
+    pg5T_2: "Sources de liquidité et de revenus pour la famille",// au décès",
+    pg5T_1_2: "Sources de liquidité et de revenus pour la succession",// au décès",
     pg5TabT: "Sources de liquidité",
     pg5TabT2: "Tous",
     pg5TabT3: "Au décès",
   
     pg5TabRow1:
-      "Prestation de décès forfaitaire du RPC/RRQ",
+      "Prestation de décès du RPC/RRQ",
     pg5TabRow3: "Total des liquidités disponibles",
     pg5TabRow4: "Moins les liquidités nécessaires au décès de l'assuré",
     pg5TabRow4_1: "Moins les liquidités nécessaires au décès de l'assuré",
@@ -273,7 +293,7 @@ export const OUTPUTTEXT = {
     pg6TabT: "Sources de revenu",
     pg6TabRow1:
       "Le revenu annuel total disponible pour cette période s'élève donc à :",
-    //pg6TabRow2: "Un revenu plus élevé est requis",
+    pg6TabRow2: "Un revenu plus élevé est requis",
     //pg6TabRow3: "Pour le survivant par la suite",
     pg5TabRow7:
     "Pour les membres survivants de la famille",
@@ -332,9 +352,9 @@ export const OUTPUTTEXT = {
       pgAppendixP2: "Le manque à gagner = flux de trésorerie entrants - sortants et est financé par l'assurance",
       pgAppendixP3 : "Situation financière actuelle",
       INASummaryTableC11:"Besoins en assurance",
-      INASummaryTableC12:"À la retraite",
+      INASummaryTableC12:"À la retraite\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0",
       INASummaryTableC13:"À l’espérance de vie",
-      INASummaryTableC14:"Jusqu’à 100 ans",
+      INASummaryTableC14:"Jusqu’à\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0 100 ans ",
       INASummaryTableC15:"Pas d’assurance : encaisser tous les actifs",
       INASummaryTableC16:"Choix intelligent",
       INASummaryTableC21:"Couvrir le style de vie des survivants",
@@ -358,10 +378,21 @@ export const OUTPUTTEXT = {
 
 
       exportData: "Exporter des données vers:",
-      
-
-  }
-};
+      toolCustomizeTitle:"Personnaliser/Générer PDF"    ,
+      toolCustomizeCover: "Remplacer l'image de couverture",
+      toolCustomizeCoverRestore: "Rétablir l'image de couverture par défaut",
+      toolCustomizeIncludeAboutMe: "Inclure la page \"À propos de moi\" ?",
+      toolCustomizeAboutAdd: "Ajouter " + "" + "À propos de moi",
+      toolCustomizeAboutRefresh: "Actualiser \"À propos de moi\"",
+      toolCustomizeAboutEdit: "Modifier \"À propos de moi\"",
+      toolCustomizeAboutRefreshMsg:"Pour consulter les dernières informations, cliquez sur le bouton  Actualiser \"À propos de moi\" dans la section Résultats." ,
+      toolCustomizeAdv: "Personnalisation avancée",
+      toolCustomizeLogo:"Ajouter/modifier le logo"        ,
+      customizeAlert:"Cette présentation client a été conçue pour être conforme aux réglementations du secteur et comprend une page contenant des Notes Importantes pour votre protection. La responsabilité de l'utilisation de ce document, qu'il soit édité ou non, vous incombe exclusivement.",
+      customizeAlertTitle:"Personnaliser la présentation",
+      taxSavingToEP:"Les cas INA qui incluent des « économies d’impôt » comme source de revenus ne peuvent pas êtres exportés vers Protéger votre succession jusqu’à la prochaine mise à jour logicielle."
+    }
+    };
 
 export const GRAPHS_LABLES = {
   en: {

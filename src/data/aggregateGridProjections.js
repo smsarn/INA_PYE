@@ -65,6 +65,7 @@ function INAFullSpreadsheetData(
   dataGov,
   dataShort,
   inflation,
+  contribsGrowByInflation,
   invRate,
   afterTaxCPP_DB,
   language
@@ -74,6 +75,7 @@ function INAFullSpreadsheetData(
   let noYrs = dataNeed.length;
   const tempDate = new Date();
   const year = tempDate.getFullYear();
+
 
   let dataColumnCapFund = [];
 
@@ -93,7 +95,8 @@ function INAFullSpreadsheetData(
       noYrs,
       //Spouse.avgTaxRate,
       survivors,
-      inflation
+      inflation,
+      contribsGrowByInflation
     );
   //const formatFr = language === "fr" ? true : false;
   const decimalChar = language === "en" ? "." : ",";
@@ -252,7 +255,8 @@ function getSurvivorsNonGovNonAssetLiabIncomeProjections(
   noYrs,
   //avgTaxRate,
   survivors,
-  inflation
+  inflation,
+  contribsGrowByInflation
 ) {
   let totalIncome = Array(noYrs).fill(0);
   let yr;
@@ -273,13 +277,20 @@ function getSurvivorsNonGovNonAssetLiabIncomeProjections(
           return item.id === element.ownerID;
         })[0].avgTaxRate;
       } catch (error) {}
+
+      
+      let adjustedInflation=inflation;
+      if(element.sourceTypeKey === INCOMESOURCES.TAX_CREDIT.Key)
+          adjustedInflation=element.growthRate;
+          
       for (yr = 0; yr < noYrs; yr++) {
+        console.log(element)
         totalIncome[yr] +=
           yr >= element.startYear &&
           yr < parseInt(element.startYear) + parseInt(element.duration)
             ? parseFloat(element.amount) *
-              (1 - avgTaxRate / 100) *
-              Math.pow(1 + inflation / 100, yr)
+              (1 - element.taxRate / 100) *
+              Math.pow(1 + adjustedInflation / 100, yr)
             : 0;
       }
     }
@@ -302,6 +313,7 @@ export function getINAGridData(
   dataGov,
   dataShort,
   inflation,
+  contribsGrowByInflation,
   language,
   invRate,
   Sources,
@@ -329,6 +341,7 @@ export function getINAGridData(
       dataGov,
       dataShort,
       inflation,
+      contribsGrowByInflation,
       invRate,
       afterTaxCPP_DB,
       language

@@ -33,11 +33,13 @@ export default class Datatable extends React.Component {
     createMuiTheme({
       typography: {
         fontFamily: '"Trebuchet MS"',
-        fontSize: 11,
-        fontWeight: "100"
+        fontSize: 12,
+        fontWeight: "100",
+        lineHeight: ".6em"
       },
       overrides: {
         MUIDataTable: {
+          responsiveScrollMaxHeight:'500px',
           tableRoot: {
             margin: 0,
             
@@ -46,7 +48,7 @@ export default class Datatable extends React.Component {
             boxShadow: "none",
             borderBottom:"1px solid rgb(150, 150, 150)",
             borderRight:"1px solid rgb(200, 200, 200)",
-          }
+          },
         },
         MuiTableRow: {
           root: {
@@ -63,24 +65,25 @@ export default class Datatable extends React.Component {
         },
         MuiTableCell: {
           head: {
-            fontSize: ".8rem"
+            fontSize: 12
           },
           
           sizeSmall: {
-            padding: "8px 3px 8px 3px"
+            fontSize: 12,
+            padding: "1px 3px 1px 3px"
           }
 
         },
-        MUIDataTableToolbar: {
+         MUIDataTableToolbar: {
           root: {
-            paddingLeft: "0px"
+            paddingLeft: "0px",
           },
           titleRoot: {
-            fontSize: 24,
+            fontSize: 18,
             fontWeight: 'bold'
           },
           icon: {
-            fontSize: 24
+            fontSize: 18
           }
         },
         MUIDataTableBodyCell: {
@@ -135,6 +138,10 @@ export default class Datatable extends React.Component {
       unit=60 
       divStyle={ width: "100%" } 
     } 
+    if (this.props.GridForPDF)
+    {
+      divStyle={ width: "100%" } 
+    } 
     
     
     let columns = [];
@@ -143,10 +150,16 @@ export default class Datatable extends React.Component {
     
       for (i = 0; i < this.props.dataProjection[0].length; ++i) {
         for (j = 0; j < this.props.dataColTitles.length; ++j) {
-          if(j<1)
-          dataRow.push(this.props.dataProjection[j][i]);
+          //if(j<1)
+          if(this.props.quin===undefined)
+          {
+            if(i<25)
+              dataRow.push(this.props.dataProjection[j][i]);
+            else if(i % 5===0)
+              dataRow.push(this.props.dataProjection[j][i]);
+          }
           else
-          dataRow.push(this.props.dataProjection[j][i]);
+            dataRow.push(this.props.dataProjection[j][i]);
         }
         data.push(dataRow);
         dataRow = [];
@@ -170,7 +183,7 @@ export default class Datatable extends React.Component {
           
           <TableCell key={index} style={styleHeader}>
             {this.props.gridIcons !== undefined && 
-            this.props.gridIcons[index] !== undefined && <div><Info infoIcon={this.props.gridIcons[index]}/><br/></div>} 
+            this.props.gridIcons[index] !== undefined && this.props.GridForPDF===false && <div><Info infoIcon={this.props.gridIcons[index]}/><br/></div>} 
           {/* {index===this.props.headerIndex && <div><Info infoIcon={getInfoIconNotes(this.props.language)}/><br/></div>}  */}
            {column.name}
            </TableCell>
@@ -188,15 +201,15 @@ export default class Datatable extends React.Component {
       }
     }
     const captions= GRID_INTERNAL_CAPTIONS[this.props.language]
-    const title=<span style={{fontSize: '14px'}}  >{captions.excel}</span>
+    const title=<span style={{fontSize: '1.2em'}}  >{captions.excel}</span>
             
               
     const excelToolbarText=captions.excel 
      const options = {
       filter: false,
       filterType: "dropdown",
-      selectableRows: "none",
-      responsive: "scrollMaxHeight", //this removes horiz
+      selectableRows: "none",      
+      responsive: this.props.GridForPDF===undefined?"scrollMaxHeight":"scrollFullHeight", //this removes horiz
       resizableColumns: true,
       selectableRowsHeader: false,
       viewColumns: false,
@@ -231,10 +244,6 @@ export default class Datatable extends React.Component {
       },
       customRowRender: (data, dataIndex, rowIndex) => {
         let style = {textAlign: "right"};
-        if (data[0] === "wwwwwww") {
-          style.backgroundColor = "green";
-          style.fontSize = "36px";
-        }
         var rows = [];
 
         let i;
@@ -262,12 +271,14 @@ export default class Datatable extends React.Component {
       customToolbar: () => <ExcelToolbar excelToolbarText={excelToolbarText} setExcel={this.setExcel} />
     };
 
+   const ctheme=this.getMuiTheme()
+   if (this.props.GridForPDF)
+      ctheme.overrides.MUIDataTableToolbar.root.display= "none"
    
-
     return (
         <div style={divStyle} >
           
-        <MuiThemeProvider theme={this.getMuiTheme()}>
+        <MuiThemeProvider theme={ctheme}>
           <MUIDataTable
             title={this.props.gridTitle}
             data={data}
@@ -277,7 +288,7 @@ export default class Datatable extends React.Component {
         </MuiThemeProvider>
         {this.state.downloadExcelNow ===1 && <DownloadExcel
           excelColumnsDataMain={this.props.dataProjection}
-          width={"90"}
+          width={this.props.GridForPDF===undefined?"90":"0"}
           excelColumnsHeaders={this.props.dataColTitles}
           title={this.props.gridTitle}
           excelColumnsDataInfoSection={this.props.gridColumnsDataExcelInfoSection}

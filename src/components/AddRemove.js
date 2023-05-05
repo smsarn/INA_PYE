@@ -101,7 +101,7 @@ export class AddRemove extends React.Component {
       <div style={{ height: "0px" }}>
         <PopupUserinputDialog
           openDialog={this.state.showConfirm === true}
-          mainMessage={lang==="en"?"Please Confirm ... ":"Veuillez confirmer ... "}
+          mainMessage={lang==="en"?"Please confirm to remove ... ":"Veuillez confirmer pour supprimer ... "}
           language={lang}
           respondToInput={this.respondToConfirmRemove}
         />

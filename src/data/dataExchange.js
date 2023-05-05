@@ -240,6 +240,10 @@ function setSources(dataInput, avgTaxRate) {
   let i;
   for (i = 0; i < dataInput.Sources.length; i++) {
     // find source owner avgtaxrate
+
+   /*  alert(Object.values(INCOMESOURCES).filter(
+      (obj) => obj.Key === sourceTypeKey
+    )[0].value.en) */
     let avgTaxRate;
     let salaryOwner = dataInput.Clients.filter((item) => {
       return item.id === dataInput.Sources[i].ownerID;
@@ -248,6 +252,7 @@ function setSources(dataInput, avgTaxRate) {
       avgTaxRate = salaryOwner[0].avgTaxRate / 100;
 
     const sourceTypeKey = dataInput.Sources[i].sourceTypeKey;
+
     // gov is taken care of in API only needs elig %
     //if (dataInput.Sources[i].Type !== INCOMESOURCES[lang].Values[1] && dataInput.Sources[i].Type !== INCOMESOURCES[lang].Values[2] && dataInput.Sources[i].Type !== INCOMESOURCES[lang].Values[3]) {
     if (
@@ -270,15 +275,16 @@ function setSources(dataInput, avgTaxRate) {
         amount: dataInput.Sources[i].amount,
         startYear: dataInput.Sources[i].startYear,
         duration: dataInput.Sources[i].duration,
-        annualGrowth: dataInput.Presentations[0].inflation / 100,
+        annualGrowth: dataInput.Sources[i].growthRate===undefined?dataInput.Presentations[0].inflation / 100:dataInput.Sources[i].growthRate/100,
         taxRate:
-          sourceTypeKey === INCOMESOURCES.DIVIDEND_INCOME.Key
+          (sourceTypeKey === INCOMESOURCES.DIVIDEND_INCOME.Key || sourceTypeKey === INCOMESOURCES.TAX_CREDIT.Key)
             ? dataInput.Sources[i].taxRate / 100
             : avgTaxRate,
         ownerID: dataInput.Sources[i].ownerID,
       });
     }
   }
+  console.log(dataE)
   return dataE;
 }
 
@@ -503,7 +509,10 @@ export function loadSavedDataToUI(savedJSon, dataInput) {
 
   dataInput.sourcesNo = savedJSon.personalIncomeSources.length;
 
+console.log(savedJSon.personalIncomeSources)
+
   for (i = 0; i < savedJSon.personalIncomeSources.length; i++) {
+    
     dataInput.Sources.push({
       id: i + 1,
       //sourceTypeKey: Object.values(INCOMESOURCES).filter(obj => obj.ID=== savedJSon.personalIncomeSources[i].ID)[0].Key,
@@ -517,6 +526,7 @@ export function loadSavedDataToUI(savedJSon, dataInput) {
       startYear: savedJSon.personalIncomeSources[i].startYear,
       duration: savedJSon.personalIncomeSources[i].duration,
       taxRate: savedJSon.personalIncomeSources[i].taxRate * 100,
+      growthRate: savedJSon.personalIncomeSources[i].annualGrowth * 100,
       ownerID:
         savedJSon.personalIncomeSources[i].ownerID === undefined ||
         savedJSon.personalIncomeSources[i].ownerID === 0
@@ -723,16 +733,18 @@ export function getOutputValues(data) {
   //console.log(data);
   output.insNeedYgChild25 = 0;
   output.insNeedYgChild18 = 0;
+
+  
   for (
     let i = 0;
-    i < output.youngestChildEndAge - output.ygChild;
+    i < Math.min(output.youngestChildEndAge - output.ygChild,data.dataShortfall.length);
     output.insNeedYgChild25 +=
       data.dataShortfall[i++] / Math.pow(1 + output.invRate / 100, i - 1)
   );
 
   for (
     let i = 0;
-    i < 18 - output.ygChild;
+    i < Math.min(18 - output.ygChild, data.dataShortfall.length);
     output.insNeedYgChild18 +=
       data.dataShortfall[i++] / Math.pow(1 + output.invRate / 100, i - 1)
   );
@@ -748,11 +760,13 @@ export function getOutputValues(data) {
   output.liabilities = [];
 
   Object.values(LIABILITIES).forEach((element) => {
-    if (element.order > 0)
+    if (element.order > 0){
+    
       output.liabilities.push({
         name: element.value[output.language],
+        desc: "",
         value: 0,
-      });
+      });}
   });
 
   /* LIABILITIES[output.language].Values.forEach(function(element) {
@@ -796,8 +810,18 @@ export function getOutputValues(data) {
       element.liabTypeKey === LIABILITIES.PROBATE.Key
         ? 0
         : element.currValue;
-    if (pos !== undefined) output.liabilities[pos].value += element.currValue;
+    if (pos !== undefined) 
+    {
+      
+        output.liabilities[pos].value += element.currValue;
+        output.liabilities[pos].desc += element.description + ",  ";
+        if(output.liabilities[pos].desc === ",  ") output.liabilities[pos].desc ="";
+    }
   });
+  for(let pos=0; pos<output.liabilities.length;pos++)
+  {
+    if (output.liabilities[pos].desc.length>=3) output.liabilities[pos].desc= output.liabilities[pos].desc.substring(0,output.liabilities[pos].desc.length-3)
+  }
 
   output.clients = [];
   let grossIncome = 0;
@@ -828,6 +852,7 @@ export function getOutputValues(data) {
     )
       output.assets.push({
         name: element.value[output.language],
+        desc:"",
         value: 0,
         disposeValue: 0,
       });
@@ -885,9 +910,19 @@ export function getOutputValues(data) {
     output.totalDisposeAsset += showAsDisposed ? element.currValue : 0;
 
     if (pos !== undefined && pos >= 0)
+    {
       output.assets[pos].value += element.currValue;
+      output.assets[pos].desc += element.description + ",  ";
+      if(output.assets[pos].desc === ",  ") output.assets[pos].desc ="";
+    }
     if (showAsDisposed) output.assets[pos].disposeValue += element.currValue;
   });
+
+  for(let pos=0; pos<output.assets.length;pos++)
+  {
+    if (output.assets[pos].desc.length>=3) output.assets[pos].desc= output.assets[pos].desc.substring(0,output.assets[pos].desc.length-3)
+  }
+
 
   let otherAssetsList = "";
   input.Assets.forEach((element) => {
@@ -938,6 +973,8 @@ export function getOutputValues(data) {
   output.totalDesiredGrossIncome2 = 0;
   // NOTE "this" is not available inside inline functions, hence:
   // or just use arrow functions
+
+  console.log(input.Sources)
   let srcOrphan = INCOMESOURCES.GOV_ORPHANS_BENEFIT.Key; //value[output.language];
   // console.log(input.Sources);
   input.Sources.forEach(function (element) {
@@ -945,6 +982,7 @@ export function getOutputValues(data) {
 			output.sources.filter(i => i.name === element.Type)[0]
 		  );
 		   */
+      console.log(element)
     let pos = output.sources.indexOf(
       output.sources.filter(
         (i) =>
@@ -955,7 +993,12 @@ export function getOutputValues(data) {
             output.language
           )
       )[0]
+
+      
     );
+    
+    if(element.taxRate===undefined || element.taxRate===null)
+    element.taxRate=input.Clients.length > 1?input.Clients[QUOTE_SPOUSE].avgTaxRate:input.Clients[QUOTE_CLIENT].avgTaxRate
 
     if (element.sourceTypeKey === srcDB) {
       // add gov DB
@@ -963,19 +1006,30 @@ export function getOutputValues(data) {
       output.totalAsset += output.govDB;
       output.totalDisposeAsset += output.govDB;
     } else {
-      output.totalSource += element.amount;
-      if (element.startYear === 0) output.totalSourceAtDeath += element.amount;
+      output.totalSource += parseFloat(element.amount);
+      output.totalSourceATax += parseFloat(element.amount * (1 - element.taxRate / 100));
+      
+
+      if (element.startYear === 0) {
+        output.totalSourceAtDeath += parseFloat(element.amount);
+        output.totalSourceATaxAtDeath += parseFloat(element.amount) * (1 - element.taxRate / 100);
+      } 
       // no orphans
       output.totalSource2 +=
-        element.sourceTypeKey !== srcOrphan ? element.amount : 0;
-      if (element.startYear === 0)
+        element.sourceTypeKey !== srcOrphan ? parseFloat(element.amount) : 0;
+      output.totalSource2ATax +=
+        element.sourceTypeKey !== srcOrphan ? parseFloat(element.amount) * (1 - element.taxRate / 100) : 0;
+      if (element.startYear === 0){
         output.totalSource2AtDeath +=
-          element.sourceTypeKey !== srcOrphan ? element.amount : 0;
+          element.sourceTypeKey !== srcOrphan ? parseFloat(element.amount) : 0;
+        output.totalSource2ATaxAtDeath +=  
+        element.sourceTypeKey !== srcOrphan ? parseFloat(element.amount) * (1 - element.taxRate / 100) : 0;
+      }
     }
     if (pos !== undefined) {
-      output.sources[pos].value += element.amount;
+      output.sources[pos].value += parseFloat(element.amount);
       if (element.startYear === 0)
-        output.sources[pos].valueAtDeath += element.amount;
+        output.sources[pos].valueAtDeath += parseFloat(element.amount);
     }
   });
   // remove gov db from sources
@@ -984,13 +1038,13 @@ export function getOutputValues(data) {
       i.name !== getListItemNameFromKey(INCOMESOURCES, srcDB, output.language)
   ); //output.srcDB);
   // after tax
-  output.totalSourceATax =
+/*   output.totalSourceATax =
     input.Clients.length > 1
-      ? output.totalSource * (1 - input.Clients[QUOTE_SPOUSE].avgTaxRate / 100)
+      ? output.totalSource * (1 - element.taxRate / 100)
       : output.totalSource * (1 - input.Clients[QUOTE_CLIENT].avgTaxRate / 100);
   output.totalSource2ATax =
     input.Clients.length > 1
-      ? output.totalSource2 * (1 - input.Clients[QUOTE_SPOUSE].avgTaxRate / 100)
+      ? output.totalSource2 * (1 - element.taxRate / 100)
       : output.totalSource2 *
         (1 - input.Clients[QUOTE_CLIENT].avgTaxRate / 100);
 
@@ -1006,7 +1060,7 @@ export function getOutputValues(data) {
         (1 - input.Clients[QUOTE_SPOUSE].avgTaxRate / 100)
       : output.totalSource2AtDeath *
         (1 - input.Clients[QUOTE_CLIENT].avgTaxRate / 100);
-
+ */
   output.percentNeed1 = 0;
   output.percentNeed2 = [];
   output.percent1 = 0;

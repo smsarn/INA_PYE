@@ -49,7 +49,7 @@ import {
   UNIVERSITY_END_AGE,
   DISPLAY_PRESENTATION,
 } from "../definitions/generalDefinitions";
-import { versionDetails, getDefaultImages } from "../utils/helper";
+import { versionDetails, getDefaultImages} from "../utils/helper";
 import {loadDefaultCase} from "../data/dataExchange";
 
 

@@ -23,6 +23,21 @@ h1.ppi1 {
 	color: #455560;
 	
 }
+h1.ppi2 {
+	font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
+	font-size: 2em;
+	color: #455560;
+	text-align: left;
+	letter-spacing: 1px;
+	font-weight: 100;
+	padding-left: 30px;
+	padding-right: 30px;
+	color: #455560;
+	
+}
+
+
+
 
 h2.ppi1 {
 	font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
@@ -35,10 +50,34 @@ h2.ppi1 {
 	padding-left: 30px;
 	padding-right: 30px;
 }
+h2.ppi2 {
+	font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
+	font-size: 1.5em;
+	color: #455560;
+	text-align: left;
+	line-height: 1.0;
+	font-weight: 100;
+	padding-top: 20px;
+	padding-left: 30px;
+	padding-right: 30px;
+}
+
 
 h3.ppi1 {
 	font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
 	font-size: 18px;
+	color: #455560;
+	text-align: left;
+	line-height: 1.0;
+	font-weight: 100;
+	padding-top: 20px;
+	padding-left: 30px;
+	padding-right: 30px;
+}
+
+h3.ppi2 {
+	font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
+	font-size: 1.1em;
 	color: #455560;
 	text-align: left;
 	line-height: 1.0;

@@ -58,27 +58,27 @@ const LINE_CHART_DIV2_STYLE = {
 };
 
 const TOP_MARGIN = 0.48;
-const PARA_WIDTH = 5.5;
+const PARA_WIDTH = 6;
 
-
-async function getSpouseINA(props)
-{
+async function getSpouseINA(props) {
   let data;
-  data= await props.getSpouseINA();
-  const spouseInsRet=data.dataOutput.dataInsuranceNeeds[0].Value;
-  const spouseInsLE=data.dataOutput.dataInsuranceNeeds[1].Value;
+  data = await props.getSpouseINA();
+  const spouseInsRet = data.dataOutput.dataInsuranceNeeds[0].Value;
+  const spouseInsLE = data.dataOutput.dataInsuranceNeeds[1].Value;
   // roles reversed so index 1 is now Client ie spouse means client!!
-  const LESpouse=data.dataOutput.lifeExpectancy.spouse+data.dataInput.Clients[1].Age
-  
+  const LESpouse =
+    data.dataOutput.lifeExpectancy.spouse + data.dataInput.Clients[1].Age;
 
-  return {spouseInsRet:spouseInsRet,spouseInsLE:spouseInsLE, LEIfClientisSurvivor:LESpouse};
+  return {
+    spouseInsRet: spouseInsRet,
+    spouseInsLE: spouseInsLE,
+    LEIfClientisSurvivor: LESpouse,
+  };
 }
 
-function formattedMoneyString(value,lang){
-  return formatted(value,lang).toString()
+function formattedMoneyString(value, lang) {
+  return formatted(value, lang).toString();
 }
-
-
 
 export async function doSavePdfAction(props) {
   let pdf = new PDF();
@@ -99,18 +99,23 @@ export async function doSavePdfAction(props) {
   const assets = props.dataInput.Assets;
   const singleFamily = isSingleFamily(clients);
   const labelsBilingual = OUTPUTTEXT[lang];
-  const LEIfSpouseisSurvivor =  props.LE.spouse + props.dataInput.Clients[1].Age
-  const toRetYears =  props.dataInput.Clients[1].retirementAge - props.dataInput.Clients[1].Age
-  
+  const LEIfSpouseisSurvivor = singleFamily?0:props.LE.spouse + props.dataInput.Clients[1].Age;
+  const toRetYears =singleFamily?0:
+    props.dataInput.Clients[1].retirementAge - props.dataInput.Clients[1].Age;
+
   const singlePerson = props.dataInput.Clients.length === 1 ? true : false;
-  const thereAfterText=singlePerson ? OUTPUTTEXT[lang].pgTabRowThereAfter_1:OUTPUTTEXT[lang].pgTabRowThereAfter;
-  const thereAfterTextSF= singlePerson ? OUTPUTTEXT[lang].pg5TabRow7_1:OUTPUTTEXT[lang].pg5TabRow7
+  const thereAfterText = singlePerson
+    ? OUTPUTTEXT[lang].pgTabRowThereAfter_1
+    : OUTPUTTEXT[lang].pgTabRowThereAfter;
+  const thereAfterTextSF = singlePerson
+    ? OUTPUTTEXT[lang].pg5TabRow7_1
+    : OUTPUTTEXT[lang].pg5TabRow7;
 
   const decimalChar = lang === "en" ? "." : ",";
   const thousands = lang === "en" ? "," : " ";
   const formatFr = lang === "fr" ? true : false;
 
-
+  const marginLeft = 1.2;
   // are there two need periods eg when children this or that
   const twoNeedPercents = output.percent2.length > 0 ? true : false;
   const pg1TitleY = 4.2;
@@ -123,13 +128,13 @@ export async function doSavePdfAction(props) {
     props.INAOption === DISPLAY_INCOME
       ? TITLES[lang].appletINA
       : TITLES[lang].appletEP,
-    InToPt(1.5),
+    InToPt(marginLeft),
     InToPt(pg1TitleY) //3.5)
   );
   /* 
   pdf.AddImageFitWidthOnly(
     "INAPage1Logo",
-    InToPt(1.51), //1.51),
+    InToPt(marginLeft1), //marginLeft1),
     InToPt(1.06),
     InToPt(5.54),
     InToPt(2.76) // max height
@@ -137,22 +142,22 @@ export async function doSavePdfAction(props) {
 
   const image = props.dataInput.Presentations[0].adviserLogo;
   const top = props.dataInput.Presentations[0].adviserLogo.top;
-  const pg1ImageID=props.dataInput.Presentations[0].adviserLogo.ID;
+  const pg1ImageID = props.dataInput.Presentations[0].adviserLogo.ID;
 
   const imageApp = props.dataInput.Presentations[0].appletImage;
-  
+
   let result;
-  result=pdf.addCustomImage(IMAGE_LOGO, pg1TitleY, image, true,top);
+  result = pdf.addCustomImage(IMAGE_LOGO, pg1TitleY, image, true, top);
 
   //result=pdf.addCustomImage(IMAGE_APPLET_INA, InToPt(pg1TitleY + 0.5), imageApp, true,top);
-    pdf.AddImage(
+  pdf.AddImage(
     IMAGE_APPLET_INA,
-    InToPt(1.51),
+    InToPt(marginLeft+.01),
     InToPt(pg1TitleY + 0.5), //4.06),
     InToPt(5.54),
     InToPt(2.75)
-  ); 
-   //	console.log(output.clients);
+  );
+  //	console.log(output.clients);
   //	console.log(OUTPUTTEXT[lang].pg1P1);
 
   pdf.SetFont(HELVETICA, NORMAL);
@@ -160,40 +165,40 @@ export async function doSavePdfAction(props) {
   pdf.SetTextColor(0x45, 0x55, 0x60);
   pdf.Text(
     OUTPUTTEXT[lang].pg1P1 + output.designedFor,
-    InToPt(1.52),
+    InToPt(marginLeft+.02),
     InToPt(pg1TitleY + 3.63) //7.13
   );
   pdf.Text(
     OUTPUTTEXT[lang].pg1P2 + output.designedBy,
-    InToPt(1.52),
+    InToPt(marginLeft+.02),
     InToPt(pg1TitleY + 4.13) //7.63)
   );
   pdf.Text(
     OUTPUTTEXT[lang].pg1P3 + output.dateApplet,
-    InToPt(1.52),
+    InToPt(marginLeft+.02),
     InToPt(pg1TitleY + 4.42) //7.92)
   );
   pdf.Text(
     OUTPUTTEXT[lang].pg1P4 + output.province,
-    InToPt(1.52),
+    InToPt(marginLeft+.02),
     InToPt(pg1TitleY + 4.69) //8.19)
   );
 
-  
-
   const headerOffset = image.image === null ? 0 : 0.25;
-  const topToTitle_Y  =1.35
-  const titleToPara_Y  =1.6
-  
+  const topToTitle_Y = 1.35;
+  const titleToPara_Y = 1.6;
+
   const topMargin = pdf.HEADER_RECT_IN_Y + headerOffset;
   {
     /*---}			// Page 2*/
     const footerText = OUTPUTTEXT[lang].pgFooter;
     const headerText = OUTPUTTEXT[lang].pg1T;
-    
+
     pdf.addFooterAndHeader(headerOffset, footerText, headerText);
 
-    result=result && pdf.addCustomImage(IMAGE_LOGO_OTHERPAGES, pg1TitleY, image,false,top);
+    result =
+      result &&
+      pdf.addCustomImage(IMAGE_LOGO_OTHERPAGES, pg1TitleY, image, false, top);
 
     pdf.SetFont(HELVETICA, NORMAL);
     if (lang === "en") pdf.SetFontSize(PxToPt(25));
@@ -201,7 +206,7 @@ export async function doSavePdfAction(props) {
     pdf.SetTextColor(0x45, 0x55, 0x60);
     pdf.Text(
       OUTPUTTITLE[lang].Values[0],
-      InToPt(1.5),
+      InToPt(marginLeft),
       InToPt(headerOffset + topToTitle_Y)
     );
 
@@ -210,17 +215,17 @@ export async function doSavePdfAction(props) {
     pdf.SetTextColor(0x45, 0x55, 0x60);
 
     // profile table
-    let x = 1.5;
+    let x = marginLeft;
     let y = headerOffset + titleToPara_Y;
     let incY = 0.4;
     let incTableY = 0.25;
-    const incColourdRowsY= incTableY + 0.08;
+    const incColourdRowsY = incTableY + 0.08;
     let height = 0.35;
     const val = singleFamily
       ? labelsBilingual.pg2TabT4Alt
       : labelsBilingual.pg2TabT4;
     let values = [
-     (singlePerson? OUTPUTTEXT[lang].pg2TabT1_1:OUTPUTTEXT[lang].pg2TabT1),
+      singlePerson ? OUTPUTTEXT[lang].pg2TabT1_1 : OUTPUTTEXT[lang].pg2TabT1,
       OUTPUTTEXT[lang].pg2TabT2,
       OUTPUTTEXT[lang].pg2TabT3,
       val,
@@ -228,48 +233,45 @@ export async function doSavePdfAction(props) {
     ];
     let fill = [115, 153, 198];
     let textColor = [255, 255, 255];
-    let Widths = [2.3, 0.5, .9, .9,.8]; // add up to PARA_WIDTH=5.5
-    if(lang==="fr") Widths = [2.0, 0.4, .85, .75,1.4];
+    let Widths = [1.7, 0.7, 1.2, 1.2, 1.2]; // add up to PARA_WIDTH=6
+    if (lang === "fr") Widths = [1.7, 0.7, 1.1, 1.1, 1.4];
     pdf.tableRow(fill, textColor, x, y, values, height, Widths);
 
-    
-    y += incY+.2;
+    y += incY + 0.2;
     fill = [255, 255, 255];
     textColor = [0x45, 0x55, 0x60];
     output.clients.forEach(function (element) {
-      
-      const len=(getListItemNameFromKey(MEMBER, element.memberKey, lang) + getName(element.name,lang)).length
+      const len = (
+        getListItemNameFromKey(MEMBER, element.memberKey, lang) +
+        getName(element.name, lang)
+      ).length;
       values = [
-        len>26?getListItemNameFromKey(MEMBER, element.memberKey, lang) :getListItemNameFromKey(MEMBER, element.memberKey, lang) + getName(element.name,lang),
+        len > 26
+          ? getListItemNameFromKey(MEMBER, element.memberKey, lang)
+          : getListItemNameFromKey(MEMBER, element.memberKey, lang) +
+            getName(element.name, lang),
         element.age.toString(),
-        formattedMoneyString(element.income,lang)
+        formattedMoneyString(element.income, lang),
         /* "$" +
           formatMoney(
            element.income,
             0,
             decimalChar,
             thousands
-          ) */,
-        (singleFamily
-          ? (element.memberKey === MEMBER.CLIENT.Key
+          ) */ (singleFamily
+          ? element.memberKey === MEMBER.CLIENT.Key
             ? "-"
-            : element.ret-element.age) //protectionPeriod
-          : element.ret).toString(),
+            : element.ret - element.age //protectionPeriod
+          : element.ret
+        ).toString(),
         (clients[element.id - 1].avgTaxRate + "%").toString(),
       ];
       pdf.tableRow(fill, textColor, x, y, values, height, Widths);
       y += incTableY;
-      if(len>26){
-        values= [
-          getName(element.name,lang),
-          "",
-          "",
-          "",
-          "",
-        ];
+      if (len > 26) {
+        values = [getName(element.name, lang), "", "", "", ""];
         pdf.tableRow(fill, textColor, x, y, values, height, Widths);
         y += incTableY;
-    
       }
     });
 
@@ -278,10 +280,11 @@ export async function doSavePdfAction(props) {
     pdf.SetFontSize(PxToPt(16));
     pdf.SetTextColor(0x45, 0x55, 0x60);
 
-    y += incTableY-.05;
+    y += incTableY - 0.05;
     fill = [115, 153, 198];
     textColor = [255, 255, 255];
     Widths = [4.3, 1.2]; // add up to PARA_WIDTH=5.5
+    Widths = [4.8, 1.2]; // add up to PARA_WIDTH=6
     let values2 = [OUTPUTTEXT[lang].pg2T3, ""];
 
     pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
@@ -290,24 +293,21 @@ export async function doSavePdfAction(props) {
     textColor = [0x45, 0x55, 0x60];
     values2 = [
       OUTPUTTEXT[lang].pg2P5,
-      (
-        formattedMoneyString(output.totalAssetExcludeInsurance,lang)
-        /* "$" +
+      formattedMoneyString(output.totalAssetExcludeInsurance, lang),
+      /* "$" +
         formatMoney(
           output.totalAssetExcludeInsurance,
           0,
           decimalChar,
           thousands
         ) */
-      ),
     ];
     y += incY;
     pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
     values2 = [
       OUTPUTTEXT[lang].pg2P6,
-      (
-        formattedMoneyString(output.totalLiabExcludeDeathRelated,lang)
-        /* 
+      formattedMoneyString(output.totalLiabExcludeDeathRelated, lang),
+      /* 
         "$" +
         formatMoney(
           output.totalLiabExcludeDeathRelated,
@@ -315,20 +315,28 @@ export async function doSavePdfAction(props) {
           decimalChar,
           thousands
         ) */
-      ),
     ];
     y += incTableY;
     pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
     values2 = OUTPUTTEXT[lang].pg2P7;
     y += incTableY;
-    pdf.tableRowSingle(fill, textColor, x+2.8, y, values2, height, Widths,false);
-    
-    values2 =
-      (
-        formattedMoneyString(output.totalAssetExcludeInsurance -
-          output.totalLiabExcludeDeathRelated,lang)
-        
-        /* "$" +
+    pdf.tableRowSingle(
+      fill,
+      textColor,
+      x + 3.6,
+      y+.01,
+      values2,
+      height,
+      Widths,
+      false
+    );
+
+    values2 = formattedMoneyString(
+      output.totalAssetExcludeInsurance - output.totalLiabExcludeDeathRelated,
+      lang
+    );
+
+    /* "$" +
         formatMoney(
           output.totalAssetExcludeInsurance -
             output.totalLiabExcludeDeathRelated,
@@ -336,42 +344,48 @@ export async function doSavePdfAction(props) {
           decimalChar,
           thousands
         ) */
-      );
     fill = [196, 223, 224];
-    pdf.tableRowSingle(fill, textColor, x+4.3, y, values2, height, Widths, true);
-    
+    pdf.tableRowSingle(
+      fill,
+      textColor,
+      x + 4.8,
+      y,
+      values2,
+      height,
+      Widths,
+      true
+    );
+
     //pdf.tableRow(fill, textColor, x+4.3, y+.065, values2, height-.10, [1.2]);
     fill = [255, 255, 255];
-    const allDB=formattedMoneyString(output.totalAssetInsurance+output.govDB,lang);
-    const govDB=formattedMoneyString(output.govDB,lang);
-    values2 = [
-      OUTPUTTEXT[lang].pg2P8.replace("yyy",govDB), 
-      (
-        allDB
-      ),
-    ];
+    const allDB = formattedMoneyString(
+      output.totalAssetInsurance + output.govDB,
+      lang
+    );
+    const govDB = formattedMoneyString(output.govDB, lang);
+    values2 = [OUTPUTTEXT[lang].pg2P8.replace("yyy", govDB), allDB];
     y += incColourdRowsY;
     pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
 
     values2 = [
       OUTPUTTEXT[lang].pg2P9,
-      (
-        formattedMoneyString(output.totalLiab - output.totalLiabExcludeDeathRelated,lang)
-        
-        /* "$" +
+      formattedMoneyString(
+        output.totalLiab - output.totalLiabExcludeDeathRelated,
+        lang
+      ),
+
+      /* "$" +
         formatMoney(
           output.totalLiab - output.totalLiabExcludeDeathRelated,
           0,
           decimalChar,
           thousands
         ) */
-      ),
     ];
     y += incTableY;
     pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
-    
-    
-    //pdf.DrawLine(InToPt(1.5), InToPt(y + incY), InToPt(PARA_WIDTH));
+
+    //pdf.DrawLine(InToPt(marginLeft), InToPt(y + incY), InToPt(PARA_WIDTH));
     y += incTableY;
 
     // ins
@@ -380,10 +394,11 @@ export async function doSavePdfAction(props) {
     pdf.SetFontSize(PxToPt(16));
     pdf.SetTextColor(0x45, 0x55, 0x60);
 
-    y += incTableY-.05;
+    y += incTableY - 0.05;
     fill = [115, 153, 198];
     textColor = [255, 255, 255];
     Widths = [4.3, 1.2]; // add up to PARA_WIDTH=5.5
+    Widths = [4.8, 1.2]; // add up to PARA_WIDTH=6
     values2 = [OUTPUTTEXT[lang].pg2T4, ""];
 
     pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
@@ -391,215 +406,232 @@ export async function doSavePdfAction(props) {
     fill = [255, 255, 255];
     textColor = [0x45, 0x55, 0x60];
 
+    y += 1 * incY;
+    values2 = OUTPUTTEXT[lang].pg2P10 + getName(clients[0].Name, lang) + ":";
+    pdf.tableRowSingle(
+      fill,
+      textColor,
+      x,
+      y,
+      values2,
+      height,
+      [PARA_WIDTH],
+      false
+    );
 
-    y += 1*incY;
-    values2 =  OUTPUTTEXT[lang].pg2P10 + getName(clients[0].Name,lang) +":"
-    pdf.tableRowSingle(fill, textColor, x, y, values2, height, [PARA_WIDTH],false);
-    
-    values2 = [
-      OUTPUTTEXT[lang].pg2P101 ,
-      ""
-    ];    
-    pdf.tableRow(fill, textColor, x+3.9, y+.16, values2, .18, Widths);
-    values2 = [
-      OUTPUTTEXT[lang].pg2P102 ,
-      ""
-    ];    
-    pdf.tableRow(fill, textColor, x+4.3, y+.16, values2, .18, Widths);
+    values2 = [OUTPUTTEXT[lang].pg2P101, ""];
+    pdf.tableRow(fill, textColor, x + 4.4, y + 0.16, values2, 0.18, Widths);
+    values2 = [OUTPUTTEXT[lang].pg2P102, ""];
+    pdf.tableRow(fill, textColor, x + 4.8, y + 0.16, values2, 0.18, Widths);
 
+    if (!singleFamily) {
+      values2 = [OUTPUTTEXT[lang].pg8TabRow3 + LEIfSpouseisSurvivor + ")", ""];
+      y += incColourdRowsY;
+      pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
 
-    if(!singleFamily)
-    {
-    values2 = [
-      OUTPUTTEXT[lang].pg8TabRow3 + LEIfSpouseisSurvivor + ")",
-      ""
-    ];
-    y += incColourdRowsY;
-    pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
+      values2 = [props.LE.spouse + "", ""];
+      pdf.tableRow(fill, textColor, x + 4.4, y + 0.11, values2, 0.18, Widths);
 
-    values2 = [
-      props.LE.spouse+"" ,
-          ""
-        ];    
-        pdf.tableRow(fill, textColor, x+3.9, y+.11, values2, .18, Widths);
-    
-  
+      values2 = formattedMoneyString(output.insNeedLE, lang);
 
-    values2 = (
-      formattedMoneyString(output.insNeedLE,lang)
-        
-      /* "$" + formatMoney(output.insNeedLE, 0, decimalChar, thousands) */)
-    fill = [196, 223, 224];
-    pdf.tableRowSingle(fill, textColor, x+4.3, y, values2, height, Widths, true);
+      /* "$" + formatMoney(output.insNeedLE, 0, decimalChar, thousands) */
+      fill = [196, 223, 224];
+      pdf.tableRowSingle(
+        fill,
+        textColor,
+        x + 4.8,
+        y,
+        values2,
+        height,
+        Widths,
+        true
+      );
+    }
 
-  }
-   
-  //pdf.tableRow(fill, textColor, x+4.3, y+.065, values2, height-.10, [1.2]);
+    //pdf.tableRow(fill, textColor, x+4.3, y+.065, values2, height-.10, [1.2]);
     fill = [255, 255, 255];
-    
+
     values2 = [
-      singleFamily? OUTPUTTEXT[lang].pg8TabRow4Alt.replace("A. ",""): OUTPUTTEXT[lang].pg8TabRow4
-      
-      ,
+      singleFamily
+        ? OUTPUTTEXT[lang].pg8TabRow4Alt.replace("A. ", "")
+        : OUTPUTTEXT[lang].pg8TabRow4,
+
       "",
     ];
     y += incColourdRowsY;
     pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
-    
-    values2 = [
-      toRetYears+"" ,
-      ""
-    ];    
-    pdf.tableRow(fill, textColor, x+3.9,  y+.11, values2, .18, Widths);
 
+    values2 = [toRetYears + "", ""];
+    pdf.tableRow(fill, textColor, x + 4.4, y + 0.11, values2, 0.18, Widths);
 
-    values2 =(
-      formattedMoneyString(output.insNeedRet,lang)
-        /* "$" + formatMoney(output.insNeedRet, 0, decimalChar, thousands) */)
+    values2 = formattedMoneyString(output.insNeedRet, lang);
+    /* "$" + formatMoney(output.insNeedRet, 0, decimalChar, thousands) */
     fill = [196, 223, 224];
-    pdf.tableRowSingle(fill, textColor, x+4.3, y, values2, height, Widths, true);
+    pdf.tableRowSingle(
+      fill,
+      textColor,
+      x + 4.8,
+      y,
+      values2,
+      height,
+      Widths,
+      true
+    );
     fill = [255, 255, 255];
-    
-    values2 = [
-      OUTPUTTEXT[lang].pg2P103
-      
-      ,
-      "",
-    ];
+
+    values2 = [OUTPUTTEXT[lang].pg2P103, ""];
     y += incColourdRowsY;
     pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
-    
-    values2 = [
-      props.yrsCoverageIfCashAll+""
-       ,
-      ""
-    ];    
-    pdf.tableRow(fill, textColor, x+3.9,  y+.11, values2, .18, Widths);
-    values2 =(
-      formattedMoneyString(0,lang)
-        /* "$" + formatMoney(output.insNeedRet, 0, decimalChar, thousands) */)
+
+    values2 = [props.yrsCoverageIfCashAll + "", ""];
+    pdf.tableRow(fill, textColor, x + 4.4, y + 0.11, values2, 0.18, Widths);
+    values2 = formattedMoneyString(0, lang);
+    /* "$" + formatMoney(output.insNeedRet, 0, decimalChar, thousands) */
     fill = [196, 223, 224];
-    pdf.tableRowSingle(fill, textColor, x+4.3, y, values2, height, Widths, true);
+    pdf.tableRowSingle(
+      fill,
+      textColor,
+      x + 4.8,
+      y,
+      values2,
+      height,
+      Widths,
+      true
+    );
     fill = [255, 255, 255];
-    if(lang!=="en") y += 0.7*incY; // long Fr text
+    if (lang !== "en") y += 0.7 * incY; // long Fr text
 
     // spouse ins
-    if(!singleFamily)
-    {
-        const spouseSwitched= await getSpouseINA(props)
-        const spouseInsRet=cleanFormat(spouseSwitched.spouseInsRet, lang);
-        const spouseInsLE=cleanFormat(spouseSwitched.spouseInsLE, lang);
-        const LEIfClientisSurvivor=spouseSwitched.LEIfClientisSurvivor
+    if (!singleFamily) {
+      const spouseSwitched = await getSpouseINA(props);
+      const spouseInsRet = cleanFormat(spouseSwitched.spouseInsRet, lang);
+      const spouseInsLE = cleanFormat(spouseSwitched.spouseInsLE, lang);
+      const LEIfClientisSurvivor = spouseSwitched.LEIfClientisSurvivor;
 
-//        pdf.DrawLine(InToPt(1.5), InToPt(y + incY), InToPt(PARA_WIDTH));
-    
-y += incTableY;
+      //        pdf.DrawLine(InToPt(marginLeft), InToPt(y + incY), InToPt(PARA_WIDTH));
 
-        // add title
-    pdf.SetFont(TIMES, NORMAL);
-    pdf.SetFontSize(PxToPt(16));
-    pdf.SetTextColor(0x45, 0x55, 0x60);
+      y += incTableY;
 
-    y += incTableY-.05;
-    fill = [115, 153, 198];
-    textColor = [255, 255, 255];
-    Widths = [4.3, 1.2]; // add up to PARA_WIDTH=5.5
-    values2 = [OUTPUTTEXT[lang].pg2T5, ""];
+      // add title
+      pdf.SetFont(TIMES, NORMAL);
+      pdf.SetFontSize(PxToPt(16));
+      pdf.SetTextColor(0x45, 0x55, 0x60);
 
-    pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
+      y += incTableY - 0.05;
+      fill = [115, 153, 198];
+      textColor = [255, 255, 255];
+      Widths = [4.3, 1.2]; // add up to PARA_WIDTH=5.5
+      Widths = [4.8, 1.2]; // add up to PARA_WIDTH=6
+      values2 = [OUTPUTTEXT[lang].pg2T5, ""];
 
-    fill = [255, 255, 255];
-    textColor = [0x45, 0x55, 0x60];
+      pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
 
+      fill = [255, 255, 255];
+      textColor = [0x45, 0x55, 0x60];
 
-        y += 1*incY;
-        pdf.tableRow(fill, textColor, x, y, [OUTPUTTEXT[lang].pg2P12], height, Widths);
-   
-        y += 1.35*incY;
-        
-        values2 =  [OUTPUTTEXT[lang].pg2P11.replace(lang==="en"?" NAME":" NOM", getName(clients[1].Name,lang)) ,
-          (
-            formattedMoneyString(output.totalAssetInsuranceIfSpouse+output.govDB,lang)
-            /*  "$" +
+      y += 1 * incY;
+      pdf.tableRow(
+        fill,
+        textColor,
+        x,
+        y,
+        [OUTPUTTEXT[lang].pg2P12],
+        height,
+        Widths
+      );
+
+      y += 1.35 * incY;
+
+      values2 = [
+        OUTPUTTEXT[lang].pg2P11.replace(
+          lang === "en" ? " NAME" : " NOM",
+          getName(clients[1].Name, lang)
+        ),
+        formattedMoneyString(
+          output.totalAssetInsuranceIfSpouse + output.govDB,
+          lang
+        ),
+        /*  "$" +
             formatMoney(
               output.totalAssetInsuranceIfSpouse+output.govDB,              
               0,
               decimalChar,
               thousands
             ) */
-          )]
+      ];
 
-          pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
-        
-        values2 = [
-          OUTPUTTEXT[lang].pg8TabRow3 + LEIfClientisSurvivor + ")",
-          ""
-        ];
-        y += incColourdRowsY;
-        pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
-    
-        
-        values2 = (
-          formattedMoneyString(spouseInsLE,lang)
-        /* "$" + formatMoney( spouseInsLE, 0, decimalChar, thousands) */)
-        fill = [196, 223, 224];
-        pdf.tableRowSingle(fill, textColor, x+4.3, y, values2, height, Widths, true);
-    
-      
+      pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
+
+      values2 = [OUTPUTTEXT[lang].pg8TabRow3 + LEIfClientisSurvivor + ")", ""];
+      y += incColourdRowsY;
+      pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
+
+      values2 = formattedMoneyString(spouseInsLE, lang);
+      /* "$" + formatMoney( spouseInsLE, 0, decimalChar, thousands) */
+      fill = [196, 223, 224];
+      pdf.tableRowSingle(
+        fill,
+        textColor,
+        x + 4.8,
+        y,
+        values2,
+        height,
+        Widths,
+        true
+      );
+
       //pdf.tableRow(fill, textColor, x+4.3, y+.065, values2, height-.10, [1.2]);
-        fill = [255, 255, 255];
-        
-        values2 = [
-          OUTPUTTEXT[lang].pg8TabRow4
-          ,
-          "",
-        ];
-        y += incColourdRowsY;
-        pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
-        
-          
+      fill = [255, 255, 255];
 
-        values2 =(
-          formattedMoneyString(spouseInsRet,lang)
-        /* "$" + formatMoney( spouseInsRet, 0, decimalChar, thousands) */)
-        fill = [196, 223, 224];
-        pdf.tableRowSingle(fill, textColor, x+4.3, y, values2, height, Widths, true);
-        fill = [255, 255, 255];
-      
+      values2 = [OUTPUTTEXT[lang].pg8TabRow4, ""];
+      y += incColourdRowsY;
+      pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
 
+      values2 = formattedMoneyString(spouseInsRet, lang);
+      /* "$" + formatMoney( spouseInsRet, 0, decimalChar, thousands) */
+      fill = [196, 223, 224];
+      pdf.tableRowSingle(
+        fill,
+        textColor,
+        x + 4.8,
+        y,
+        values2,
+        height,
+        Widths,
+        true
+      );
+      fill = [255, 255, 255];
     }
 
-
-
     // if more than 5 clients move
-    if(output.clients.length>lang==="en"?4:3){
+    if (output.clients.length > lang === "en" ? 4 : 3) {
       pdf.addFooterAndHeader(headerOffset, footerText, headerText);
       /* extra assump PAGE */
-      result=result && pdf.addCustomImage(IMAGE_LOGO_OTHERPAGES, pg1TitleY, image,false,top);
+      result =
+        result &&
+        pdf.addCustomImage(IMAGE_LOGO_OTHERPAGES, pg1TitleY, image, false, top);
       pdf.SetFont(HELVETICA, NORMAL);
       if (lang === "en") pdf.SetFontSize(PxToPt(25));
       else pdf.SetFontSize(PxToPt(20));
       pdf.SetFont(TIMES, NORMAL);
       pdf.SetFontSize(PxToPt(16));
-      x = 1.5;
-      y = headerOffset + titleToPara_Y-.3;
+      x = marginLeft;
+      y = headerOffset + titleToPara_Y - 0.3;
       incY = 0.44;
       height = 0.35;
+    } else y += 2 * incTableY;
 
-    }
-    else
-      y += 2*incTableY;
-    
     // assump table
     pdf.SetFont(TIMES, NORMAL);
     pdf.SetFontSize(PxToPt(16));
     pdf.SetTextColor(0x45, 0x55, 0x60);
 
-    //  pdf.DrawLine(InToPt(1.5), InToPt(y - 0.13), InToPt(PARA_WIDTH));
+    //  pdf.DrawLine(InToPt(marginLeft), InToPt(y - 0.13), InToPt(PARA_WIDTH));
     // y += .3*incY;
     fill = [115, 153, 198];
     textColor = [255, 255, 255];
     Widths = [4.9, 0.6]; // add up to PARA_WIDTH=5.5
+    Widths = [5.2, 0.8]; // add up to PARA_WIDTH=6
     values2 = [OUTPUTTEXT[lang].pg2T2, ""];
 
     pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
@@ -609,7 +641,12 @@ y += incTableY;
     values2 = [OUTPUTTEXT[lang].pg7TabRow4, (output.infRate + "%").toString()];
     y += incY;
     pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
-    values2 = [singlePerson?OUTPUTTEXT[lang].pg7TabRow5_1:OUTPUTTEXT[lang].pg7TabRow5, (output.invRate + "%").toString()];
+    values2 = [
+      singlePerson
+        ? OUTPUTTEXT[lang].pg7TabRow5_1
+        : OUTPUTTEXT[lang].pg7TabRow5,
+      (output.invRate + "%").toString(),
+    ];
     y += incTableY;
     pdf.tableRow(fill, textColor, x, y, values2, height, Widths);
 
@@ -626,17 +663,19 @@ y += incTableY;
     pdf.SetFontSize(PxToPt(16));
     pdf.SetTextColor(0x45, 0x55, 0x60);
 
-    y += 2 * incY-.07;
-    pdf.DrawLine(InToPt(1.5), InToPt(y - 0.35), InToPt(PARA_WIDTH));
-   // y += 0.7 * incY;
+    y += 2 * incY - 0.07;
+    pdf.DrawLine(InToPt(marginLeft), InToPt(y - 0.35), InToPt(PARA_WIDTH));
+    // y += 0.7 * incY;
 
-    paragraph = singlePerson?OUTPUTTEXT[lang].pg2Tab2_1: OUTPUTTEXT[lang].pg2Tab2;
-    pdf.MultilineText(paragraph, InToPt(1.5), InToPt(y), InToPt(5.6));
+    paragraph = singlePerson
+      ? OUTPUTTEXT[lang].pg2Tab2_1
+      : OUTPUTTEXT[lang].pg2Tab2;
+    pdf.MultilineText(paragraph, InToPt(marginLeft), InToPt(y), InToPt(5.6));
 
-    y += incY -.05;
+    y += incY - 0.05;
     paragraph = OUTPUTTEXT[lang].pg2Tab3;
-    pdf.MultilineText(paragraph, InToPt(1.5), InToPt(y), InToPt(5.6));
-    
+    pdf.MultilineText(paragraph, InToPt(marginLeft), InToPt(y), InToPt(5.6));
+
     /* // notes
     pdf.SetFont(TIMES, NORMAL);
     pdf.SetFontSize(PxToPt(16));
@@ -655,7 +694,7 @@ y += incTableY;
     pdf.SetFont(TIMES, NORMAL);
     pdf.SetFontSize(PxToPt(16));
     pdf.SetTextColor(0x45, 0x55, 0x60);
-    pdf.MultilineText(paragraph, InToPt(1.5), InToPt(y), InToPt(PARA_WIDTH));
+    pdf.MultilineText(paragraph, InToPt(marginLeft), InToPt(y), InToPt(PARA_WIDTH));
  */
     /* 	values = ["Client", "$70,000", "65"];
 			y += incY;	
@@ -667,7 +706,7 @@ y += incTableY;
 
     //pdf.SetFillColor(255, 255, 255);
     //pdf.SetTextColor(0x45, 0x55, 0x60);
-    //pdf.Rectangle(InToPt(1.5), InToPt(2), InToPt(1.8), InToPt(0.4));
+    //pdf.Rectangle(InToPt(marginLeft), InToPt(2), InToPt(1.8), InToPt(0.4));
     //pdf.Text("Client", InToPt(1.61), InToPt(2.25));
     //pdf.SetFillColor(255, 255, 255);
     //pdf.Rectangle(InToPt(3.32), InToPt(2), InToPt(1.8), InToPt(0.4));
@@ -677,7 +716,7 @@ y += incTableY;
     //pdf.Text("65", InToPt(5.25), InToPt(2.25));
 
     //pdf.SetFillColor(255, 255, 255);
-    //pdf.Rectangle(InToPt(1.5), InToPt(2.5), InToPt(1.8), InToPt(0.4));
+    //pdf.Rectangle(InToPt(marginLeft), InToPt(2.5), InToPt(1.8), InToPt(0.4));
     //pdf.Text("Spouse", InToPt(1.61), InToPt(2.75));
     //pdf.SetFillColor(255, 255, 255);
     //pdf.Rectangle(InToPt(3.32), InToPt(2.5), InToPt(1.8), InToPt(0.4));
@@ -687,8 +726,8 @@ y += incTableY;
     //pdf.Text("65", InToPt(5.25), InToPt(2.75));
 
     //	// Page 3
-//    pdf.AddPage();
-  //  pdf.Header(headerText, headerOffset);
+    //    pdf.AddPage();
+    //  pdf.Header(headerText, headerOffset);
 
     pdf.addFooterAndHeader(headerOffset, footerText, headerText);
 
@@ -698,64 +737,84 @@ y += incTableY;
 
     // combine 2 and 3
     // logo if asked for
-    result=result && pdf.addCustomImage(IMAGE_LOGO_OTHERPAGES, pg1TitleY, image,false,top);
+    result =
+      result &&
+      pdf.addCustomImage(IMAGE_LOGO_OTHERPAGES, pg1TitleY, image, false, top);
 
     pdf.SetFont(HELVETICA, NORMAL);
     if (lang === "en") pdf.SetFontSize(PxToPt(25));
     else pdf.SetFontSize(PxToPt(20));
 
     pdf.SetTextColor(0x45, 0x55, 0x60);
-    pdf.Text(singlePerson?OUTPUTTEXT[lang].pg3T_1:OUTPUTTEXT[lang].pg3T, InToPt(1.5), InToPt(headerOffset + topToTitle_Y
-  ));
+    pdf.Text(
+      singlePerson ? OUTPUTTEXT[lang].pg3T_1 : OUTPUTTEXT[lang].pg3T,
+      InToPt(marginLeft),
+      InToPt(headerOffset + topToTitle_Y)
+    );
 
-    paragraph =singlePerson?OUTPUTTEXT[lang].pg3P1_1:OUTPUTTEXT[lang].pg3P1;
+    paragraph = singlePerson
+      ? OUTPUTTEXT[lang].pg3P1_1
+      : OUTPUTTEXT[lang].pg3P1;
     pdf.SetFont(TIMES, NORMAL);
     pdf.SetFontSize(PxToPt(16));
     pdf.SetTextColor(0x45, 0x55, 0x60);
     pdf.MultilineText(
       paragraph,
-      InToPt(1.5),
+      InToPt(marginLeft),
       InToPt(headerOffset + 1.8),
       InToPt(PARA_WIDTH)
     );
 
-    x = 1.5;
+    x = marginLeft;
     y = headerOffset + 2.5;
     incY = 0.4;
     height = 0.35;
-    Widths = [4.3, 1.2]; // add up to PARA_WIDTH=5.5
 
-    values = [OUTPUTTEXT[lang].pg3TabT];
+    Widths = [2.3, 2.1, 1.1]; // add up to PARA_WIDTH=5.5
+    Widths = [2.6, 2.2, 1.2]; // add up to PARA_WIDTH=6
+
+    values = [
+      OUTPUTTEXT[lang].pg3TabT,
+      OUTPUTTEXT[lang].pg3TabT2,
+      OUTPUTTEXT[lang].pg3TabT3,
+    ];
     fill = [115, 153, 198];
     textColor = [255, 255, 255];
-    pdf.tableRow(fill, textColor, x, y, values, height, [PARA_WIDTH]);
+    pdf.tableRow(fill, textColor, x, y, values, height, Widths); //[PARA_WIDTH]);
 
     fill = [255, 255, 255];
     textColor = [0x45, 0x55, 0x60];
 
     y += incY;
+
     output.liabilities.forEach(function (element) {
+      const specs = element.desc.split(",  ");
       values = [
         element.name,
-        (
-          formattedMoneyString(element.value,lang)
+        specs.length > 0 ? specs[0] : "",
+        formattedMoneyString(element.value, lang),
         /* "$" + formatMoney(element.value, 0, decimalChar, thousands) */
-        ),
       ];
       pdf.tableRow(fill, textColor, x, y, values, height, Widths);
       y += incTableY;
+      if (specs.length > 1) {
+        for (let i = 1; i < specs.length; i++) {
+          values = ["", specs[i], ""];
+          pdf.tableRow(fill, textColor, x, y, values, height, Widths);
+          y += incTableY;
+        }
+      }
     });
     y -= incTableY;
     values = [
       OUTPUTTEXT[lang].pg3TabRTot,
-      (
-        formattedMoneyString(output.totalLiab,lang)
-        /* "$" + formatMoney(output.totalLiab, 0, decimalChar, thousands) */
-      ),
+      "",
+      formattedMoneyString(output.totalLiab, lang),
+      /* "$" + formatMoney(output.totalLiab, 0, decimalChar, thousands) */
     ];
     y += incY;
     pdf.tableRow(fill, textColor, x, y, values, height, Widths);
-    pdf.DrawLine(InToPt(1.5), InToPt(y), InToPt(PARA_WIDTH));
+    pdf.DrawLine(InToPt(marginLeft), InToPt(y), InToPt(PARA_WIDTH));
 
     // pdf.addFooterAndHeader(headerOffset,footerText, headerText);
 
@@ -770,23 +829,25 @@ y += incTableY;
     else pdf.SetFontSize(PxToPt(20));
 
      pdf.SetTextColor(0x45, 0x55, 0x60);
-    pdf.Text(OUTPUTTEXT[lang].pg4T, InToPt(1.5), InToPt(topToTitle_Y
+    pdf.Text(OUTPUTTEXT[lang].pg4T, InToPt(marginLeft), InToPt(topToTitle_Y
   ));
     
     paragraph = OUTPUTTEXT[lang].pg4P1;
     pdf.SetFont(TIMES, NORMAL);
     pdf.SetFontSize(PxToPt(16));
     pdf.SetTextColor(0x45, 0x55, 0x60);
-    pdf.MultilineText(paragraph, InToPt(1.5), InToPt(headerOffset+topToTitle_Y
+    pdf.MultilineText(paragraph, InToPt(marginLeft), InToPt(headerOffset+topToTitle_Y
   ), InToPt(PARA_WIDTH));
 / / this is already in pg 3 so no para here
 */
-    x = 1.5;
+    x = marginLeft;
     //   y = headerOffset+1.65;//2.3; don't go down
     y += incY;
     //incY = 0.44;
     height = 0.35;
     //const Widths = 5;
+    Widths = [4.3, 1.2]; // add up to PARA_WIDTH=5.
+    Widths = [4.8, 1.2]; // add up to PARA_WIDTH=6
 
     values = [OUTPUTTEXT[lang].pg4TabT];
     fill = [115, 153, 198];
@@ -797,19 +858,21 @@ y += incTableY;
     textColor = [0x45, 0x55, 0x60];
 
     values = [
-      (singlePerson?OUTPUTTEXT[lang].pg4TabRow1_1: OUTPUTTEXT[lang].pg4TabRow1),
-      (
-        formattedMoneyString(output.Income + output.Income2,lang)
-        /* "$" +
+      singlePerson
+        ? OUTPUTTEXT[lang].pg4TabRow1_1
+        : OUTPUTTEXT[lang].pg4TabRow1,
+      formattedMoneyString(output.Income + output.Income2, lang),
+      /* "$" +
         formatMoney(output.Income + output.Income2, 0, decimalChar, thousands) */
-      ),
     ];
     y += incY;
     pdf.tableRow(fill, textColor, x, y, values, height, Widths);
 
     y += incY;
     pdf.MultilineText(
-     singlePerson? OUTPUTTEXT[lang].pg4TabRow2_1:OUTPUTTEXT[lang].pg4TabRow2,
+      singlePerson
+        ? OUTPUTTEXT[lang].pg4TabRow2_1
+        : OUTPUTTEXT[lang].pg4TabRow2,
       InToPt(x + 0.1),
       InToPt(y + incY),
       InToPt(3)
@@ -817,7 +880,7 @@ y += incTableY;
 
     //values = [OUTPUTTEXT[lang].pg4TabRow2,""];
     y += incY - 0.3;
-    pdf.DrawLine(InToPt(1.5), InToPt(y - 0.13), InToPt(PARA_WIDTH));
+    pdf.DrawLine(InToPt(marginLeft), InToPt(y - 0.13), InToPt(PARA_WIDTH));
 
     //pdf.tableRow(fill, textColor, x, y, values, height, Widths);
 
@@ -827,93 +890,95 @@ y += incTableY;
         (output.percent1 + "%").toString(),
       ];
       y += 2.1 * incY;
-      pdf.DrawLine(InToPt(1.5), InToPt(y), InToPt(PARA_WIDTH));
+      pdf.DrawLine(InToPt(marginLeft), InToPt(y), InToPt(PARA_WIDTH));
       pdf.tableRow(fill, textColor, x, y, values, height, Widths);
 
       values = [
         thereAfterText,
         //(output.percent2 + "%").toString(),
-        (output.percent2.map((item) => item + "% ")).toString(),
+        output.percent2.map((item) => item + "% ").toString(),
       ];
       y += incTableY;
       pdf.tableRow(fill, textColor, x, y, values, height, Widths);
-      //    pdf.DrawLine(InToPt(1.5), InToPt(y), InToPt(PARA_WIDTH));
+      //    pdf.DrawLine(InToPt(marginLeft), InToPt(y), InToPt(PARA_WIDTH));
     } else {
-      values = [
-        thereAfterText,
-        (output.percent1 + "%").toString(),
-      ];
+      values = [thereAfterText, (output.percent1 + "%").toString()];
       y += 2.1 * incY;
       pdf.tableRow(fill, textColor, x, y, values, height, Widths);
-      //  pdf.DrawLine(InToPt(1.5), InToPt(y), InToPt(PARA_WIDTH));
+      //  pdf.DrawLine(InToPt(marginLeft), InToPt(y), InToPt(PARA_WIDTH));
     }
     values = [OUTPUTTEXT[lang].pg4TabRow5, ""];
-    y += 1.5 * incY;
+    y += marginLeft * incY;
     pdf.tableRow(fill, textColor, x, y, values, height, Widths);
-    //pdf.DrawLine(InToPt(1.5), InToPt(y), InToPt(PARA_WIDTH));
+    //pdf.DrawLine(InToPt(marginLeft), InToPt(y), InToPt(PARA_WIDTH));
 
     if (twoNeedPercents) {
       values = [
         OUTPUTTEXT[lang].pgTabRowMoreIncome,
-        (
-          formattedMoneyString(output.percentNeed1,lang)
+        formattedMoneyString(output.percentNeed1, lang),
         /* "$" + formatMoney(output.percentNeed1, 0, decimalChar, thousands) */
-        ),
       ];
       y += incY;
       pdf.tableRow(fill, textColor, x, y, values, height, Widths);
-      pdf.DrawLine(InToPt(1.5), InToPt(y), InToPt(PARA_WIDTH));
+      pdf.DrawLine(InToPt(marginLeft), InToPt(y), InToPt(PARA_WIDTH));
 
       values = [
         thereAfterText,
-        (
-          formattedMoneyString(output.percentNeed2.reduce((a, b) => a + b, 0),lang)
-        /* "$" + formatMoney(output.percentNeed2.reduce((a, b) => a + b, 0), 0, decimalChar, thousands) */
+        formattedMoneyString(
+          output.percentNeed2.reduce((a, b) => a + b, 0),
+          lang
         ),
+        /* "$" + formatMoney(output.percentNeed2.reduce((a, b) => a + b, 0), 0, decimalChar, thousands) */
       ];
     } else
       values = [
         thereAfterText,
-        (
-          formattedMoneyString(output.percentNeed1,lang)
+        formattedMoneyString(output.percentNeed1, lang),
         /* "$" + formatMoney(output.percentNeed1, 0, decimalChar, thousands) */
-        ),
       ];
 
     y += incTableY;
     pdf.tableRow(fill, textColor, x, y, values, height, Widths);
-    //pdf.DrawLine(InToPt(1.5), InToPt(y), InToPt(PARA_WIDTH));
+    //pdf.DrawLine(InToPt(marginLeft), InToPt(y), InToPt(PARA_WIDTH));
     //pdf.tableRow(fill, textColor, x, y, values, height, Widths);
     //y += incY;
-    //pdf.DrawLine(InToPt(1.5), InToPt(y), InToPt(PARA_WIDTH));
+    //pdf.DrawLine(InToPt(marginLeft), InToPt(y), InToPt(PARA_WIDTH));
 
     pdf.addFooterAndHeader(headerOffset, footerText, headerText);
 
     {
       /* PAGE 5 Family Cash Sources at Death*/
     }
-    result=result && pdf.addCustomImage(IMAGE_LOGO_OTHERPAGES, pg1TitleY, image,false,top);
+    result =
+      result &&
+      pdf.addCustomImage(IMAGE_LOGO_OTHERPAGES, pg1TitleY, image, false, top);
 
-    Widths =  lang === "en"?[3.35, 1.1, 1.1]:[3.65, .95, .95]; // add up to PARA_WIDTH=5.5
+    Widths = lang === "en" ? [3.35, 1.1, 1.1] : [3.65, 0.95, 0.95]; // add up to PARA_WIDTH=5.5
+    Widths = lang === "en" ? [2.5, 1.5, 1, 1] : [2.5, 1.5, 1, 1]; // add up to PARA_WIDTH=6
+
     pdf.SetFont(HELVETICA, NORMAL);
     if (lang === "en") pdf.SetFontSize(PxToPt(25));
     else pdf.SetFontSize(PxToPt(20));
 
     pdf.SetTextColor(0x45, 0x55, 0x60);
-    pdf.Text(singlePerson?OUTPUTTEXT[lang].pg5T_1:OUTPUTTEXT[lang].pg5T, InToPt(1.5), InToPt(headerOffset + topToTitle_Y
-  ));
+    pdf.Text(
+      singlePerson ? OUTPUTTEXT[lang].pg5T_1 : OUTPUTTEXT[lang].pg5T,
+      InToPt(marginLeft),
+      InToPt(headerOffset + topToTitle_Y)
+    );
 
     pdf.SetFont(TIMES, NORMAL);
 
     pdf.SetFontSize(PxToPt(16));
 
-    x = 1.5;
+    x = marginLeft;
     y = headerOffset + titleToPara_Y;
     incY = 0.44;
     height = 0.35;
     //const Widths = 5;
     values = [
       OUTPUTTEXT[lang].pg5TabT,
+      OUTPUTTEXT[lang].pg3TabT2,
       OUTPUTTEXT[lang].pg5TabT2,
       OUTPUTTEXT[lang].pg5TabT3,
     ];
@@ -947,13 +1012,13 @@ y += incTableY;
     } else */ {
       values = [
         OUTPUTTEXT[lang].pg5TabRow1,
-        (
-          formattedMoneyString(output.govDB,lang)
-        /* "$" + formatMoney(output.govDB, 0, decimalChar, thousands) */),
-        (
-          formattedMoneyString(output.govDB,lang)
-        /* "$" + formatMoney(output.govDB, 0, decimalChar, thousands) */),
-          
+        "",
+        formattedMoneyString(output.govDB, lang),
+        /* "$" + formatMoney(output.govDB, 0, decimalChar, thousands) */ formattedMoneyString(
+          output.govDB,
+          lang
+        ),
+        /* "$" + formatMoney(output.govDB, 0, decimalChar, thousands) */
       ];
       y += incY;
       pdf.tableRow(fill, textColor, x, y, values, height, Widths);
@@ -961,38 +1026,41 @@ y += incTableY;
 
     y += incY;
     output.assets.forEach(function (element) {
+      const specs = element.desc.split(",  ");
       values = [
         element.name,
-        (
-          formattedMoneyString(element.value,lang)
+        specs.length > 0 ? specs[0] : "",
+        formattedMoneyString(element.value, lang),
         /* "$" + formatMoney(element.value, 0, decimalChar, thousands) */
-        ),
         element.disposeValue > 0
-          ? (
-            formattedMoneyString(element.disposeValue,lang)
-            /* "$" + formatMoney(element.disposeValue, 0, decimalChar, thousands) */
-            )
-          : "",
+          ? formattedMoneyString(element.disposeValue, lang)
+          : /* "$" + formatMoney(element.disposeValue, 0, decimalChar, thousands) */
+            "",
       ];
       pdf.tableRow(fill, textColor, x, y, values, height, Widths);
       y += incTableY;
+      if (specs.length > 1) {
+        for (let i = 1; i < specs.length; i++) {
+          values = ["", specs[i], ""];
+          pdf.tableRow(fill, textColor, x, y, values, height, Widths);
+          y += incTableY;
+        }
+      }
+    
     });
 
     values = [
       OUTPUTTEXT[lang].pg5TabRow3,
-      (
-        formattedMoneyString(output.totalAsset,lang)
-        /* "$" + formatMoney(output.totalAsset, 0, decimalChar, thousands) */
-      ),
-      (
-        formattedMoneyString(output.totalDisposeAsset,lang)
-        /* "$" + formatMoney(output.totalDisposeAsset, 0, decimalChar, thousands) */
-      ),
+      "",
+      formattedMoneyString(output.totalAsset, lang),
+      /* "$" + formatMoney(output.totalAsset, 0, decimalChar, thousands) */
+      formattedMoneyString(output.totalDisposeAsset, lang),
+      /* "$" + formatMoney(output.totalDisposeAsset, 0, decimalChar, thousands) */
     ];
     y += incY;
     pdf.tableRow(fill, textColor, x, y, values, height, Widths);
 
-   /*  if (lang === "fr") {
+    /*  if (lang === "fr") {
       y += 0.73 * incY;
       pdf.MultilineText(
         OUTPUTTEXT[lang].pg5TabRow4,
@@ -1009,18 +1077,18 @@ y += incTableY;
       y += 0.73 * incY;
     } else */ {
       values = [
-        singlePerson?OUTPUTTEXT[lang].pg5TabRow4_1: OUTPUTTEXT[lang].pg5TabRow4,
+        singlePerson
+          ? OUTPUTTEXT[lang].pg5TabRow4_1
+          : OUTPUTTEXT[lang].pg5TabRow4,
         "",
-        (
-          formattedMoneyString(output.totalLiab,lang)
+        formattedMoneyString(output.totalLiab, lang),
         /* "$" + formatMoney(output.totalLiab, 0, decimalChar, thousands) */
-        ),
       ];
       y += incY;
       pdf.tableRow(fill, textColor, x, y, values, height, Widths);
     }
 
-    y += incY;
+    y += incY+.1;
     /* pdf.MultilineText(
       OUTPUTTEXT[lang].pg5TabRow5,
       InToPt(x + 0.1),
@@ -1028,16 +1096,16 @@ y += incTableY;
       InToPt(3)
     ); */
     values = [
-      singlePerson?OUTPUTTEXT[lang].pg5TabRow5_1: OUTPUTTEXT[lang].pg5TabRow5,
+      singlePerson
+        ? OUTPUTTEXT[lang].pg5TabRow5_1
+        : OUTPUTTEXT[lang].pg5TabRow5,
       "",
-      (
-        formattedMoneyString(output.totalDisposeAsset - output.totalLiab,lang)
-        /* "$" + formatMoney(output.totalDisposeAsset - output.totalLiab, 0, decimalChar, thousands) */
-      ),
+      formattedMoneyString(output.totalDisposeAsset - output.totalLiab, lang),
+      /* "$" + formatMoney(output.totalDisposeAsset - output.totalLiab, 0, decimalChar, thousands) */
     ];
     //y += incY;
     pdf.tableRow(fill, textColor, x, y, values, height, Widths);
-    
+
     /* pdf.Text(
       "$" +
         formatMoney(
@@ -1051,33 +1119,35 @@ y += incTableY;
     ); */
 
     y += incY;
-    pdf.DrawLine(InToPt(1.5), InToPt(y - 0.43), InToPt(PARA_WIDTH));
+    pdf.DrawLine(InToPt(marginLeft), InToPt(y - 0.43), InToPt(PARA_WIDTH));
 
     pdf.addFooterAndHeader(headerOffset, footerText, headerText);
 
-   
-   
-   
-   
     {
       /* PAGE 6 Family Income Sources at Death*/
     }
-    result=result && pdf.addCustomImage(IMAGE_LOGO_OTHERPAGES, pg1TitleY, image,false,top);
+    result =
+      result &&
+      pdf.addCustomImage(IMAGE_LOGO_OTHERPAGES, pg1TitleY, image, false, top);
     Widths = [4.4, 1.1]; // add up to PARA_WIDTH=5.5
-    Widths = [3.0,1.6, .9]; // add up to PARA_WIDTH=5.5
+    Widths = [3.0, 1.6, 0.9]; // add up to PARA_WIDTH=5.5
+    Widths = [3.2, 1.8, 1]; // add up to PARA_WIDTH=6
     pdf.SetFont(HELVETICA, NORMAL);
     if (lang === "en") pdf.SetFontSize(PxToPt(25));
     else pdf.SetFontSize(PxToPt(20));
 
     pdf.SetTextColor(0x45, 0x55, 0x60);
-    pdf.Text(singlePerson?OUTPUTTEXT[lang].pg6T_1: OUTPUTTEXT[lang].pg6T, InToPt(1.5), InToPt(headerOffset + topToTitle_Y
-  ));
+    pdf.Text(
+      singlePerson ? OUTPUTTEXT[lang].pg6T_1 : OUTPUTTEXT[lang].pg6T,
+      InToPt(marginLeft),
+      InToPt(headerOffset + topToTitle_Y)
+    );
 
     pdf.SetFont(TIMES, NORMAL);
 
     pdf.SetFontSize(PxToPt(16));
 
-    x = 1.5;
+    x = marginLeft;
     y = headerOffset + titleToPara_Y;
     incY = 0.44;
     height = 0.35;
@@ -1096,8 +1166,6 @@ y += incTableY;
     textColor = [255, 255, 255];
     pdf.tableRow(fill, textColor, x, y, values, height, Widths);
 
-
-
     fill = [255, 255, 255];
     textColor = [0x45, 0x55, 0x60];
 
@@ -1105,11 +1173,9 @@ y += incTableY;
     output.sources.forEach(function (element) {
       values = [
         element.name,
-        (
-          formattedMoneyString(element.value,lang)
+        formattedMoneyString(element.value, lang),
         /* "$" + formatMoney(element.value, 0, decimalChar, thousands) */
-        ),
-        formattedMoneyString(element.valueAtDeath,lang),
+        formattedMoneyString(element.valueAtDeath, lang),
       ];
       pdf.tableRow(fill, textColor, x, y, values, height, Widths);
       y += incTableY;
@@ -1122,12 +1188,13 @@ y += incTableY;
       InToPt(3)
     );
     y += incY + 0.3;
-    pdf.DrawLine(InToPt(1.5), InToPt(y - 0.04), InToPt(PARA_WIDTH));
+    pdf.DrawLine(InToPt(marginLeft), InToPt(y - 0.04), InToPt(PARA_WIDTH));
     //y += incY+.1;
 
     // Widths = [3.1, 1.2, 1.2]; // add up to PARA_WIDTH=5.5
-    Widths = [4.8, .8]; // add up to PARA_WIDTH=5.5
-  
+    Widths = [4.8, 0.8]; // add up to PARA_WIDTH=5.5
+    Widths = [5, 1]; // add up to PARA_WIDTH=6
+
     if (twoNeedPercents) {
       y += incY - 0.27;
 
@@ -1145,16 +1212,15 @@ y += incTableY;
       pdf.tableRow(
         fill,
         textColor,
-        x + 3.6,
+        x + 3.4,
         y,
         [
           "(" +
             labelsBilingual.pg6Net +
-            (
-              formattedMoneyString(output.totalSourceATaxAtDeath,lang)
-        /* "  $" +
+            formattedMoneyString(output.totalSourceATaxAtDeath, lang)
+              /* "  $" +
               formatMoney(output.totalSourceATax, 0, decimalChar, thousands) */
-            ).toString() +
+              .toString() +
             ")",
         ],
         height,
@@ -1167,10 +1233,8 @@ y += incTableY;
         x + 4.6,
         y,
         [
-          (
-            formattedMoneyString(output.totalSourceAtDeath,lang)
-        /* "$" + formatMoney(output.totalSource, 0, decimalChar, thousands) */
-          ),
+          formattedMoneyString(output.totalSourceAtDeath, lang),
+          /* "$" + formatMoney(output.totalSource, 0, decimalChar, thousands) */
         ],
         height,
         Widths
@@ -1184,7 +1248,7 @@ y += incTableY;
         textColor,
         x,
         y,
-        [!singleFamily?thereAfterText: (thereAfterTextSF)],
+        [!singleFamily ? thereAfterText : thereAfterTextSF],
         height,
         Widths
       );
@@ -1193,16 +1257,15 @@ y += incTableY;
       pdf.tableRow(
         fill,
         textColor,
-        x + 3.6,
+        x + 3.4,
         y,
         [
           "(" +
             labelsBilingual.pg6Net +
-            (
-              formattedMoneyString(output.totalSource2ATaxAtDeath,lang)
-        /* "  $" +
+            formattedMoneyString(output.totalSource2ATaxAtDeath, lang)
+              /* "  $" +
               formatMoney(output.totalSource2ATax, 0, decimalChar, thousands) */
-            ).toString() +
+              .toString() +
             ")",
         ],
         height,
@@ -1215,10 +1278,8 @@ y += incTableY;
         x + 4.6,
         y,
         [
-          (
-            formattedMoneyString(output.totalSource2AtDeath,lang)
-        /* "$" + formatMoney(output.totalSource2, 0, decimalChar, thousands) */
-          ),
+          formattedMoneyString(output.totalSource2AtDeath, lang),
+          /* "$" + formatMoney(output.totalSource2, 0, decimalChar, thousands) */
         ],
         height,
         Widths
@@ -1266,7 +1327,7 @@ y += incTableY;
         textColor,
         x,
         y,
-        [!singleFamily?thereAfterText: (thereAfterTextSF)],
+        [!singleFamily ? thereAfterText : thereAfterTextSF],
         height,
         Widths
       );
@@ -1275,19 +1336,17 @@ y += incTableY;
       pdf.tableRow(
         fill,
         textColor,
-        x + 3.6,
+        x + 3.4,
         y,
         [
           "(" +
             labelsBilingual.pg6Net +
-            (
-              formattedMoneyString(output.totalSourceATaxAtDeath,lang)
-        /* "  $" +
+            formattedMoneyString(output.totalSourceATaxAtDeath, lang) +
+            /* "  $" +
               formatMoney(output.totalSourceATax, 0, decimalChar, thousands) */
-            ) +
             ")",
         ],
-        height+.1,
+        height + 0.1,
         Widths
       );
       pdf.SetFontSize(PxToPt(16));
@@ -1297,12 +1356,10 @@ y += incTableY;
         x + 4.6,
         y,
         [
-          (
-            formattedMoneyString(output.totalSourceAtDeath,lang)
-        /* "$" + formatMoney(output.totalSource, 0, decimalChar, thousands) */
-          ),
+          formattedMoneyString(output.totalSourceAtDeath, lang),
+          /* "$" + formatMoney(output.totalSource, 0, decimalChar, thousands) */
         ],
-        height+.1,
+        height + 0.1,
         Widths
       );
 
@@ -1316,7 +1373,7 @@ y += incTableY;
       InToPt(3)
     );
     y += incY - 0.13;
-    pdf.DrawLine(InToPt(1.5), InToPt(y + 0.26), InToPt(PARA_WIDTH));
+    pdf.DrawLine(InToPt(marginLeft), InToPt(y + 0.26), InToPt(PARA_WIDTH));
 
     //values = [OUTPUTTEXT[lang].pgTabRowMoreIncome, ("$"+ formatMoney(output.percentNeed1-output.totalSource, 0,decimalChar,thousands))];
     //y += incY;
@@ -1339,38 +1396,53 @@ y += incTableY;
       pdf.tableRow(
         fill,
         textColor,
-        x + 3.6,
+        x + 3.4,
         y,
         [
           "(" +
-            (
-              formatMoney(output.percentNeed1, 0, decimalChar, thousands)
+            formatMoney(
+              output.percentNeed1,
+              0,
+              decimalChar,
+              thousands
             ).toString() +
             "-" +
-            (
-              
-              formatMoney(output.totalSourceATaxAtDeath, 0, decimalChar, thousands)
+            formatMoney(
+              output.totalSourceATaxAtDeath,
+              0,
+              decimalChar,
+              thousands
             ).toString() +
             ")",
         ],
-        height+.1,
+        height + 0.1,
         [1.2]
       );
 
       pdf.SetFontSize(PxToPt(16));
       fill = [196, 223, 224];
-      
-      values2=(
-        formattedMoneyString(Math.max(0, output.percentNeed1 - output.totalSourceATaxAtDeath),lang)
-        /* "$" +
+
+      values2 = formattedMoneyString(
+        Math.max(0, output.percentNeed1 - output.totalSourceATaxAtDeath),
+        lang
+      );
+      /* "$" +
         formatMoney(
           Math.max(0, output.percentNeed1 - output.totalSourceATax),
           0,
           decimalChar,
           thousands
         ) */
-      )
-      pdf.tableRowSingle(fill, textColor, x+4.6, y, values2, height, Widths, true);
+      pdf.tableRowSingle(
+        fill,
+        textColor,
+        x + 4.6,
+        y,
+        values2,
+        height,
+        Widths,
+        true
+      );
       /* pdf.tableRow(
         fill,
         textColor,
@@ -1392,7 +1464,7 @@ y += incTableY;
       );
  */
       fill = [255, 255, 255];
-      values = [!singleFamily?thereAfterText:(thereAfterTextSF)];
+      values = [!singleFamily ? thereAfterText : thereAfterTextSF];
       //y += incY;
       y += incColourdRowsY;
       pdf.tableRow(fill, textColor, x, y, values, height, Widths);
@@ -1401,37 +1473,57 @@ y += incTableY;
       pdf.tableRow(
         fill,
         textColor,
-        x + 3.6,
+        x + 3.4,
         y,
         [
           "(" +
-            (
-              formatMoney(output.percentNeed2.reduce((a, b) => a + b, 0), 0, decimalChar, thousands)
+            formatMoney(
+              output.percentNeed2.reduce((a, b) => a + b, 0),
+              0,
+              decimalChar,
+              thousands
             ).toString() +
             "-" +
-            (
-              formatMoney(output.totalSource2ATaxAtDeath, 0, decimalChar, thousands)
+            formatMoney(
+              output.totalSource2ATaxAtDeath,
+              0,
+              decimalChar,
+              thousands
             ).toString() +
             ")",
         ],
-        height+.1,
+        height + 0.1,
         [1.2]
       );
 
       pdf.SetFontSize(PxToPt(16));
       fill = [196, 223, 224];
-      values2=(
-        formattedMoneyString(Math.max(0, output.percentNeed2.reduce((a, b) => a + b, 0) - output.totalSource2ATaxAtDeath),lang)
-        /* "$" +
+      values2 = formattedMoneyString(
+        Math.max(
+          0,
+          output.percentNeed2.reduce((a, b) => a + b, 0) -
+            output.totalSource2ATaxAtDeath
+        ),
+        lang
+      );
+      /* "$" +
         formatMoney(
           Math.max(0, output.percentNeed2.reduce((a, b) => a + b, 0) - output.totalSource2ATax),          
           0,
           decimalChar,
           thousands
         ) */
-      )
-      pdf.tableRowSingle(fill, textColor, x+4.6, y, values2, height, Widths, true);
-/* 
+      pdf.tableRowSingle(
+        fill,
+        textColor,
+        x + 4.6,
+        y,
+        values2,
+        height,
+        Widths,
+        true
+      );
+      /* 
       pdf.tableRow(
         fill,
         textColor,
@@ -1457,38 +1549,52 @@ y += incTableY;
       pdf.tableRow(
         fill,
         textColor,
-        x + 3.6,
+        x + 3.4,
         y,
         [
           "(" +
-            (
-              formatMoney(output.percentNeed1, 0, decimalChar, thousands)
+            formatMoney(
+              output.percentNeed1,
+              0,
+              decimalChar,
+              thousands
             ).toString() +
             "-" +
-            (
-              
-              formatMoney(output.totalSourceATaxAtDeath, 0, decimalChar, thousands)
+            formatMoney(
+              output.totalSourceATaxAtDeath,
+              0,
+              decimalChar,
+              thousands
             ).toString() +
             ")",
         ],
-        height+.1,
+        height + 0.1,
         [1.2]
       );
       pdf.SetFontSize(PxToPt(16));
       fill = [196, 223, 224];
-      
-      values2=(
-        formattedMoneyString(Math.max(0, output.percentNeed1 - output.totalSourceATaxAtDeath),lang)
-        /* "$" +
+
+      values2 = formattedMoneyString(
+        Math.max(0, output.percentNeed1 - output.totalSourceATaxAtDeath),
+        lang
+      );
+      /* "$" +
         formatMoney(
           Math.max(0, output.percentNeed1 - output.totalSourceATax),
           0,
           decimalChar,
           thousands
         ) */
-      )
-      pdf.tableRowSingle(fill, textColor, x+4.6, y, values2, height, Widths, true);
-      
+      pdf.tableRowSingle(
+        fill,
+        textColor,
+        x + 4.6,
+        y,
+        values2,
+        height,
+        Widths,
+        true
+      );
     }
 
     pdf.SetFontSize(PxToPt(16));
@@ -1517,15 +1623,6 @@ y += incTableY;
 
     pdf.addFooterAndHeader(headerOffset, footerText, headerText);
 
-   
-   
-   
-   
-   
-   
-   
-   
-   
     {
       // remove this page
       /* PAGE 7 Life info anal*/
@@ -1538,14 +1635,14 @@ y += incTableY;
     else pdf.SetFontSize(PxToPt(20));
 
     pdf.SetTextColor(0x45, 0x55, 0x60);
-    pdf.Text(OUTPUTTEXT[lang].pg7T, InToPt(1.5), InToPt(headerOffset+topToTitle_Y
+    pdf.Text(OUTPUTTEXT[lang].pg7T, InToPt(marginLeft), InToPt(headerOffset+topToTitle_Y
   ));
 
     pdf.SetFont(TIMES, NORMAL);
 
     pdf.SetFontSize(PxToPt(16));
 
-    x = 1.5;
+    x = marginLeft;
     y = headerOffset+titleToPara_Y;
     incY = 0.42;
     height = 0.35;
@@ -1633,7 +1730,7 @@ y += incTableY;
     );
 
     y += incY + 0.3;
-    pdf.DrawLine(InToPt(1.5), InToPt(y - 0.23), InToPt(PARA_WIDTH));
+    pdf.DrawLine(InToPt(marginLeft), InToPt(y - 0.23), InToPt(PARA_WIDTH));
     y += incY - 0.2;
     pdf.MultilineText(
       OUTPUTTEXT[lang].pg7TabRow6,
@@ -1713,14 +1810,16 @@ y += incTableY;
         pdf.tableRow(fill, textColor, x, y, values, height, Widths);
       }
     }
-    //  pdf.AddChart("bar1", InToPt(1.5), InToPt(y + 0.7), InToPt(4), InToPt(2));
+    //  pdf.AddChart("bar1", InToPt(marginLeft), InToPt(y + 0.7), InToPt(4), InToPt(2));
 
     pdf.addFooterAndHeader(headerOffset,footerText, headerText);
  */
     {
       /* PAGE 8 Life info anal 2 */
     }
-    result=result && pdf.addCustomImage(IMAGE_LOGO_OTHERPAGES, pg1TitleY, image,false,top);
+    result =
+      result &&
+      pdf.addCustomImage(IMAGE_LOGO_OTHERPAGES, pg1TitleY, image, false, top);
 
     Widths = [4.3, 1.2];
     pdf.SetFont(HELVETICA, NORMAL);
@@ -1728,19 +1827,24 @@ y += incTableY;
     else pdf.SetFontSize(PxToPt(20));
 
     pdf.SetTextColor(0x45, 0x55, 0x60);
-    pdf.Text(OUTPUTTEXT[lang].pg8T, InToPt(1.5), InToPt(headerOffset + topToTitle_Y
-  ));
+    pdf.Text(
+      OUTPUTTEXT[lang].pg8T,
+      InToPt(marginLeft),
+      InToPt(headerOffset + topToTitle_Y)
+    );
 
     pdf.SetFont(TIMES, NORMAL);
 
     pdf.SetFontSize(PxToPt(16));
 
-    x = 1.5;
+    x = marginLeft;
     y = headerOffset + titleToPara_Y;
     incY = 0.42;
     height = 0.35;
     //const Widths = 5;
-    values = [singlePerson?OUTPUTTEXT[lang].pg8TabT_1: OUTPUTTEXT[lang].pg8TabT];
+    values = [
+      singlePerson ? OUTPUTTEXT[lang].pg8TabT_1 : OUTPUTTEXT[lang].pg8TabT,
+    ];
     fill = [115, 153, 198];
     textColor = [255, 255, 255];
     pdf.tableRow(fill, textColor, x, y, values, height, [PARA_WIDTH]);
@@ -1761,16 +1865,14 @@ y += incTableY;
       InToPt(3)
     );
     pdf.Text(
-      (
-        formattedMoneyString(output.totalDisposeAsset - output.totalLiab,lang)
-        /* "$" +
+      formattedMoneyString(output.totalDisposeAsset - output.totalLiab, lang),
+      /* "$" +
         formatMoney(
           output.totalDisposeAsset - output.totalLiab,
           0,
           decimalChar,
           thousands
         ) */
-      ),
       InToPt(x + 4.42),
       InToPt(y + 0.21)
     );
@@ -1784,25 +1886,22 @@ y += incTableY;
     );
     y += incY - 0.1;
 
-    if(!singleFamily)
-    {
-    values = [
-      OUTPUTTEXT[lang].pg8TabRow3 + LEIfSpouseisSurvivor + ")",
-      (
-        formattedMoneyString(output.insNeedLE,lang)
+    if (!singleFamily) {
+      values = [
+        OUTPUTTEXT[lang].pg8TabRow3 + LEIfSpouseisSurvivor + ")",
+        formattedMoneyString(output.insNeedLE, lang),
         /* "$" + formatMoney(output.insNeedLE, 0, decimalChar, thousands) */
-      ),
-    ];
-    y += incY + 0.1;
-    pdf.tableRow(fill, textColor, x, y, values, height, Widths);
-  }
+      ];
+      y += incY + 0.1;
+      pdf.tableRow(fill, textColor, x, y, values, height, Widths);
+    }
 
     values = [
-      singleFamily? OUTPUTTEXT[lang].pg8TabRow4Alt.replace("A. ",""): OUTPUTTEXT[lang].pg8TabRow4,
-      (
-        formattedMoneyString(output.insNeedRet,lang)
-        /* "$" + formatMoney(output.insNeedRet, 0, decimalChar, thousands) */
-      ),
+      singleFamily
+        ? OUTPUTTEXT[lang].pg8TabRow4Alt.replace("A. ", "")
+        : OUTPUTTEXT[lang].pg8TabRow4,
+      formattedMoneyString(output.insNeedRet, lang),
+      /* "$" + formatMoney(output.insNeedRet, 0, decimalChar, thousands) */
     ];
     y += incY;
     pdf.tableRow(fill, textColor, x, y, values, height, Widths);
@@ -1810,12 +1909,17 @@ y += incTableY;
     if (output.hasChild) {
       if (output.ygChild < maxDur) {
         values = [
-          singleFamily?OUTPUTTEXT[lang].pg8TabRow5.replace("C.","B.").replace("25",output.youngestChildEndAge): OUTPUTTEXT[lang].pg8TabRow5.replace("25",output.youngestChildEndAge),
-          (
-            formattedMoneyString(output.insNeedYgChild25,lang)
-        /* "$" +
+          singleFamily
+            ? OUTPUTTEXT[lang].pg8TabRow5
+                .replace("C.", "B.")
+                .replace("25", output.youngestChildEndAge)
+            : OUTPUTTEXT[lang].pg8TabRow5.replace(
+                "25",
+                output.youngestChildEndAge
+              ),
+          formattedMoneyString(output.insNeedYgChild25, lang),
+          /* "$" +
             formatMoney(output.insNeedYgChild25, 0, decimalChar, thousands) */
-          ),
         ];
         y += incY;
         pdf.tableRow(fill, textColor, x, y, values, height, Widths);
@@ -1823,54 +1927,69 @@ y += incTableY;
 
       if (output.ygChild < orphAge) {
         values = [
-          singleFamily?OUTPUTTEXT[lang].pg8TabRow6.replace("D.","C."): OUTPUTTEXT[lang].pg8TabRow6,
-          (
-            formattedMoneyString(output.insNeedYgChild18,lang)
-        /* "$" +
+          singleFamily
+            ? OUTPUTTEXT[lang].pg8TabRow6.replace("D.", "C.")
+            : OUTPUTTEXT[lang].pg8TabRow6,
+          formattedMoneyString(output.insNeedYgChild18, lang),
+          /* "$" +
             formatMoney(output.insNeedYgChild18, 0, decimalChar, thousands) */
-          ),
         ];
         y += incY;
         pdf.tableRow(fill, textColor, x, y, values, height, Widths);
       }
     }
-    pdf.AddChart("bar2", InToPt(1.5), InToPt(y + 0.7), InToPt(4), InToPt(2));
+    pdf.AddChart("bar2", InToPt(marginLeft), InToPt(y + 0.7), InToPt(4), InToPt(2));
 
     pdf.addFooterAndHeader(headerOffset, footerText, headerText);
 
     {
       /* Nptes*/
     }
-    result=result && pdf.addCustomImage(IMAGE_LOGO_OTHERPAGES, pg1TitleY, image,false,top);
+    result =
+      result &&
+      pdf.addCustomImage(IMAGE_LOGO_OTHERPAGES, pg1TitleY, image, false, top);
 
     pdf.SetFont(HELVETICA, NORMAL);
     if (lang === "en") pdf.SetFontSize(PxToPt(25));
     else pdf.SetFontSize(PxToPt(20));
 
     pdf.SetTextColor(0x45, 0x55, 0x60);
-    pdf.Text(OUTPUTTEXT[lang].pg9T, InToPt(1.5), InToPt(headerOffset+topToTitle_Y
-  ));
+    pdf.Text(
+      OUTPUTTEXT[lang].pg9T,
+      InToPt(marginLeft),
+      InToPt(headerOffset + topToTitle_Y)
+    );
 
     paragraph = OUTPUTTEXT[lang].pg9P1;
     pdf.SetFont(TIMES, NORMAL);
     pdf.SetFontSize(PxToPt(16));
     pdf.SetTextColor(0x45, 0x55, 0x60);
-    pdf.MultilineText(paragraph, InToPt(1.5), InToPt(headerOffset+1.8), InToPt(PARA_WIDTH));
+    pdf.MultilineText(
+      paragraph,
+      InToPt(marginLeft),
+      InToPt(headerOffset + 1.8),
+      InToPt(PARA_WIDTH)
+    );
 
     //pdf.addFooterAndHeader(headerOffset,footerText, headerText);
-    pdf.addHeaderNoFooter(headerOffset,headerText);
+    pdf.addHeaderNoFooter(headerOffset, headerText);
     {
       /* Acknow*/
     }
-    result=result && pdf.addCustomImage(IMAGE_LOGO_OTHERPAGES, pg1TitleY, image,false,top);
+    result =
+      result &&
+      pdf.addCustomImage(IMAGE_LOGO_OTHERPAGES, pg1TitleY, image, false, top);
 
     pdf.SetFont(HELVETICA, NORMAL);
     if (lang === "en") pdf.SetFontSize(PxToPt(25));
     else pdf.SetFontSize(PxToPt(20));
 
     pdf.SetTextColor(0x45, 0x55, 0x60);
-    pdf.Text(OUTPUTTEXT[lang].pg10T, InToPt(1.5), InToPt(headerOffset + topToTitle_Y
-  ));
+    pdf.Text(
+      OUTPUTTEXT[lang].pg10T,
+      InToPt(marginLeft),
+      InToPt(headerOffset + topToTitle_Y)
+    );
 
     paragraph = OUTPUTTEXT[lang].pg10P1;
     pdf.SetFont(TIMES, NORMAL);
@@ -1878,7 +1997,7 @@ y += incTableY;
     pdf.SetTextColor(0x45, 0x55, 0x60);
     pdf.MultilineText(
       paragraph,
-      InToPt(1.5),
+      InToPt(marginLeft),
       InToPt(headerOffset + 1.8),
       InToPt(PARA_WIDTH)
     );
@@ -1887,7 +2006,7 @@ y += incTableY;
 
     pdf.SetFontSize(PxToPt(16));
 
-    x = 1.5;
+    x = marginLeft;
     y = headerOffset + 3.6;
     incY = 0.42;
     height = 0.35;
@@ -1926,11 +2045,14 @@ y += incTableY;
 
     pdf.Footer(OUTPUTTEXT[lang].pgFooter);
 
-    if(result===false)
-      alert(lang==="en"? "PDF image error, SVG extension is not supported":"Erreur d’image PDF, l’extension SVG n’est pas prise en charge")  
+    if (result === false)
+      alert(
+        lang === "en"
+          ? "PDF image error, SVG extension is not supported"
+          : "Erreur d’image PDF, l’extension SVG n’est pas prise en charge"
+      );
 
     // Done
     pdf.Save("INA_PDF.pdf");
   }
 }
-
