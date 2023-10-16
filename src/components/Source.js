@@ -250,7 +250,7 @@ export default class Source extends Component {
         s1.growthRate =
             parseInt(10000 * valueClean) / 10000; 
     }
-    console.log(s1)
+    //console.log(s1)
     if (changed){
        this.props.handleUpdate(s1);
        this.setState({ loading: this.props.disableAddRemove });

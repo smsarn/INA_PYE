@@ -241,7 +241,7 @@ function setSources(dataInput, avgTaxRate) {
   for (i = 0; i < dataInput.Sources.length; i++) {
     // find source owner avgtaxrate
 
-   /*  alert(Object.values(INCOMESOURCES).filter(
+    /*  alert(Object.values(INCOMESOURCES).filter(
       (obj) => obj.Key === sourceTypeKey
     )[0].value.en) */
     let avgTaxRate;
@@ -275,16 +275,20 @@ function setSources(dataInput, avgTaxRate) {
         amount: dataInput.Sources[i].amount,
         startYear: dataInput.Sources[i].startYear,
         duration: dataInput.Sources[i].duration,
-        annualGrowth: dataInput.Sources[i].growthRate===undefined?dataInput.Presentations[0].inflation / 100:dataInput.Sources[i].growthRate/100,
+        annualGrowth:
+          dataInput.Sources[i].growthRate === undefined
+            ? dataInput.Presentations[0].inflation / 100
+            : dataInput.Sources[i].growthRate / 100,
         taxRate:
-          (sourceTypeKey === INCOMESOURCES.DIVIDEND_INCOME.Key || sourceTypeKey === INCOMESOURCES.TAX_CREDIT.Key)
+          sourceTypeKey === INCOMESOURCES.DIVIDEND_INCOME.Key ||
+          sourceTypeKey === INCOMESOURCES.TAX_CREDIT.Key
             ? dataInput.Sources[i].taxRate / 100
             : avgTaxRate,
         ownerID: dataInput.Sources[i].ownerID,
       });
     }
   }
-  console.log(dataE)
+  //console.log(dataE)
   return dataE;
 }
 
@@ -345,7 +349,10 @@ function setProjSettings(age, dataInput, outputInsuranceNeed) {
     valuationDate: date,
     notes: dataInput.Presentations[0].notes,
     version: versionDetails().version,
-    caller: (!APPLET_EP && dataInput.Presentations[0].designedBy === "AMPLIFI") ? "AMPLIFI" : appletMode,
+    caller:
+      !APPLET_EP && dataInput.Presentations[0].designedBy === "AMPLIFI"
+        ? "AMPLIFI"
+        : appletMode,
     insuranceAmt: outputInsuranceNeed,
     overwriteProbate: dataInput.Presentations[0].overwriteProbate,
     contribsGrowByInflation: dataInput.Presentations[0].contribsGrowByInflation,
@@ -509,10 +516,9 @@ export function loadSavedDataToUI(savedJSon, dataInput) {
 
   dataInput.sourcesNo = savedJSon.personalIncomeSources.length;
 
-console.log(savedJSon.personalIncomeSources)
+  //console.log(savedJSon.personalIncomeSources)
 
   for (i = 0; i < savedJSon.personalIncomeSources.length; i++) {
-    
     dataInput.Sources.push({
       id: i + 1,
       //sourceTypeKey: Object.values(INCOMESOURCES).filter(obj => obj.ID=== savedJSon.personalIncomeSources[i].ID)[0].Key,
@@ -610,7 +616,9 @@ console.log(savedJSon.personalIncomeSources)
 
     adviserLogo: logo,
     appletImage: appletImage,
-    overwriteProbate: APPLET_INA? savedJSon.projectionSettings.overwriteProbate:false,
+    overwriteProbate: APPLET_INA
+      ? savedJSon.projectionSettings.overwriteProbate
+      : false,
     contribsGrowByInflation:
       savedJSon.projectionSettings.contribsGrowByInflation,
     withdsGrowByInflation: savedJSon.projectionSettings.withdsGrowByInflation,
@@ -722,7 +730,7 @@ export function getOutputValues(data) {
   const maxDur =
     provinceKey === "QC" ? MAX_ORPHAN_DUR_QC : MAX_ORPHAN_DUR_NON_QC;
   output.youngestChildEndAge = maxDur;
-  if (output.hasChild)
+  if (output.hasChild) {
     output.youngestChildEndAge = Math.min(
       maxDur,
       input.Clients.filter((item) => {
@@ -730,24 +738,28 @@ export function getOutputValues(data) {
       })[0].retirementAge
     );
 
-  //console.log(data);
-  output.insNeedYgChild25 = 0;
-  output.insNeedYgChild18 = 0;
+    //console.log(data);
+    output.insNeedYgChild25 = 0;
+    output.insNeedYgChild18 = 0;
 
-  
-  for (
-    let i = 0;
-    i < Math.min(output.youngestChildEndAge - output.ygChild,data.dataShortfall.length);
-    output.insNeedYgChild25 +=
-      data.dataShortfall[i++] / Math.pow(1 + output.invRate / 100, i - 1)
-  );
+    for (
+      let i = 0;
+      i <
+      Math.min(
+        output.youngestChildEndAge - output.ygChild,
+        data.dataShortfall.length
+      );
+      output.insNeedYgChild25 +=
+        data.dataShortfall[i++] / Math.pow(1 + output.invRate / 100, i - 1)
+    );
 
-  for (
-    let i = 0;
-    i < Math.min(18 - output.ygChild, data.dataShortfall.length);
-    output.insNeedYgChild18 +=
-      data.dataShortfall[i++] / Math.pow(1 + output.invRate / 100, i - 1)
-  );
+    for (
+      let i = 0;
+      i < Math.min(18 - output.ygChild, data.dataShortfall.length);
+      output.insNeedYgChild18 +=
+        data.dataShortfall[i++] / Math.pow(1 + output.invRate / 100, i - 1)
+    );
+  }
 
   output.insNeedYgChild25 =
     output.insNeedYgChild25 < 0 ? 0 : output.insNeedYgChild25;
@@ -760,13 +772,13 @@ export function getOutputValues(data) {
   output.liabilities = [];
 
   Object.values(LIABILITIES).forEach((element) => {
-    if (element.order > 0){
-    
+    if (element.order > 0) {
       output.liabilities.push({
         name: element.value[output.language],
         desc: "",
         value: 0,
-      });}
+      });
+    }
   });
 
   /* LIABILITIES[output.language].Values.forEach(function(element) {
@@ -810,17 +822,19 @@ export function getOutputValues(data) {
       element.liabTypeKey === LIABILITIES.PROBATE.Key
         ? 0
         : element.currValue;
-    if (pos !== undefined) 
-    {
-      
-        output.liabilities[pos].value += element.currValue;
-        output.liabilities[pos].desc += element.description + ",  ";
-        if(output.liabilities[pos].desc === ",  ") output.liabilities[pos].desc ="";
+    if (pos !== undefined) {
+      output.liabilities[pos].value += element.currValue;
+      output.liabilities[pos].desc += element.description + ",  ";
+      if (output.liabilities[pos].desc === ",  ")
+        output.liabilities[pos].desc = "";
     }
   });
-  for(let pos=0; pos<output.liabilities.length;pos++)
-  {
-    if (output.liabilities[pos].desc.length>=3) output.liabilities[pos].desc= output.liabilities[pos].desc.substring(0,output.liabilities[pos].desc.length-3)
+  for (let pos = 0; pos < output.liabilities.length; pos++) {
+    if (output.liabilities[pos].desc.length >= 3)
+      output.liabilities[pos].desc = output.liabilities[pos].desc.substring(
+        0,
+        output.liabilities[pos].desc.length - 3
+      );
   }
 
   output.clients = [];
@@ -852,7 +866,7 @@ export function getOutputValues(data) {
     )
       output.assets.push({
         name: element.value[output.language],
-        desc:"",
+        desc: "",
         value: 0,
         disposeValue: 0,
       });
@@ -909,20 +923,21 @@ export function getOutputValues(data) {
         : 0;
     output.totalDisposeAsset += showAsDisposed ? element.currValue : 0;
 
-    if (pos !== undefined && pos >= 0)
-    {
+    if (pos !== undefined && pos >= 0) {
       output.assets[pos].value += element.currValue;
       output.assets[pos].desc += element.description + ",  ";
-      if(output.assets[pos].desc === ",  ") output.assets[pos].desc ="";
+      if (output.assets[pos].desc === ",  ") output.assets[pos].desc = "";
     }
     if (showAsDisposed) output.assets[pos].disposeValue += element.currValue;
   });
 
-  for(let pos=0; pos<output.assets.length;pos++)
-  {
-    if (output.assets[pos].desc.length>=3) output.assets[pos].desc= output.assets[pos].desc.substring(0,output.assets[pos].desc.length-3)
+  for (let pos = 0; pos < output.assets.length; pos++) {
+    if (output.assets[pos].desc.length >= 3)
+      output.assets[pos].desc = output.assets[pos].desc.substring(
+        0,
+        output.assets[pos].desc.length - 3
+      );
   }
-
 
   let otherAssetsList = "";
   input.Assets.forEach((element) => {
@@ -974,7 +989,7 @@ export function getOutputValues(data) {
   // NOTE "this" is not available inside inline functions, hence:
   // or just use arrow functions
 
-  console.log(input.Sources)
+  //console.log(input.Sources)
   let srcOrphan = INCOMESOURCES.GOV_ORPHANS_BENEFIT.Key; //value[output.language];
   // console.log(input.Sources);
   input.Sources.forEach(function (element) {
@@ -982,7 +997,7 @@ export function getOutputValues(data) {
 			output.sources.filter(i => i.name === element.Type)[0]
 		  );
 		   */
-      console.log(element)
+    //(element)
     let pos = output.sources.indexOf(
       output.sources.filter(
         (i) =>
@@ -993,12 +1008,13 @@ export function getOutputValues(data) {
             output.language
           )
       )[0]
-
-      
     );
-    
-    if(element.taxRate===undefined || element.taxRate===null)
-    element.taxRate=input.Clients.length > 1?input.Clients[QUOTE_SPOUSE].avgTaxRate:input.Clients[QUOTE_CLIENT].avgTaxRate
+
+    if (element.taxRate === undefined || element.taxRate === null)
+      element.taxRate =
+        input.Clients.length > 1
+          ? input.Clients[QUOTE_SPOUSE].avgTaxRate
+          : input.Clients[QUOTE_CLIENT].avgTaxRate;
 
     if (element.sourceTypeKey === srcDB) {
       // add gov DB
@@ -1007,23 +1023,29 @@ export function getOutputValues(data) {
       output.totalDisposeAsset += output.govDB;
     } else {
       output.totalSource += parseFloat(element.amount);
-      output.totalSourceATax += parseFloat(element.amount * (1 - element.taxRate / 100));
-      
+      output.totalSourceATax += parseFloat(
+        element.amount * (1 - element.taxRate / 100)
+      );
 
       if (element.startYear === 0) {
         output.totalSourceAtDeath += parseFloat(element.amount);
-        output.totalSourceATaxAtDeath += parseFloat(element.amount) * (1 - element.taxRate / 100);
-      } 
+        output.totalSourceATaxAtDeath +=
+          parseFloat(element.amount) * (1 - element.taxRate / 100);
+      }
       // no orphans
       output.totalSource2 +=
         element.sourceTypeKey !== srcOrphan ? parseFloat(element.amount) : 0;
       output.totalSource2ATax +=
-        element.sourceTypeKey !== srcOrphan ? parseFloat(element.amount) * (1 - element.taxRate / 100) : 0;
-      if (element.startYear === 0){
+        element.sourceTypeKey !== srcOrphan
+          ? parseFloat(element.amount) * (1 - element.taxRate / 100)
+          : 0;
+      if (element.startYear === 0) {
         output.totalSource2AtDeath +=
           element.sourceTypeKey !== srcOrphan ? parseFloat(element.amount) : 0;
-        output.totalSource2ATaxAtDeath +=  
-        element.sourceTypeKey !== srcOrphan ? parseFloat(element.amount) * (1 - element.taxRate / 100) : 0;
+        output.totalSource2ATaxAtDeath +=
+          element.sourceTypeKey !== srcOrphan
+            ? parseFloat(element.amount) * (1 - element.taxRate / 100)
+            : 0;
       }
     }
     if (pos !== undefined) {
@@ -1038,7 +1060,7 @@ export function getOutputValues(data) {
       i.name !== getListItemNameFromKey(INCOMESOURCES, srcDB, output.language)
   ); //output.srcDB);
   // after tax
-/*   output.totalSourceATax =
+  /*   output.totalSourceATax =
     input.Clients.length > 1
       ? output.totalSource * (1 - element.taxRate / 100)
       : output.totalSource * (1 - input.Clients[QUOTE_CLIENT].avgTaxRate / 100);
@@ -1146,5 +1168,4 @@ function findMatchingKey(objValues, nameFromFile) {
   )[0].Key;
 }
 
-export function sendToReloadINA()
-{}
+export function sendToReloadINA() {}

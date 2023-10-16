@@ -470,7 +470,7 @@ export default class OutputGraphs extends React.Component {
             {/* PAGE 1 cover*/}
             <div className="newPage" id="Page1">
               <div style={{ width: "90%" }}>
-                <h2 className="ppi2 print-only">
+                <h2 className="ppi2 printOnly">
                   {OUTPUTTEXT[lang].pgAppendix +
                     ": " +
                     OUTPUTTEXT[lang].pgAppendixT}
@@ -539,7 +539,7 @@ export default class OutputGraphs extends React.Component {
               <pagebreak />
             </div>
             {/* PAGE 2*/}
-            <div className="print-only newPage" id="Page2">
+            <div className="printOnly newPage" id="Page2">
               {this.useNewPDFMethod && (
                 <div className="printOnly" style={{ width: "90%" }}>
                   <AggregateGrid

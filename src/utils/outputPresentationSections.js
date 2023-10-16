@@ -4,10 +4,6 @@ import OutputPage from "../components/outputPage.js";
 
 import {
   ASSETS,
-  APPLET_INA,
-  DISPLAY_LIFEEXP,
-  DISPLAY_ENDAGE,
-  DISPLAY_RETIREMENT,
   MAX_ORPHAN_DUR_QC,
   MAX_ORPHAN_DUR_NON_QC,
   ORPHAN_AGE_QC,
@@ -19,7 +15,6 @@ import {
   TITLES,
   IMAGE_APPLET_INA,
   IMAGE_APPLET_EP,
-  COVER_IMAGE_BASE64_INA,
   INCOMESOURCES,
 } from "../definitions/generalDefinitions";
 
@@ -62,6 +57,7 @@ import { MultiButtons } from "../components/MultiButtons";
 import DataTable from "../components/GridExcelComponent/DataTable";
 
 const ABOUTME_IMAGE = "aboutMeImage";
+const GRID_BREAK = 30;
 
 export function getINAPages(
   props,
@@ -126,8 +122,6 @@ export function getINAPages(
   let maxDur = provinceKey === "QC" ? MAX_ORPHAN_DUR_QC : MAX_ORPHAN_DUR_NON_QC;
   let orphAge = provinceKey === "QC" ? ORPHAN_AGE_QC : ORPHAN_AGE_NON_QC;
 
-
-  
   // graph details
   const options = {
     legend: {
@@ -279,7 +273,7 @@ export function getINAPages(
         ) : (
           <img
             ID={IMAGE_APPLET_INA}
-            style={{ maxWidth: "100%", maxHeight:"400px" }}
+            style={{ maxWidth: "100%", maxHeight: "400px" }}
             src={appletImage}
           />
         )}
@@ -353,7 +347,7 @@ export function getINAPages(
           </thead>
           <tbody>
             {output.clients.map((item) => (
-              <tr key={item.id} >
+              <tr key={item.id}>
                 <td>
                   {item.memberKey === MEMBER.CLIENT.Key
                     ? MEMBER.CLIENT.value[lang] + getName(item.name, lang)
@@ -723,34 +717,36 @@ export function getINAPages(
         <table className="INA">
           <thead>
             <tr>
-              <th style={{ width: "38%" }}>{labelsBilingual.pg3TabT}  </th>
+              <th style={{ width: "38%" }}>{labelsBilingual.pg3TabT} </th>
               <th style={{ width: "44%" }}>{labelsBilingual.pg3TabT2}</th>{" "}
               <th style={{ width: "18%" }}>{labelsBilingual.pg3TabT3}</th>
-              
             </tr>
           </thead>
           <tbody>
             {output.liabilities.map((item) => {
+              return (
+                <tr key={item.name}>
+                  <td>{item.name}</td>
+                  <td>{item.desc !== undefined ? item.desc : ""}</td>
+                  <td className="textalignright">
+                    <span data-ppi-noneditable>
+                      {formatted(item.value, lang)}
+                    </span>
 
-
-            return(
-              <tr key={item.name}>
-                <td >{item.name}</td>
-                <td >{item.desc!==undefined ? item.desc:""}</td>
-                <td className="textalignright">
-                <span data-ppi-noneditable>{formatted(item.value, lang)}</span>
-
-                  {/*       {dollarEn}{formatMoney(item.value, 0, decimalChar, thousands)} */}
-                </td>
-              </tr>)}
-            )}
+                    {/*       {dollarEn}{formatMoney(item.value, 0, decimalChar, thousands)} */}
+                  </td>
+                </tr>
+              );
+            })}
             <tr className="backgroundcolorDCE5F0">
               <td colSpan="2">
                 <strong>{labelsBilingual.pg3TabRTot}</strong>
               </td>
               <td className="textalignright">
                 <strong>
-                <span data-ppi-noneditable>{formatted(output.totalLiab, lang)}</span>
+                  <span data-ppi-noneditable>
+                    {formatted(output.totalLiab, lang)}
+                  </span>
 
                   {/*       {dollarEn}
               {formatMoney(
@@ -798,7 +794,9 @@ export function getINAPages(
                   : labelsBilingual.pg4TabRow1}
               </td>
               <td className="textalignright">
-              <span data-ppi-noneditable>{formatted(output.Income + output.Income2, lang)}</span>
+                <span data-ppi-noneditable>
+                  {formatted(output.Income + output.Income2, lang)}
+                </span>
 
                 {/*     {dollarEn}
             {formatMoney(
@@ -837,7 +835,9 @@ export function getINAPages(
             )}
             {output.percent2.length === 0 && (
               <tr>
-                <td className="paddingleft25">{singleFamily ?thereAfterTextSF:thereAfterText}</td>
+                <td className="paddingleft25">
+                  {singleFamily ? thereAfterTextSF : thereAfterText}
+                </td>
                 <td className="textalignright">{output.percent1}%</td>
               </tr>
             )}
@@ -870,7 +870,9 @@ export function getINAPages(
             )}
             {output.percent2.length > 0 && (
               <tr>
-                <td className="paddingleft25">{singleFamily?thereAfterTextSF:thereAfterText}</td>
+                <td className="paddingleft25">
+                  {singleFamily ? thereAfterTextSF : thereAfterText}
+                </td>
                 <td className="textalignright">
                   {formatted(
                     output.percentNeed2.reduce((a, b) => a + b, 0),
@@ -889,7 +891,9 @@ export function getINAPages(
             )}
             {output.percent2.length === 0 && (
               <tr>
-                <td className="paddingleft25">{singleFamily?thereAfterTextSF:thereAfterText}</td>
+                <td className="paddingleft25">
+                  {singleFamily ? thereAfterTextSF : thereAfterText}
+                </td>
                 <td className="textalignright">
                   {formatted(output.percentNeed1, lang)}
 
@@ -927,7 +931,7 @@ export function getINAPages(
           width: "100%",
         }}
       >
-        <table className="INA">
+        <table className="INA"  data-ppi-noneditable>
           <thead>
             <tr>
               <th style={{ width: "34%" }}>{labelsBilingual.pg5TabT}</th>
@@ -960,7 +964,7 @@ export function getINAPages(
                 return (
                   <tr key={item.name}>
                     <td>{item.name}</td>
-                    <td>{item.desc!==undefined && item.desc}</td>
+                    <td>{item.desc !== undefined && item.desc}</td>
                     <td className="textalignright">
                       <span data-ppi-noneditable>
                         {formatted(item.value, lang)}
@@ -1157,23 +1161,25 @@ export function getINAPages(
                 </td>
 
                 <td className="textalignright">
-                  
-                    (
-                      <span style={{ fontSize: ".8em" }} data-ppi-noneditable>{formatMoney(
+                  (
+                  <span style={{ fontSize: ".8em" }} data-ppi-noneditable>
+                    {formatMoney(
                       output.percentNeed1,
                       0,
                       decimalChar,
                       thousands
-                    )}</span>
-                    -
-                    <span style={{ fontSize: ".8em" }} data-ppi-noneditable>{formatMoney(
+                    )}
+                  </span>
+                  -
+                  <span style={{ fontSize: ".8em" }} data-ppi-noneditable>
+                    {formatMoney(
                       output.totalSourceATaxAtDeath,
                       0,
                       decimalChar,
                       thousands
-                    )}</span>
-                    )
-                  
+                    )}
+                  </span>
+                  )
                 </td>
 
                 <td className="textalignright">
@@ -1197,26 +1203,29 @@ export function getINAPages(
                   {!singleFamily ? thereAfterText : thereAfterTextSF}
                 </td>
                 <td className="textalignrightbackgroundcolorDCE5F0">
-                  
-                    (
-                      <span style={{ fontSize: ".8em" }} data-ppi-noneditable>  {formatMoney(
+                  (
+                  <span style={{ fontSize: ".8em" }} data-ppi-noneditable>
+                    {" "}
+                    {formatMoney(
                       output.percentNeed2.reduce((a, b) => a + b, 0),
                       0,
                       decimalChar,
                       thousands
-                    )}</span>
-                    -
-                    <span style={{ fontSize: ".8em" }} data-ppi-noneditable>{
+                    )}
+                  </span>
+                  -
+                  <span style={{ fontSize: ".8em" }} data-ppi-noneditable>
+                    {
                       /* formatMoney(output.totalSource2ATax, 0, decimalChar, thousands) */
-                     formatMoney(
+                      formatMoney(
                         output.totalSource2ATaxAtDeath,
                         0,
                         decimalChar,
                         thousands
                       )
-                    }</span>
-                    )
-                  
+                    }
+                  </span>
+                  )
                 </td>
                 <td className="textalignrightbackgroundcolorDCE5F0">
                   <strong>
@@ -1500,7 +1509,7 @@ export function getINAPages(
   let pages = [];
   /* cover page */
 
-  console.log(aboutMeSpecs, includeAboutMe);
+  // console.log(aboutMeSpecs, includeAboutMe);
   pages.push(pageCover);
   /* AboutMe page if requested */
   {
@@ -1568,6 +1577,10 @@ export function getINAPages(
   return { allPages: allPages, refPage: refPage };
 }
 
+function get_td(amount, lang) {
+  return <td className="textalignright">{formatMoney2(amount, 0, lang)}</td>;
+}
+
 export function getEPPages(
   props,
   appletImage,
@@ -1626,10 +1639,6 @@ export function getEPPages(
     ); //<div><Loader type="TailSpin" color="black" height={30} width={30} /></div>
   }
 
-  /* const allPages =
-      props.dataInput.Presentations[0].adviserLogo.image !== null &&
-      props.dataInput.Presentations[0].adviserLogo.allPages;
- */
   let j = 0;
 
   const images = getLogoAndAppletImage(
@@ -1639,9 +1648,6 @@ export function getEPPages(
     props.updateImageApplet,
     props.updateImageLogo
   );
-  const logoTop = images.logoTop;
-  const logoBottom = images.logoBottom;
-  const headerTitle = TITLES[lang].appletEP;
   const aboutMeSpecs = props.aboutMe;
 
   const logoOnTop = images.logoOnTop;
@@ -1650,14 +1656,10 @@ export function getEPPages(
   const logoFirstPg = images.logo1stPage1; //<div style={{marginLeft:marginLeft1stPg + "%"}}><img className="logo1st" src={props.dataInput.Presentations[0].adviserLogo.image} /></div>;
   const hasLogo = props.dataInput.Presentations[0].adviserLogo !== null;
 
-  const styleAmtCell = { textAlign: "right", height: "1px" };
-
-  console.log(props.aggregateGrid, props.dataInput);
-
   // build simple agg grid:
 
   const aggGrid = buildSimpleAggregateGridEP(props.aggregateGrid);
-  console.log(aggGrid);
+  //console.log(aggGrid);
 
   const ABOUTME_IMAGE = "aboutMeImage";
 
@@ -1690,22 +1692,24 @@ export function getEPPages(
         ) : (
           <img
             ID={IMAGE_APPLET_EP}
-            style={{ maxWidth: "100%", maxHeight:"400px" }}
+            style={{ maxWidth: "100%", maxHeight: "400px" }}
             src={appletImage}
           />
         )}
       </div>
 
-      <h5 className="ppi2">
-        {labelsBilingual.pg1P1} {output.designedFor}
-        <br />
-        {labelsBilingual.pg1P2} {output.designedBy}
-        <br />
-        {labelsBilingual.pg1P3} {output.dateApplet}
-        <br />
-        {labelsBilingual.pg1P4} {output.province}
-        <br />
-      </h5>
+      <div>
+        <h5 className="ppi2">
+          {labelsBilingual.pg1P1} {output.designedFor}
+          <br />
+          {labelsBilingual.pg1P2} {output.designedBy}
+          <br />
+          {labelsBilingual.pg1P3} {output.dateApplet}
+          <br />
+          {labelsBilingual.pg1P4} {output.province}
+          <br />
+        </h5>
+      </div>
     </div>
   );
 
@@ -1775,19 +1779,17 @@ export function getEPPages(
               <table
                 className="EP"
                 style={{ paddingLeft: "10px", width: "100%" }}
-              >
+                data-ppi-noneditable>
                 <tbody>
                   <tr>
-                    <th className="tableTitleEP" colSpan="2">
-                      {labelsBilingual.pg3TabT}
-                    </th>
+                    <th colSpan="2">{labelsBilingual.pg3TabT}</th>
                   </tr>
                   {/* add assets*/}
                   {output.assets.map((item) => {
                     totalAssets += item.value;
                     return (
                       <tr key={item.name}>
-                        <td style={{ height: "1px", width: "65%" }}>
+                        <td style={{ width: "65%" }}>
                           {item.name}
                           {item.name === ASSETS.OTHER_ASSETS.value[lang] &&
                           item.value > 0
@@ -1798,7 +1800,6 @@ export function getEPPages(
                           className="textalignright"
                           style={{ height: "1px" }}
                         >
-                          {/* ${formatMoney(item.value, 0, ",", ",")} */}
                           {formatMoney2(item.value, 0, lang)}
                         </td>
                       </tr>
@@ -1815,7 +1816,6 @@ export function getEPPages(
                   >
                     <td>{labelsBilingual.pg3Tab2RTot}</td>
                     <td className="textalignright" style={{ height: "1px" }}>
-                      {/* ${formatMoney(totalAssets, 0, ",", ",")} */}
                       {formatMoney2(totalAssets, 0, lang)}
                     </td>
                   </tr>
@@ -1842,12 +1842,10 @@ export function getEPPages(
               <table
                 className="EP"
                 style={{ paddingLeft: "10px", width: "100%" }}
-              >
+                data-ppi-noneditable>
                 <tbody>
                   <tr>
-                    <th className="tableTitleEP" colSpan="2">
-                      {labelsBilingual.pg3Tab2T}
-                    </th>
+                    <th colSpan="2">{labelsBilingual.pg3Tab2T}</th>
                   </tr>
                   {/* liabs*/}
                   {output.liabilities.map((item) => {
@@ -1856,7 +1854,6 @@ export function getEPPages(
                       <tr key={item.name}>
                         <td style={{ width: "60%" }}>{item.name}</td>
                         <td className="textalignright">
-                          {/* ${formatMoney(item.value, 0, ",", ",")} */}
                           {formatMoney2(item.value, 0, lang)}
                         </td>
                       </tr>
@@ -1873,7 +1870,6 @@ export function getEPPages(
                   >
                     <td>{labelsBilingual.pg3Tab2RTot}</td>
                     <td className="textalignright" style={{ height: "1px" }}>
-                      {/* ${formatMoney(totalLiabs, 0, ",", ",")} */}
                       {formatMoney2(totalLiabs, 0, lang)}
                     </td>
                   </tr>
@@ -1888,7 +1884,6 @@ export function getEPPages(
                   >
                     <td>{labelsBilingual.pg3Tab2NW}</td>
                     <td className="textalignright" style={{ height: "1px" }}>
-                      {/* ${formatMoney(totalAssets-totalLiabs, 0, ",", ",")} */}
                       {formatMoney2(totalAssets - totalLiabs, 0, lang)}
                     </td>
                   </tr>
@@ -1914,19 +1909,20 @@ export function getEPPages(
             <table
               className="EP"
               style={{ paddingLeft: "10px", width: "100%" }}
+              data-ppi-noneditable
             >
               <tbody>
                 <tr>
-                  <th className="tableTitleEP" style={{ width: "30%" }}>
+                  <th style={{ width: "30%" }}>
                     {labelsBilingual.pg3Tab3R1C1}
                   </th>
-                  <th className="tableTitleEP" style={{ width: "20%" }}>
+                  <th style={{ width: "20%" }}>
                     {labelsBilingual.pg3Tab3R1C2}
                   </th>
-                  <th className="tableTitleEP" style={{ width: "20%" }}>
+                  <th style={{ width: "20%" }}>
                     {labelsBilingual.pg3Tab3R1C3}
                   </th>
-                  <th className="tableTitleEP" style={{ width: "20%" }}>
+                  <th style={{ width: "20%" }}>
                     {labelsBilingual.pg3Tab3R1C4}
                   </th>
                 </tr>
@@ -1939,40 +1935,19 @@ export function getEPPages(
                       ]
                     }
                   </td>
-                  <td className="textalignright">
-                    {/* $
-              {formatMoney(
-                this.AssetLiabProjs.EstateLiabsByType[ASSET_TAX_TYPE_REAL_ESTATE],
-                0,
-                ",",
-                ","
-              )} */}
-                    {formatMoney2(
-                      AssetLiabProjs.EstateLiabsByType[
-                        ASSET_TAX_TYPE_REAL_ESTATE
-                      ],
-                      0,
-                      lang
-                    )}
-                  </td>
-                  <td className="textalignright">
-                    {/* $
-              {formatMoney(
-                this.AssetLiabProjs.EstateLiabsByTypeLE3[
-                  ASSET_TAX_TYPE_REAL_ESTATE
-                ],
-                0,
-                ",",
-                ","
-              )} */}
-                    {formatMoney2(
-                      AssetLiabProjs.EstateLiabsByTypeLE3[
-                        ASSET_TAX_TYPE_REAL_ESTATE
-                      ],
-                      0,
-                      lang
-                    )}
-                  </td>
+                  {get_td(
+                    AssetLiabProjs.EstateLiabsByType[
+                      ASSET_TAX_TYPE_REAL_ESTATE
+                    ],
+                    lang
+                  )}
+
+                  {get_td(
+                    AssetLiabProjs.EstateLiabsByTypeLE3[
+                      ASSET_TAX_TYPE_REAL_ESTATE
+                    ],
+                    lang
+                  )}
                 </tr>
                 <tr>
                   <td>{labelsBilingual.pg3Tab3R3C1}</td>
@@ -1983,36 +1958,14 @@ export function getEPPages(
                       ]
                     }
                   </td>
-                  <td className="textalignright">
-                    {/* $
-              {formatMoney(
-                this.AssetLiabProjs.EstateLiabsByType[ASSET_TAX_TYPE_STOCKS],
-                0,
-                ",",
-                ","
-              )} */}
-                    {formatMoney2(
-                      AssetLiabProjs.EstateLiabsByType[ASSET_TAX_TYPE_STOCKS],
-                      0,
-                      lang
-                    )}
-                  </td>
-                  <td className="textalignright">
-                    {/* $
-              {formatMoney(
-                this.AssetLiabProjs.EstateLiabsByTypeLE3[ASSET_TAX_TYPE_STOCKS],
-                0,
-                ",",
-                ","
-              )} */}
-                    {formatMoney2(
-                      AssetLiabProjs.EstateLiabsByTypeLE3[
-                        ASSET_TAX_TYPE_STOCKS
-                      ],
-                      0,
-                      lang
-                    )}
-                  </td>
+                  {get_td(
+                    AssetLiabProjs.EstateLiabsByType[ASSET_TAX_TYPE_STOCKS],
+                    lang
+                  )}
+                  {get_td(
+                    AssetLiabProjs.EstateLiabsByTypeLE3[ASSET_TAX_TYPE_STOCKS],
+                    lang
+                  )}
                 </tr>
                 <tr>
                   <td>{labelsBilingual.pg3Tab3R4C1}</td>
@@ -2023,38 +1976,16 @@ export function getEPPages(
                       ]
                     }
                   </td>
-                  <td className="textalignright">
-                    {/* $
-              {formatMoney(
-                this.AssetLiabProjs.EstateLiabsByType[ASSET_TAX_TYPE_SMALL_BUS],
-                0,
-                ",",
-                ","
-              )} */}
-                    {formatMoney2(
-                      AssetLiabProjs.EstateLiabsByType[
-                        ASSET_TAX_TYPE_SMALL_BUS
-                      ],
-                      0,
-                      lang
-                    )}
-                  </td>
-                  <td className="textalignright">
-                    {/* $
-              {formatMoney(
-                AssetLiabProjs.EstateLiabsByTypeLE3[ASSET_TAX_TYPE_SMALL_BUS],
-                0,
-                ",",
-                ","
-              )} */}
-                    {formatMoney2(
-                      AssetLiabProjs.EstateLiabsByTypeLE3[
-                        ASSET_TAX_TYPE_SMALL_BUS
-                      ],
-                      0,
-                      lang
-                    )}
-                  </td>
+                  {get_td(
+                    AssetLiabProjs.EstateLiabsByType[ASSET_TAX_TYPE_SMALL_BUS],
+                    lang
+                  )}
+                  {get_td(
+                    AssetLiabProjs.EstateLiabsByTypeLE3[
+                      ASSET_TAX_TYPE_SMALL_BUS
+                    ],
+                    lang
+                  )}
                 </tr>
                 <tr>
                   <td>{labelsBilingual.pg3Tab3R5C1}</td>
@@ -2065,34 +1996,14 @@ export function getEPPages(
                       ]
                     }
                   </td>
-                  <td className="textalignright">
-                    {/* $
-              {formatMoney(
-                AssetLiabProjs.EstateLiabsByType[ASSET_TAX_TYPE_RRSP],
-                0,
-                ",",
-                ","
-              )} */}
-                    {formatMoney2(
-                      AssetLiabProjs.EstateLiabsByType[ASSET_TAX_TYPE_RRSP],
-                      0,
-                      lang
-                    )}
-                  </td>
-                  <td className="textalignright">
-                    {/* $
-              {formatMoney(
-                AssetLiabProjs.EstateLiabsByTypeLE3[ASSET_TAX_TYPE_RRSP],
-                0,
-                ",",
-                ","
-              )} */}
-                    {formatMoney2(
-                      AssetLiabProjs.EstateLiabsByTypeLE3[ASSET_TAX_TYPE_RRSP],
-                      0,
-                      lang
-                    )}
-                  </td>
+                  {get_td(
+                    AssetLiabProjs.EstateLiabsByType[ASSET_TAX_TYPE_RRSP],
+                    lang
+                  )}
+                  {get_td(
+                    AssetLiabProjs.EstateLiabsByTypeLE3[ASSET_TAX_TYPE_RRSP],
+                    lang
+                  )}
                 </tr>
                 <tr>
                   <td>{labelsBilingual.pg3Tab3R6C1}</td>
@@ -2103,36 +2014,16 @@ export function getEPPages(
                       ]
                     }
                   </td>
-                  <td className="textalignright">
-                    {/* $
-              {formatMoney(
-                AssetLiabProjs.EstateLiabsByType[ASSET_TAX_TYPE_INTEREST],
-                0,
-                ",",
-                ","
-              )} */}
-                    {formatMoney2(
-                      AssetLiabProjs.EstateLiabsByType[ASSET_TAX_TYPE_INTEREST],
-                      0,
-                      lang
-                    )}
-                  </td>
-                  <td className="textalignright">
-                    {/* $
-              {formatMoney(
-                AssetLiabProjs.EstateLiabsByTypeLE3[ASSET_TAX_TYPE_INTEREST],
-                0,
-                ",",
-                ","
-              )} */}
-                    {formatMoney2(
-                      AssetLiabProjs.EstateLiabsByTypeLE3[
-                        ASSET_TAX_TYPE_INTEREST
-                      ],
-                      0,
-                      lang
-                    )}
-                  </td>
+                  {get_td(
+                    AssetLiabProjs.EstateLiabsByType[ASSET_TAX_TYPE_INTEREST],
+                    lang
+                  )}
+                  {get_td(
+                    AssetLiabProjs.EstateLiabsByTypeLE3[
+                      ASSET_TAX_TYPE_INTEREST
+                    ],
+                    lang
+                  )}
                 </tr>
                 <tr>
                   <td>{labelsBilingual.pg3Tab3R7C1}</td>
@@ -2143,34 +2034,15 @@ export function getEPPages(
                       ]
                     }
                   </td>
-                  <td className="textalignright">
-                    {/* $
-              {formatMoney(
-                AssetLiabProjs.EstateLiabsByType[ASSET_TAX_TYPE_INTEREST],
-                0,
-                ",",
-                ","
-              )} */}
-                    {formatMoney2(
-                      AssetLiabProjs.EstateLiabsByType[ASSET_TAX_TYPE_OTHER],
-                      0,
-                      lang
-                    )}
-                  </td>
-                  <td className="textalignright">
-                    {/* $
-              {formatMoney(
-                AssetLiabProjs.EstateLiabsByTypeLE3[ASSET_TAX_TYPE_INTEREST],
-                0,
-                ",",
-                ","
-              )} */}
-                    {formatMoney2(
-                      AssetLiabProjs.EstateLiabsByTypeLE3[ASSET_TAX_TYPE_OTHER],
-                      0,
-                      lang
-                    )}
-                  </td>
+
+                  {get_td(
+                    AssetLiabProjs.EstateLiabsByType[ASSET_TAX_TYPE_OTHER],
+                    lang
+                  )}
+                  {get_td(
+                    AssetLiabProjs.EstateLiabsByTypeLE3[ASSET_TAX_TYPE_OTHER],
+                    lang
+                  )}
                 </tr>
                 <tr
                   style={{
@@ -2179,22 +2051,8 @@ export function getEPPages(
                   }}
                 >
                   <td colSpan="2">{labelsBilingual.pg3Tab3R8C1}</td>
-                  <td className="textalignright">
-                    {/* ${formatMoney(AssetLiabProjs.EstateLiabsByTypeTotal, 0, ",", ",")} */}
-                    {formatMoney2(
-                      AssetLiabProjs.EstateLiabsByTypeTotal,
-                      0,
-                      lang
-                    )}
-                  </td>
-                  <td className="textalignright">
-                    {/* ${formatMoney(AssetLiabProjs.EstateLiabsByTypeLE3Total, 0, ",", ",")} */}
-                    {formatMoney2(
-                      AssetLiabProjs.EstateLiabsByTypeLE3Total,
-                      0,
-                      lang
-                    )}
-                  </td>
+                  {get_td(AssetLiabProjs.EstateLiabsByTypeTotal, lang)}
+                  {get_td(AssetLiabProjs.EstateLiabsByTypeLE3Total, lang)}
                 </tr>
               </tbody>
             </table>
@@ -2227,7 +2085,7 @@ export function getEPPages(
         <div className="outputSectionTitle"> {labelsBilingual.pg4T}</div>
         <p className="ppi2">{labelsBilingual.pg4P1}</p>
       </div>
-      <div style={{ maxWidth: "650px" }}>
+      <div style={{ maxWidth: "550px" }} data-ppi-noneditable>
         {loaded === true && (
           <OutputGraphStacked
             language={lang}
@@ -2244,27 +2102,25 @@ export function getEPPages(
         className="ppi2"
         style={{
           color: "darkgrey",
-          marginTop: "30px",
           fontSize: "12px",
-          float: "left",
-          clear: "both",
-        }}
+        }} data-ppi-noneditable
       >
         {labelsBilingual.pg4P2 + LE + ")"}
       </div>
-      <p
-        className="ppi2"
-        style={{
-          backgroundColor: "lightgrey",
-          width: "84%",
-          marginTop: "30px",
-          paddingTop: "10px",
-          paddingBottom: "12px",
-          marginLeft: "30px",
-          float: "left",
-        }}
-      >
+      <p className="EPGreyMsg" data-ppi-noneditable>
         {labelsBilingual.pg4P3
+          .replace(
+            "G1",
+            AssetLiabProjs.EstateLiabsByTypeTotal <
+              AssetLiabProjs.EstateLiabsByTypeLE3Total
+              ? lang === "en"
+                ? "grows"
+                : "passe"
+              : lang === "en"
+              ? "changes"
+              : "passe"
+          )
+
           .replace(
             "X1",
             formatMoney2(AssetLiabProjs.EstateLiabsByTypeTotal, 0, lang)
@@ -2274,7 +2130,10 @@ export function getEPPages(
             formatMoney2(AssetLiabProjs.EstateLiabsByTypeLE3Total, 0, lang)
           )}
       </p>
-      <div>
+      <p className="ppi2">
+        {OUTPUTTEXTEP[lang].graphsLeakageT1} <br />
+      </p>
+      <div data-ppi-noneditable>
         <OutputGraphsEPLeakage
           insuranceNeed={props.insuranceNeed}
           projectEnd={startAge + LE + 3}
@@ -2322,19 +2181,7 @@ export function getEPPages(
           </p>
         ))}
 
-        <p
-          className="ppi2"
-          style={{
-            backgroundColor: "lightgrey",
-            width: "84%",
-            marginTop: "30px",
-            paddingTop: "10px",
-            paddingBottom: "12px",
-            marginLeft: "30px",
-          }}
-        >
-          {labelsBilingual.pg5Plast}
-        </p>
+        <p className="EPGreyMsg">{labelsBilingual.pg5Plast}</p>
       </div>
     </div>
   );
@@ -2372,14 +2219,69 @@ export function getEPPages(
   {
     /* PAGE 7 appendix ledgers*/
   }
-  const pageAggGrid = (
+
+  let pageAggGrid = [];
+
+  aggGrid.map((grid, index) => {
+    const styleP = index > 0 ? "ppi2  printOnly" : "ppi2";
+    pageAggGrid.push(
+      <div className="newPage" id={"PageAggGrid".concat(index)}>
+        {index === 0 && <hr className="ppi1 no-print" />}
+
+        <div style={styleWithLogoGrids}>
+          <h2 className={styleP} >
+            {labelsBilingual.pg8T + ": " + labelsBilingual.pg3T}
+          </h2>
+
+          <p className={styleP} >{labelsBilingual.pg8P1}</p>
+          <p className={styleP+" printOnly"} >{labelsBilingual.pg8PAgg}</p>
+
+          {index === 0 && (
+            <div className="ppi2 no-print" style={{ marginLeft: "24px" }}>
+              <MultiButtons
+                noButtons={2}
+                buttonCaption={[labelsBilingual.pg8O1, labelsBilingual.pg8O2]}
+                selected={showGrids ? 2 : 1}
+                selectMultiButton={clickMultiButton}
+              />
+            </div>
+          )}
+
+          <div>
+            {
+              <div
+                className="printOnly"
+                style={{ width: "100%", fontSize: ".8em" }}
+              >
+                <h4 className="ppi2">{grid.gridTitle}</h4>
+                <div className="container"  data-ppi-noneditable>
+                  <div className="row">
+                    <div className="col s12 board">
+                      <table className="INA  INA_EP_Grids" id="simple-board">
+                        <thead style={{ backgroundColor: "#384d7b" }}>
+                          {grid.colTitles}
+                        </thead>
+                        <tbody>{grid.rows}</tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    );
+  });
+  /* const pageAggGrid = (
     <div className="newPage" id="PageAggGrid">
       <hr className="ppi1 no-print" />
 
       <div style={styleWithLogoGrids}>
         <h2 className="ppi2">{labelsBilingual.pg8T}</h2>
 
-        <p className="ppi2">{labelsBilingual.pg8P2}</p>
+        <p className="ppi2">{labelsBilingual.pg8P1}</p>
+        <p className="ppi3">{labelsBilingual.pg8PAgg}</p>
 
         <div className="ppi2 no-print" style={{ marginLeft: "24px" }}>
           <MultiButtons
@@ -2396,21 +2298,12 @@ export function getEPPages(
               className="printOnly"
               style={{ width: "100%", fontSize: ".8em" }}
             >
-              {/*                   <AggregateGrid
-                    aggregateGrid={props.aggregateGrid}
-                    LE={props.LE}
-                    lang={lang}
-                    insNeedLine={""}
-                    GridForPDF={true}
-                  />
-
- */}
               <h4 className="ppi2">{aggGrid.gridTitle}</h4>
               <div className="container">
                 <div className="row">
                   <div className="col s12 board">
-                    <table className="INA" id="simple-board">
-                      <thead>{aggGrid.title}</thead>
+                    <table className="INA  INA_EP_Grids" id="simple-board">
+                      <thead  style={{backgroundColor: "#384d7b"}}>{aggGrid.colTitles}</thead>
                       <tbody>{aggGrid.rows}</tbody>
                     </table>
                   </div>
@@ -2422,109 +2315,160 @@ export function getEPPages(
       </div>
     </div>
   );
+ */
 
   let pageOtherGrids = [];
-  AssetLiabProjs.projectionsGrids.map((grid) => {
-    //console.log(grid.dataColTitles)
+  let pageOtherGridsPDF = [];
+  let otherGrids = {
+    gridsIfSelected: pageOtherGrids,
+    gridsPDF: pageOtherGridsPDF,
+  };
+  {
+    AssetLiabProjs.projectionsGrids.map((grid) => {
+      //console.log(grid.dataColTitles)
 
-    let rows = [];
-    let title = [];
-    for (var idx = 0; idx < grid.dataColTitles.length; idx++) {
-      let tID = `cell${i}-${idx}`;
-      title.push(
-        <td key={tID} id={tID}>
-          {grid.dataColTitles[idx]}
-        </td>
-      );
-    }
+      let rows = [];
+      let title = [];
+      for (var idx = 0; idx < grid.dataColTitles.length; idx++) {
+        let tID = `cell${i}-${idx}`;
+        title.push(
+          <td key={tID} id={tID}>
+            {grid.dataColTitles[idx]}
+          </td>
+        );
+      }
 
-    for (var i = 0; i < grid.dataProjection[0].length; i++) {
-      let rowID = `row${i}`;
-      let cell = [];
-      let upTo = 25;
-      if (i > upTo) {
-        if (i % 5 === 0) {
+      for (var i = 0; i < grid.dataProjection[0].length; i++) {
+        let rowID = `row${i}`;
+        let cell = [];
+        let upTo = 125;
+        if (i > upTo) {
+          if (i % 5 === 0) {
+            for (var idx = 0; idx < grid.dataColTitles.length; idx++) {
+              let cellID = `cell${i}-${idx}`;
+              if (i === props.LE && idx === 0)
+                cell.push(
+                  <td key={cellID} id={cellID}>
+                    {grid.dataProjection[idx][i] + "    LE"}
+                  </td>
+                );
+              else
+                cell.push(
+                  <td key={cellID} id={cellID}>
+                    {grid.dataProjection[idx][i]}
+                  </td>
+                );
+            }
+          }
+        } else {
           for (var idx = 0; idx < grid.dataColTitles.length; idx++) {
             let cellID = `cell${i}-${idx}`;
+            const le = i === props.LE && idx === 0 ? ":LE" : "";
             cell.push(
-              <td key={cellID} id={cellID}>
-                {grid.dataProjection[idx][i]}
+              <td
+                key={cellID}
+                id={cellID}
+                style={{ backgroundColor: i === props.LE && "#d2d6e5" }}
+              >
+                {grid.dataProjection[idx][i] + le}
               </td>
             );
           }
         }
-      } else {
-        for (var idx = 0; idx < grid.dataColTitles.length; idx++) {
-          let cellID = `cell${i}-${idx}`;
-          cell.push(
-            <td key={cellID} id={cellID}>
-              {grid.dataProjection[idx][i]}
-            </td>
+
+        const i1 = GRID_BREAK + 1;
+        let i2 = 200;
+        if (
+          props.LE > GRID_BREAK &&
+          props.LE < grid.dataProjection[0].length - 2
+        )
+          i2 = grid.dataProjection[0].length - 3;
+
+        if (
+          i === props.LE ||
+          i <= GRID_BREAK ||
+          i >= grid.dataProjection[0].length - 2
+        )
+          rows.push(
+            <tr key={i} id={rowID}>
+              {cell}
+            </tr>
           );
-        }
+        else if (i === i1 || i === i2)
+          rows.push(
+            <tr
+              key={i}
+              id={rowID}
+              style={{
+                backgroundColor: "white",
+                borderRight: "hidden",
+                borderLeft: "hidden",
+              }}
+            >
+              <td colSpan={grid.dataColTitles.length}>...</td>
+            </tr>
+          );
       }
 
-      rows.push(
-        <tr key={i} id={rowID}>
-          {cell}
-        </tr>
-      );
-    }
-
-    console.log(grid.dataProjection, rows);
-
-    return pageOtherGrids.push(
-      <div className="newPage" id={"assets Page".concat(j)}>
-        <h4 className="ppi2">{grid.gridTitle}</h4>
-        <div className="container">
-          <div className="row">
-            <div className="col s12 board">
-              <table className="INA" id="simple-board">
-                <thead>{title}</thead>
-                <tbody>{rows}</tbody>
-              </table>
+      //console.log(title,aggGrid.titles);
+      if (showGrids) {
+        pageOtherGrids.push(
+          <DataTable
+            key={j++}
+            dataColTitles={grid.dataColTitles}
+            dataProjection={grid.dataProjection}
+            gridTitle={grid.gridTitle}
+            gridIcons={[]}
+            specialRow={LE - startAge}
+            language={lang}
+          />
+          /*  <div className="newPage" id={"assets Page".concat(j)}>
+            <h4 className="ppi2">{grid.gridTitle}</h4>
+            <div className="container">
+              <div className="row">
+                <div className="col s12 board">
+                  <table className="INA INA_EP_Grids" id="simple-board" >
+                    <thead  style={{backgroundColor: "red"}}>{title}</thead>
+                    <tbody>{rows}</tbody>
+                  </table>
+                </div>
+              </div>
+              
+            </div>
+          </div> */
+        );
+      }
+      pageOtherGridsPDF.push(
+        <div className="newPage printOnly"  id={"assets Page".concat(j)}>
+          <p className="ppi2">{labelsBilingual.pg8P2}</p>
+          <p className="ppi3">{grid.gridTitle}</p>
+          <div className="container" data-ppi-noneditable>
+            <div className="row">
+              <div className="col s12 board">
+                <table className="INA  INA_EP_Grids" id="simple-board">
+                  <thead style={{ backgroundColor: "#384d7b" }}>{title}</thead>
+                  <tbody>{rows}</tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    );
-  });
+      );
 
-  /* this.pages.push(
-    <div className="newPage" id="Page8">
-      <div
-        id="assetGrid"
-        className="no-print"
-        style={{
-          clear: "both",
-          float: "left",
-          marginLeft: "25px",
-        }} 
-      >
-        {props.showGrids &&
-          this.AssetLiabProjs.projectionsGrids.map((grid) => {
-            //console.log(grid.dataColTitles)
-            return (
-              <DataTable
-                key={j++}
-                dataColTitles={grid.dataColTitles}
-                dataProjection={grid.dataProjection}
-                gridTitle={grid.gridTitle}
-                gridIcons={[]}
-                specialRow={LE - startAge}
-                language={lang}
-              />
-            );
-          })}
-      </div>
-    </div>
-  ); */
+      otherGrids = {
+        gridsIfSelected: pageOtherGrids,
+        gridsPDF: pageOtherGridsPDF,
+      };
+
+      return otherGrids;
+    });
+  }
 
   {
     /* PAGE 9 notes*/
   }
   const pageNotes = (
-    <div className="newPage" id="PageNotes">
+    <div className="newPage" id="PageNotes" data-ppi-noneditable data-ppi-pagelocked>
       <div>
         <hr className="ppi1 no-print" />
         <div style={styleWithLogo}>
@@ -2540,33 +2484,84 @@ export function getEPPages(
   /* add all pages  */
   let pages = [];
   /* cover page */
+  let iAppendix = 0;
 
   pages.push(pageCover);
   /* AboutMe page if requested */
   {
     aboutMeSpecs !== null && includeAboutMe && pages.push(pageAboutMe);
   }
+
+  let iHideLogoStart=0;
+  let iHideLogoEnd=0;
+
   pages.push(pageIntro);
+  iAppendix++;
   pages.push(pageFinances);
+  iAppendix++;
   pages.push(pageFinancesFut);
+  iAppendix++;
   pages.push(pageEPAlts);
+  iAppendix++;
   pages.push(pageLI);
-  pages.push(pageAggGrid);
-  for (let i = 0; i < pageOtherGrids.length; i++) {
-    pages.push(pageOtherGrids[i]);
+  iAppendix++;
+  
+  
+  iHideLogoStart=iAppendix+1
+  for (let i = 0; i < pageAggGrid.length; i++) {
+    pages.push(pageAggGrid[i]);
   }
+  
+  for (let i = 0; i < otherGrids.gridsIfSelected.length; i++) {
+    pages.push(otherGrids.gridsIfSelected[i]);
+  }
+  
+  for (let i = 0; i < otherGrids.gridsPDF.length; i++) {
+    pages.push(otherGrids.gridsPDF[i]);
+  }
+  iHideLogoEnd=iHideLogoStart+otherGrids.gridsPDF.length+pageAggGrid.length+otherGrids.gridsIfSelected.length-1
+
   pages.push(pageNotes);
 
   let allPages = [];
   let refPage = [];
   let iAboutMe = -1;
-  let iLandscape = 6;
+
+  let iLandscape = Array(pages.length).fill(0);
+  let iHideLogo = Array(pages.length).fill(0);
+
+
+  let logo;
+  let aggPage = 6;
+  if (aboutMeSpecs !== null && includeAboutMe) {
+    aggPage = 7;
+  }
+  for (let j = aggPage; j <= aggPage + aggGrid.length - 1; j++)
+    iLandscape[j] = 1;
+
   if (aboutMeSpecs !== null && includeAboutMe) {
     iAboutMe = 1;
-    iLandscape = 7;
   }
 
-  for (let i = 0; i < pages.length; i++)
+  for (let i = 0; i < pages.length; i++) {
+    logo=null;
+  
+    if(hasLogo && logoOnTop) 
+  {
+    if (i === 0)
+     logo=logoFirstPg
+    else
+    {
+      if(logoAllPages && !(i>=iHideLogoStart && i<= iHideLogoEnd))
+      {
+        console.log(i)
+        logo=logoOnly;
+
+      } 
+    } 
+  }
+
+    
     allPages.push(
       <div
         className="presentationItem page"
@@ -2577,36 +2572,32 @@ export function getEPPages(
         <OutputPage
           content={pages[i]}
           header={
-            i > 0 && !(includeAboutMe && i === 1) && TITLES[lang].appletEP
+            ((i > 0 &&
+            i <= iAppendix) || i===pages.length-1) &&
+            !(includeAboutMe && i === 1) &&
+            TITLES[lang].appletEP
           }
           footer={
             i === 0 || i === pages.length - 1 || i === iAboutMe
               ? ""
               : OUTPUTTEXT[lang].pgFooter
           }
-          logoTop={
-            hasLogo && logoOnTop
-              ? i === 0
-                ? logoFirstPg
-                : logoAllPages
-                ? logoOnly
-                : null
-              : null
-          }
+          logoTop={logo}
+            
           logoBottom={
-            hasLogo && !logoOnTop
+            hasLogo && !logoOnTop  
               ? i === 0
                 ? logoOnly
-                : logoAllPages
+                : logoAllPages && !(i>=iHideLogoStart && i<= iHideLogoEnd )
                 ? logoOnly
                 : null
               : null
           }
-          orientation={i === iLandscape ? "landscape" : "portrait"}
+          orientation={iLandscape[i] === 1 ? "landscape" : "portrait"}
           firstPageLogoWidth={firstPageLogoWidth}
         />
       </div>
     );
-
-  return { allPages: allPages, refPage: refPage };
+  }
+  return { allPages: allPages, refPage: refPage, landScapePages: iLandscape };
 }

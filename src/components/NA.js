@@ -186,9 +186,11 @@ if (APPLET_INA)
   OutputPresentation = React.lazy(() => import("./outputPresentation"));
 
 let OutputPresentationEP;
-if (APPLET_EP)
+if (APPLET_EP) {
   OutputPresentationEP = React.lazy(() => import("./outputPresentationEP"));
 
+  // console.log(OutputPresentationEP);
+}
 let OutputGraphs;
 if (APPLET_INA) OutputGraphs = React.lazy(() => import("./OutputGraphs"));
 
@@ -286,28 +288,32 @@ export class NA extends Component {
     this.dataQS = "";
     this.intervalID = 0;
     this.INAOption = APPLET_INA ? DISPLAY_INCOME : DISPLAY_TAXLIAB;
-    this.agentAccessQuery = false;
+    this.queryingAccess = false;
+    this.NonAppletCall=false;
     this.aboutMe = null;
-    this.token="";
+    this.token = "";
     //this.OutputPresentation = null;
     //this.OutputPresentationEP = null;
   }
 
   probateSync = async (dataInput, dataOutput) => {
     // if not there add
+
     let qbProbate = new Array(dataOutput.probate.numericValues.length).fill(0);
     if (dataInput.Presentations[0].provinceKey === "QC")
       dataOutput.probate.numericValues = qbProbate;
 
-    //  console.log(dataOutput.probate.numericValues)
     let probate = LIABILITIES.PROBATE.Key;
     let hasProbate = dataInput.Liabilitys.find(
       (x) => x.liabTypeKey === probate
     );
+
     if (hasProbate !== undefined) {
       hasProbate.currValue = dataOutput.probate.numericValues[0];
+    } else {
+      // if probate was deleted so not in liabs but has values make them 0
+      dataOutput.probate.numericValues = qbProbate;
     }
-    //console.log(hasProbate,dataInput)
 
     return dataInput;
   };
@@ -370,7 +376,9 @@ export class NA extends Component {
 
   parseQSs = async (query) => {
     let caseID = "";
-    this.agentAccessQuery = false;
+    //if (this.queryingAccess !== -1)
+    // finished checking, reloads if it is -1 and denies
+    //this.queryingAccess = 1; // has access
     if (query.caseGUID !== undefined) caseID = query.caseGUID;
     if (query.clientGUID !== undefined)
       this.clientIDToShowCasesFor = query.clientGUID;
@@ -458,118 +466,64 @@ export class NA extends Component {
 
     const query = queryString.parse(window.location.search);
 
+    //console.log(query);
     this.setState({ initialQSParsing: 1 });
 
     //await this.setToken(query.TKTOK, query.authToken);
+    // if checking access don't record INA login
+    if (query.AgentAccessQuery === "1" || query.FBAction === "1" || (query.DBAction !== undefined && query.DBAction !== "")) {
+      this.NonAppletCall = true;
+    }
 
     let validToken = false;
-    ;
-    if (query.authToken !== undefined)
-    {
+    if (query.authToken !== undefined) {
       validToken = await this.setToken(query.authToken);
-      this.token=query.authToken
-    }
-    else if (query.TKTOK !== undefined)
-    {
+      this.token = query.authToken;
+    } else if (query.TKTOK !== undefined) {
       validToken = await this.setToken(query.TKTOK);
-      this.token=query.TKTOK
+      this.token = query.TKTOK;
     }
 
-    if(validToken===false)this.setState({ showLogout: true });
+    if (validToken === false) this.setState({ showLogout: true });
 
     this.aboutMe = await handleFetchAdvisorPortfolio(this.token);
 
-    
-
-
-
-    console.log(this.aboutMe, this.userEmail);
+    //console.log(this.aboutMe, this.userEmail);
 
     // agent access re colour or else
     if (query.AgentAccessQuery === "1") {
-      this.agentAccessQuery = true;
-      if (query.authToken !== undefined || query.TKTOK !== undefined) {
+      this.queryingAccess = true; // checking
+      if (!(query.authToken === undefined && query.TKTOK === undefined)) {
         let data = await fetchValidateTokenGetAgentEmailRecordAppletLogin(
           query.authToken !== undefined ? query.authToken : query.TKTOK,
-          "INA"
-        );
-        await window.parent.postMessage(
-          "AGENT_ACCESS_" + data.accessLevel,
-          "*"
-        );
-      }
-
-      setTimeout(() => {}, 1000);
-      return;
-      // else
-      //  await window.parent.postMessage("AGENT_ACCESS_NONE", "*")
-    }
-
-    
-
-    await this.parseQSs(query);
-
-    await this.setState({ initialQSParsing: validToken ? 0 : -1 });
-    this.setState({ initialQSParsing: 0 });
-
-    /* if (validToken === false) {
-      localStorage.removeItem("TKTOK");
-      console.log("send To Reload INA");
-      await sendToReloadINA();
-    }
-     
-    if (this.state.initialLoading === false) {
-      window.parent.postMessage("FRAME_LOADED", "*");
-    }*/
-  };
-
-  /* if (query.QS !== undefined) {
-      await this.handleInitilizeQuoteFromQueryString(query.QS);
-      //this.handleInitilizeQuoteFromQueryString(query.QS);
-    } else {
-      await this.handleIntitalFetch1(
-        // this.handleIntitalFetch(
-        query.lang === "fr" || global.langFr ? "fr" : "en"
-      );
-    }
-
-    if (query.recover !== undefined) {
-      if (query.recover === "true") {
-        let d = new Date();
-        d = d.setHours(d.getHours(), d.getMinutes() - 5, 0, 0);
-        const objJSONData = JSON.parse(
-          localStorage.getItem(APPLET_INA ? "INAData" : "EP")
+          "ZZZ"
         );
 
-        var dRecover = new Date(
-          objJSONData.dataPresentations.Presentations[0].valuationDate
-        );
-        dRecover = new Date(
-          objJSONData.dataPresentations.Presentations[0].presentationDate
-        );
-        if (dRecover > d) {
-          await this.loadStorage();
-          hideRecover();
+        //console.log(data);
+        if (data.accessLevelTKD === "NONE") {
+          //this.queryingAccess = -1; // no access
+          await window.parent.postMessage(
+            "AGENT_ACCESS_" + data.accessLevelTKD,
+            "*"
+          );
+        } else {
+          //this.queryingAccess = 1; // access
+          await window.parent.postMessage(
+            "AGENT_ACCESS_" + data.accessLevelTKD,
+            "*"
+          );
         }
       }
     }
-    if (query.snapimport !== undefined) {
-      if (query.snapimport === "1") {
-        this.setState({ SnapImport: true });
-      }
-    }
-    if (this.state.initialLoading === false) {
-      window.parent.postMessage("FRAME_LOADED", "*");
-    }
-    // now UI is loaded call initiaal API calls async but dont await
-    if (query.QS === undefined) {
-      this.handleIntitalFetch(
-        // this.handleIntitalFetch(
-        query.lang === "fr" || global.langFr ? "fr" : "en"
-      );
+
+    if (this.queryingAccess === false) {
+      await this.parseQSs(query);
+
+      await this.setState({ initialQSParsing: validToken ? 0 : -1 });
+      this.setState({ initialQSParsing: 0 });
     }
   };
-  */
+
   setToken = async (authToken) => {
     let validToken = false;
     let token = authToken;
@@ -577,15 +531,15 @@ export class NA extends Component {
       //const decoded = jwt_decode(authToken);
 
       //this.userEmail = decoded.upn;
-      const email =null; //sessionStorage.getItem("userEmail");
+      const email = null; //sessionStorage.getItem("userEmail");
       //console.log(email, this.userEmail, this.agentID);
       if (email === null || email === undefined || email === "") {
         const agentSpecs =
           await fetchValidateTokenGetAgentEmailRecordAppletLogin(
             token,
-            APPLET_INA ? "INA" : "EP"
+            this.NonAppletCall?"ZZZ":(APPLET_INA ? "INA" : "EP")
           );
-        // await console.log("agentSpecs:" +agentSpecs);
+        await console.log("agentSpecs:" +agentSpecs);
         validToken = agentSpecs.validToken;
         if (validToken === true) {
           this.userEmail = agentSpecs.email;
@@ -597,7 +551,7 @@ export class NA extends Component {
         // save applet login
         fetchValidateTokenGetAgentEmailRecordAppletLogin(
           token,
-          APPLET_INA ? "INA" : "EP"
+          this.NonAppletCall?"ZZZ":(APPLET_INA ? "INA" : "EP")
         );
 
         this.userEmail = email;
@@ -605,7 +559,7 @@ export class NA extends Component {
         validToken = true;
       }
     }
-    //console.log("this.userEmail:" + this.userEmail);
+    console.log("this.userEmail:" + this.userEmail, validToken);
     return validToken;
 
     //   let result= await fetchGetAgentGUIDFromDB(this.userEmail)
@@ -720,6 +674,7 @@ export class NA extends Component {
         newStateCandidateInput
       );
       let newStateCandidateOutput = this.populateOutput2(data, dataOutput);
+
       // assets projs , do all assets if it is from a saved file we need all for RESULTS
       if (
         newStateCandidateOutput.assetProjections !== null &&
@@ -786,12 +741,14 @@ export class NA extends Component {
       //newStateCandidateOutput.encryptedInput = this.dataQS;
       // liabs projs
       // aggregate grid proj
+
       newStateCandidateOutput.aggregateGrid = await this.updateOutputData(
         newStateCandidateInput,
         newStateCandidateOutput
       );
       return newStateCandidateOutput;
     } catch (error) {
+      console.log(error);
       return null;
     }
   };
@@ -869,7 +826,7 @@ export class NA extends Component {
     }
   };
 
-  populateOutput = async (data) => {
+  /* populateOutput = async (data) => {
     let dataOutput = this.state.dataOutput;
 
     dataOutput.dataInsuranceNeeds = data.dataInsuranceNeeds;
@@ -888,51 +845,58 @@ export class NA extends Component {
     dataOutput.lifeExpectancy.joint = data.lifeExpJLTD;
 
     this.setState({ dataOutput: dataOutput, SnapImport: false });
-  };
+  }; */
 
   handleEncryptedDataModes = async (mode, dataInput, dataOutput) => {
-    const lang = dataInput.Presentations[0].language;
-    const insuranceNeed =
-      dataOutput.dataInsuranceNeeds[dataInput.Presentations[0].periodOption]
-        .Value;
-    let dataNA = await setUIDataToAPI(dataInput, insuranceNeed);
-    let data = await handleFetchQueryString(dataNA);
-    if (data !== undefined) {
-      this.dataQS = data;
-      if (mode === MODE_ONLY_GET_ENCRYPTED_QS) return data;
-      else if (mode === MODE_SAVE) this.setState({ promptForSave: true });
-      else if (mode === MODE_EMAIL) {
-        let url =
-          "mailto: ?subject= " +
-          (APPLET_INA ? TITLES[lang].appletINA : TITLES[lang].appletEP) +
-          " &body= " +
-          (EMAIL[lang].body +
-            ".%0D%0A" +
+    try {
+      const lang = dataInput.Presentations[0].language;
+      const insuranceNeed =
+        dataOutput.dataInsuranceNeeds[dataInput.Presentations[0].periodOption]
+          .Value;
+
+      let dataNA = await setUIDataToAPI(dataInput, insuranceNeed);
+      let data = await handleFetchQueryString(dataNA);
+
+      // console.log(data)
+
+      if (data !== undefined) {
+        this.dataQS = data;
+        if (mode === MODE_ONLY_GET_ENCRYPTED_QS) return data;
+        else if (mode === MODE_SAVE) this.setState({ promptForSave: true });
+        else if (mode === MODE_EMAIL) {
+          let url =
+            "mailto: ?subject= " +
+            (APPLET_INA ? TITLES[lang].appletINA : TITLES[lang].appletEP) +
+            " &body= " +
+            (EMAIL[lang].body +
+              ".%0D%0A" +
+              appSiteParent +
+              "?applet=EP&QS=" +
+              this.dataQS);
+
+          const ft =
             appSiteParent +
-            "?applet=EP&QS=" +
-            this.dataQS);
+            "/?" +
+            ["applet=" + DISPLAY_NAME, "QS=" + this.dataQS].join("&");
+          url =
+            "mailto: ?subject= " +
+            (APPLET_INA ? TITLES[lang].appletINA : TITLES[lang].appletEP) +
+            " &body= " +
+            EMAIL[lang].body +
+            ".%0D%0A" +
+            encodeURIComponent(ft);
 
-        const ft =
-          appSiteParent +
-          "/?" +
-          ["applet=" + DISPLAY_NAME, "QS=" + this.dataQS].join("&");
-        url =
-          "mailto: ?subject= " +
-          (APPLET_INA ? TITLES[lang].appletINA : TITLES[lang].appletEP) +
-          " &body= " +
-          EMAIL[lang].body +
-          ".%0D%0A" +
-          encodeURIComponent(ft);
-
-        window.location.href = url;
+          window.location.href = url;
+        }
       }
+    } catch (error) {
+      console.log("error in recalc: " + error);
     }
   };
 
   handleInitilizeQuoteFromQueryString = async (savedINA_QS) => {
     //log(savedINA_QS)
     const data = await handleFetchINADataFromQueryString(savedINA_QS);
-    //  console.log(data)
 
     let objJSONData = await loadSavedDataToUI(data, this.state.dataInput);
 
@@ -1013,9 +977,11 @@ export class NA extends Component {
         newStateCandidateOutput
       );
 
+      //(newStateCandidateOutput);
       if (
-        newStateCandidateInput.Presentations[0].overwriteProbate === false ||
-        APPLET_EP
+        newStateCandidateOutput.probate !== null &&
+        (newStateCandidateInput.Presentations[0].overwriteProbate === false ||
+          APPLET_EP)
       ) {
         newStateCandidateInput = await this.probateSync(
           newStateCandidateInput,
@@ -1030,7 +996,9 @@ export class NA extends Component {
         dataInput: newStateCandidateInput,
         dataOutput: newStateCandidateOutput,
       };
-    } catch (error) {}
+    } catch (error) {
+      console.log("error in recalc: " + error);
+    }
   };
 
   updateOutputData = async (
@@ -1107,7 +1075,6 @@ export class NA extends Component {
           0,
           noProjectYrs
         );
-
 
         if (APPLET_INA) {
           aggregateGrid = await getINAGridData(
@@ -1298,10 +1265,8 @@ export class NA extends Component {
     const newDataInput = cloneDeep(dataInput);
     const newDataOutput = cloneDeep(dataOutput);
 
-    if (source.sourceTypeKey!==INCOMESOURCES.TAX_CREDIT.Key)
-        source.growthRate=newDataInput.Presentations[0].inflation;
-        
-    console.log(source);
+    if (source.sourceTypeKey !== INCOMESOURCES.TAX_CREDIT.Key)
+      source.growthRate = newDataInput.Presentations[0].inflation;
 
     newDataInput.Sources[source.id - 1] = source;
 
@@ -2273,7 +2238,6 @@ export class NA extends Component {
   syncPanelsValues2 = (newStateCandidateInput, itemToUpdateGroup, doAlert) => {
     // EP dosent have needs and sources to sync
 
-    
     let needsDur = false;
     let sourcesDur = false;
     let needsAmt = false;
@@ -2290,18 +2254,17 @@ export class NA extends Component {
     }
 
     // NOTE: not written to state yet so check potential changes
-    let curDurBeforeUpdate=0;
+    let curDurBeforeUpdate = 0;
     try {
       if (singleFamily) {
-        curDurBeforeUpdate= singleFamilyProjectionYears(this.state.dataInput.Clients).noProjectionYrs;
-      } 
-      else
-          curDurBeforeUpdate=this.state.dataInput.Clients[this.survIdx].retirementAge-this.state.dataInput.Clients[this.survIdx].Age
-        
-    } catch (error) {
-      
-    }
-    
+        curDurBeforeUpdate = singleFamilyProjectionYears(
+          this.state.dataInput.Clients
+        ).noProjectionYrs;
+      } else
+        curDurBeforeUpdate =
+          this.state.dataInput.Clients[this.survIdx].retirementAge -
+          this.state.dataInput.Clients[this.survIdx].Age;
+    } catch (error) {}
 
     newStateCandidateInput = this.handleAddAssetTaxCredit2(
       newStateCandidateInput
@@ -2318,11 +2281,6 @@ export class NA extends Component {
 
           const dur = protectionPeriod;
 
-          console.log(
-            newStateCandidateInput.Needs[i].duration,
-            newStateCandidateInput.Needs,
-            this.state.dataInput.Needs
-          );
           //const dur = 100 - newStateCandidateInput.Clients[this.survIdx].Age;
           if (
             this.caseFromFile === false &&
@@ -2345,10 +2303,13 @@ export class NA extends Component {
             ) {
               // change duration of % of income
               // adjust it if it is the default based on old age and retAge, ie it is not a delibrate input duration
-      
+
               if (
-                (newStateCandidateInput.Needs[i].duration===curDurBeforeUpdate && dur !==curDurBeforeUpdate && curDurBeforeUpdate>0 &&
-                  dur > 0)
+                newStateCandidateInput.Needs[i].duration ===
+                  curDurBeforeUpdate &&
+                dur !== curDurBeforeUpdate &&
+                curDurBeforeUpdate > 0 &&
+                dur > 0
               ) {
                 newStateCandidateInput.Needs[i].duration = dur;
                 needsDur = true;
@@ -2407,8 +2368,8 @@ export class NA extends Component {
             newStateCandidateInput.Sources[i].sourceTypeKey ===
             INCOMESOURCES.TAX_CREDIT.Key
           )
-            newStateCandidateInput.Sources[i].taxRate =0;
-              /* 100 - newStateCandidateInput.Presentations[0].taxRate; */
+            newStateCandidateInput.Sources[i].taxRate = 0;
+          /* 100 - newStateCandidateInput.Presentations[0].taxRate; */
 
           // allow a different surv income dur if they input directly
           if (
@@ -2420,9 +2381,11 @@ export class NA extends Component {
             if (
               newStateCandidateInput.Sources[i].sourceTypeKey ===
                 INCOMESOURCES.SURVIVORS_INCOME.Key &&
-              newStateCandidateInput.Sources[i].startYear === 0 &&              
-              newStateCandidateInput.Sources[i].duration===curDurBeforeUpdate && dur !==curDurBeforeUpdate && curDurBeforeUpdate>0 &&
-              
+              newStateCandidateInput.Sources[i].startYear === 0 &&
+              newStateCandidateInput.Sources[i].duration ===
+                curDurBeforeUpdate &&
+              dur !== curDurBeforeUpdate &&
+              curDurBeforeUpdate > 0 &&
               dur > 0
             ) {
               newStateCandidateInput.Sources[i].duration = dur;
@@ -2555,10 +2518,11 @@ export class NA extends Component {
       // put loaded data to quote and show
 
       this.setState({ loading: true });
-      //  console.log(objJSONData)
+
       this.caseFromFile = true;
       const { dataOutput } = this.state;
       const newDataOutput = cloneDeep(dataOutput);
+
       const newState = await this.reSync_reCalculate_reRender(
         objJSONData,
         newDataOutput,
@@ -2724,14 +2688,18 @@ export class NA extends Component {
   };
 
   respondToLogoutRequest = (OK) => {
+    const applet = APPLET_INA ? "INA" : "EP";
     this.setState({ showLogout: false });
-    window.parent.postMessage("TOKEN_FAILED_" +
-    this.state.dataInput.Presentations[0].language +
-    "_" +
-    this.state.encryptedInputLife1AndSpouse,
-  "*");
-  } 
-  
+    window.parent.postMessage(
+      "TOKEN_FAILED_" +
+        applet +
+        "_" +
+        this.state.dataInput.Presentations[0].language +
+        "_" +
+        this.state.dataOutput.encryptedInputLife1AndSpouse,
+      "*"
+    );
+  };
 
   respondToSaveRequest = (OK, fileName) => {
     this.setState({ promptForSave: false });
@@ -2819,15 +2787,26 @@ export class NA extends Component {
     if (url2.indexOf(SITE_TEST) !== -1)
       urlReload = PARENT_SITE_TEST + "?ina=" + shortid.generate();
 
-    const urlLogoff = "https://adfs.ppi.ca/adfs/ls/?wa=wsignout1.0";
+    //const urlLogoff = "https://adfs.ppi.ca/adfs/ls/?wa=wsignout1.0";
     //	if(fails>1){
     //localStorage.setItem('INAAPIFails', parseInt(0));
-    window.parent.location.href = urlLogoff;
+    //window.parent.location.href = urlLogoff;
     //	}
     //	else
-    {
-      window.parent.location.href = urlReload;
-    }
+    //{
+    const applet = APPLET_INA ? "INA" : "EP";
+    window.parent.postMessage(
+      "TOKEN_FAILED_" +
+        applet +
+        "_" +
+        this.state.dataInput.Presentations[0].language +
+        "_" +
+        this.state.dataOutput.encryptedInputLife1AndSpouse,
+      "*"
+    );
+
+    //window.parent.location.href = urlReload;
+    //}
   };
 
   EmailINA = () => {
@@ -2971,7 +2950,6 @@ export class NA extends Component {
   };
 
   imageAdjust = (image, ID) => {
-    console.log(image);
     if (ID === IMAGE_LOGO)
       this.setState((prevState) => ({
         dataInput: {
@@ -3270,9 +3248,10 @@ export class NA extends Component {
     console.log("in NA: "this.props.language) 
 
     else  */
-    console.log(dataInput.Needs);
-    if (this.agentAccessQuery) return "";
-    else if (this.state.promptShowCases && this.state.initialQSParsing === 0)
+
+    if (this.queryingAccess) {
+      return "";
+    } else if (this.state.promptShowCases && this.state.initialQSParsing === 0)
       return (
         <div>
           <br /> DB
@@ -3293,11 +3272,7 @@ export class NA extends Component {
       );
     else {
       if (this.state.initialLoading === true) {
-        return (
-          <div>
-            <br /> loading
-          </div>
-        );
+        return lang === "en" ? "loading" : "S'il vous plaît, attendez";
       } else {
         return (
           <div
@@ -3360,11 +3335,11 @@ export class NA extends Component {
                 severity={"error"}
                 openDialog={this.state.showLogout === true}
                 mainMessage={
-                  lang === "en" ? "Your Toolkit Direct session has expired. Toolkit Direct will now reload." : "Votre session ToolkitDirect a expiré. ToolkitDirect va maintenant se recharger."
+                  lang === "en"
+                    ? "Your Toolkit Direct session has expired. Toolkit Direct will now reload."
+                    : "Votre session ToolkitDirect a expiré. ToolkitDirect va maintenant se recharger."
                 }
-                
                 language={lang}
-                
                 respondToInput={this.respondToLogoutRequest}
               />
             </div>
@@ -3634,7 +3609,7 @@ export class NA extends Component {
               <div style={{ paddingLeft: "40%" }}>
                 <Info
                   infoIcon={getInfoNoInternetAccess(lang)}
-                  respondToPopUp={this.respondToPopUp}
+                  respondToPopUp={this.respondToLogoutRequest}
                   ref={(Info) => (this.dlgLogin = Info)}
                 />
               </div>

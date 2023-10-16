@@ -68,8 +68,10 @@ export class OutputGraphsEPLeakage extends React.Component {
     // leakageGraps.dataPieEstateLeakage.plugins=[ChartDataLabels]
     // leakageGraps.dataPieEstateLeakageLE.plugins=[ChartDataLabels]
 
-    leakageGraps.optionsPieEstateLeakage.legend.labels.boxWidth = 20;
-    leakageGraps.optionsPieEstateLeakageLE.legend.labels.boxWidth = 20;
+    leakageGraps.optionsPieEstateLeakage.legend.labels.boxWidth = 10;
+    
+    leakageGraps.optionsPieEstateLeakageLE.legend.labels.boxWidth = 10;
+    
 
     leakageGraps.optionsPieEstateLeakage.animation = {
       onComplete: async () => {
@@ -83,22 +85,31 @@ export class OutputGraphsEPLeakage extends React.Component {
     };
 
     //optionsPieEstateLeakageLE.legend.labels.position = "left";
-    //leakageGraps.dataPieEstateLeakage.responsive=false
-    //leakageGraps.dataPieEstateLeakage.maintainAspectRatio=false
+    leakageGraps.dataPieEstateLeakage.responsive=true
+    leakageGraps.dataPieEstateLeakage.maintainAspectRatio=false
+    leakageGraps.dataPieEstateLeakageLE.responsive=true
+    leakageGraps.dataPieEstateLeakageLE.maintainAspectRatio=false
     //leakageGraps.optionsPieEstateLeakage.legend.position= "bottom"
     //leakageGraps.optionsPieEstateLeakageLE.legend.position= "bottom"
+    leakageGraps.optionsPieEstateLeakage.title.fontSize= 12
+    leakageGraps.optionsPieEstateLeakageLE.title.fontSize= 12
+    leakageGraps.optionsPieEstateLeakage.title.fontColor= "#455560"
+    leakageGraps.optionsPieEstateLeakageLE.title.fontColor= "#455560"
 
+    leakageGraps.optionsPieEstateLeakage.legend.labels.fontSize= 8 //16
+    leakageGraps.optionsPieEstateLeakageLE.legend.labels.fontSize= 8 //16
+
+
+    const maxGraphWidth=window.screen.width/window.devicePixelRatio +"px";//window.screen.width*.6/window.devicePixelRatio +"px";
+    
+
+    
     return (
-      <div style={{ width: "90%" }}>
+      <div style={{ width: "100%" }}>
         <div style={{ width: "100%" }}>
-          <h3 className="ppi1">
-            <div>
-              {OUTPUTTEXTEP[lang].graphsLeakageT1} <br />
-            </div>
-          </h3>
-
+         
+         {/* 
           <div className="row">
-            <div className="column">
               {(this.props.pieEstateLeakageConvertedToBase64 === undefined ||
                 this.props.pieEstateLeakageConvertedToBase64 === null) && (
                 <article
@@ -107,7 +118,7 @@ export class OutputGraphsEPLeakage extends React.Component {
                 >
                   <div
                     style={{
-                      visibility: this.props.useNewPDFMethod && "hidden",
+                      visibility: this.props.useNewPDFMethod && "hidden", width:"29%", maxWidth:maxGraphWidth
                     }}
                   >
                     <Pie
@@ -118,11 +129,11 @@ export class OutputGraphsEPLeakage extends React.Component {
                 </article>
               )}
 
+             <div className="column">
               {this.props.pieEstateLeakageConvertedToBase64 !== null && (
                 <img src={this.props.pieEstateLeakageConvertedToBase64} />
               )}
-            </div>
-            <div className="column">
+            </div> 
               {(this.props.pieEstateLeakage2ConvertedToBase64 === undefined ||
                 this.props.pieEstateLeakage2ConvertedToBase64 === null) && (
                 <article
@@ -131,7 +142,7 @@ export class OutputGraphsEPLeakage extends React.Component {
                 >
                   <div
                     style={{
-                      visibility: this.props.useNewPDFMethod && "hidden",
+                      visibility: this.props.useNewPDFMethod && "hidden", width:"29%", maxWidth:maxGraphWidth
                     }}
                   >
                     <Pie
@@ -142,46 +153,84 @@ export class OutputGraphsEPLeakage extends React.Component {
                 </article>
               )}
 
-              {this.props.pieEstateLeakageConvertedToBase64 !== null && (
-                <img src={this.props.pieEstateLeakageConvertedToBase64} />
+            <div className="column">
+              {this.props.pieEstateLeakage2ConvertedToBase64 !== null && (
+                <img src={this.props.pieEstateLeakage2ConvertedToBase64} />
               )}
-            </div>
+            </div> 
+
           </div>
 
-          {/* 
-        {this.props.useNewPDFMethod && (
-                      <div className="printOnly" style={{ height: "100px" }}>
-                        {this.props.pieEstateLeakageConvertedToBase64 !== null && (
-                          <img src={this.props.pieEstateLeakageConvertedToBase64} />
-                        )}
-                      </div>
-                    )}
-        <article  id="pieEstateLeakage"
-            className="canvas-containerLeakage">
-            <div className="EPGraphDiv">
-            <Pie
-              data={leakageGraps.dataPieEstateLeakage}
-              options={leakageGraps.optionsPieEstateLeakage}
-            />
-          </div >
-          </article>
-          {this.props.useNewPDFMethod && (
-                      <div className="printOnly" style={{ height: "100px" }}>
-                        {this.props.pieEstateLeakage2ConvertedToBase64 !== null && (
-                          <img src={this.props.pieEstateLeakage2ConvertedToBase64} />
-                        )}
-                      </div>
-                    )}
-        <article  id="pieEstateLeakage2"
-            className="canvas-containerLeakage" >
-            <div className="EPGraphDiv">
-            <Pie
-              data={leakageGraps.dataPieEstateLeakageLE}
-              options={leakageGraps.optionsPieEstateLeakageLE}
-            />
-          </div>
-        </article>
-  </div>*/}
+
+ */}
+          <table   style={{
+                      visibility: this.props.useNewPDFMethod && "hidden", width:"54%"
+          }}>
+          <tr>
+            <td width="50%">
+            {(this.props.pieEstateLeakageConvertedToBase64 === undefined ||
+                this.props.pieEstateLeakageConvertedToBase64 === null) && (
+                <article
+                  id="pieEstateLeakage"
+                  className="canvas-containerLeakage"
+                >
+                    <Pie
+                      data={leakageGraps.dataPieEstateLeakage}
+                      options={leakageGraps.optionsPieEstateLeakage}
+                    />
+                </article>
+              )}
+            </td>
+            
+            <td width="50%">
+            {(this.props.pieEstateLeakage2ConvertedToBase64 === undefined ||
+                this.props.pieEstateLeakage2ConvertedToBase64 === null) && (
+                 <article
+                  id="pieEstateLeakage2"
+                  className="canvas-containerLeakage"
+                >
+                    <Pie
+                      data={leakageGraps.dataPieEstateLeakageLE}
+                      options={leakageGraps.optionsPieEstateLeakageLE}
+                    />
+                </article>
+              )}
+            </td>
+            
+            </tr>  
+          </table>      
+
+
+
+          <table className="printOnly">
+          <tr style={{border:"none"}}>
+            <td width="50%" style={{border:"none"}}>
+            {this.props.pieEstateLeakageConvertedToBase64 !== null && (
+                <img style={{marginLeft:"-8px", width:"400px"}} src={this.props.pieEstateLeakageConvertedToBase64} />
+              )}
+            </td>
+            <td width="50%" style={{border:"none"}}>
+            {this.props.pieEstateLeakage2ConvertedToBase64 !== null && (
+                <img style={{marginLeft:"-100px", width:"400px"}} src={this.props.pieEstateLeakage2ConvertedToBase64} />
+              )}
+            </td>
+            </tr>  
+          </table>      
+
+          <table className="no-print">
+          <tr style={{border:"none"}}>
+            <td style={{border:"none"}}>
+            {this.props.pieEstateLeakageConvertedToBase64 !== null && (
+                <img style={{ width:"500px" }} src={this.props.pieEstateLeakageConvertedToBase64} />
+              )}
+            </td>
+            <td style={{border:"none"}}>
+            {this.props.pieEstateLeakage2ConvertedToBase64 !== null && (
+                <img style={{width:"500px"}} src={this.props.pieEstateLeakage2ConvertedToBase64} />
+              )}
+            </td>
+            </tr>  
+          </table>      
 
           <br />
           <hr />

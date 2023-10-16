@@ -586,6 +586,11 @@ export function doSavePdfActionEP(props, AssetLiabProjs) {
 
       paraY = paraY + 3.7 * lineHeight;
       paragraph = OUTPUTTEXTEP[lang].pg4P3
+      .replace(
+        "G1",
+        AssetLiabProjs.EstateLiabsByTypeTotal<AssetLiabProjs.EstateLiabsByTypeLE3Total?
+        (lang==="en"?"grows":"passe"):(lang==="en"?"changes":"passe")
+      )
         .replace(
           "X1",
           formatMoney2(AssetLiabProjs.EstateLiabsByTypeTotal, 0, lang)

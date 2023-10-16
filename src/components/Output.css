@@ -108,6 +108,25 @@ padding-right: 1.9em; */
 color: #455560;
 }
 
+p.ppi3 {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: .8em;
+  line-height: .8;
+  color: #455560;
+}
+
+p.EPGreyMsg {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 1.1em;
+  line-height: 1.5;
+  padding: 16px;
+  margin: 4%;
+  width:86%;
+  color: #455560;
+  background-color: lightgrey;;
+}
+
+
 .divppi1 {
   font-family: Georgia, "Times New Roman", Times, serif;
   font-size: 16px;
@@ -229,20 +248,30 @@ h3.ppi2 {
 }
 
 .EP {
-  font-family: "Trebuchet MS", "Times New Roman", Times, serif;
-  font-size: 14px; 
+  /* font-family: "Trebuchet MS", "Times New Roman", Times, serif; */
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 12px; 
 	color: #455560;
-	text-align: center;
+	text-align: left;
 	font-weight: 100;
 	white-space: nowrap;
   border-collapse:collapse;
-  padding:10px
+  padding:10px;
+  height:25px;
+}
 
+.EP td {
+  font-family: Trebuchet MS, Arial, Helvetica, sans-serif;
+  }
+ 
+.EP th{
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-weight: bold;
+  background: #d9d9d9;
+  padding: 6px 6px 3px;
+  height:30px;
 }
-/* th, td {
-  padding: 10px;
-}
- */
+ 
 
 
 h5.ppi1 {
@@ -350,9 +379,7 @@ th, td, tr {
 }
 
 
- table.EP {
-  font-family: Georgia, "Times New Roman", Times, serif;
-  }
+
 
 table.customization td, table.customization tr {
   background-color: rgb(226, 226, 226);
@@ -375,9 +402,13 @@ table.INA td, table.INA th {
 table.INA tr:nth-child(even) {
   background: #ECECEC;
 }
-/* table.INA thead {
+
+
+
+
+ /* table.INA thead {
   background: #062953;
-} */
+} */ 
 /* table.INA thead th {
   font-size: 15px;
   font-weight: bold;
@@ -399,7 +430,7 @@ table.INA tfoot .links {
 }
 
 
-table.INA th{
+table.INA thead{
   font-size: 1.1em;
   font-weight: bold;
   color: white;
@@ -413,6 +444,12 @@ table.INA th{
   height: 1.2em;
   
 }
+
+table.INA_EP_Grids, table.INA_EP_Grids th, table.INA_EP_Grids td {
+  border: 1px solid black;
+  
+}
+
 
 .NeedsTable {
   font-family: Georgia, "Times New Roman", Times, serif;

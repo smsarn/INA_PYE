@@ -856,6 +856,8 @@ let i;
       this.dataValues.DD[2].disableOptionValue[3] = true;
     }
 
+    this.DDTax.disableOptionValue[2] = assetCurr.assetTypeKey === ASSETS.REAL_ESTATE.Key;
+
     //console.log(this.props.assetCurr.projection, this.props.projection[0].grid);
     if (this.state.loading === true && this.props.disableAddRemove === true) {
       return "";

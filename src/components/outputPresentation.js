@@ -7,16 +7,12 @@ import { PopupUserinputDialog } from "./PopupUserInput";
 import {
   IMAGE_APPLET_INA,
   COVER_IMAGE_BASE64_INA,
-  INCOMESOURCES
+  INCOMESOURCES,
 } from "../definitions/generalDefinitions";
 
-import {
-  handleFetchHtmlToPDF2,
-  handleFetchEditPres,
- 
-} from "../utils/FetchAPIs";
+import { handleFetchHtmlToPDF2, handleFetchEditPres } from "../utils/FetchAPIs";
 import { OUTPUTTEXT } from "../definitions/outputDefinitions";
-import { Bar} from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import { doSavePdfAction } from "./OutputPDF";
 import {
   getLogoAndAppletImage,
@@ -30,19 +26,16 @@ import {
   //getDefaultImages,
 } from "../utils/helper";
 
-import {getINAPages
-} from "../utils/outputPresentationSections";
+import { getINAPages } from "../utils/outputPresentationSections";
 
-import {
-  getOutputInfoGrid
-} from "../utils/outputPresentationSections";
+import { getOutputInfoGrid } from "../utils/outputPresentationSections";
 
 import { getInfoINA, getInfoPDF } from "../definitions/infoIconsDefinitions";
 import { Info } from "./Info";
 import saveAs from "file-saver";
 import CustomizeToolbar from "./CustomizeToolbar";
 import OutputInfoGrid from "./OutputInfoGrid";
-import OutputExportGrid from "./OutputExportGrid"
+import OutputExportGrid from "./OutputExportGrid";
 
 const ABOUTME_IMAGE = "aboutMeImage";
 
@@ -60,11 +53,13 @@ export default class OutputPresentation extends Component {
       appletImage: null,
       logoImage: null,
       aboutMe: this.props.aboutMe,
-      includeAboutMe: this.props.aboutMe!==undefined && this.props.aboutMe.lastname!==undefined,
+      includeAboutMe:
+        this.props.aboutMe !== undefined &&
+        this.props.aboutMe.lastname !== undefined,
       refreshAboutMe: false,
       pdfLoaded: true,
-      customizeMsg:false,
-      showToEPMsg:false
+      customizeMsg: false,
+      showToEPMsg: false,
     };
 
     this.dateApplet = "";
@@ -73,15 +68,14 @@ export default class OutputPresentation extends Component {
     this.showLogo = "none";
     this.showAppletImage = "none";
     this.refPage = [];
-    this.editPresBlob=null
+    this.editPresBlob = null;
   }
 
   doPDF = () => {
     doSavePdfAction(this.props);
   };
 
-
-  setUpPDF=async ()=>{
+  setUpPDF = async () => {
     let barConvertedToBase64 = await chartToBase64Image("bar2");
     let aboutMeImageConvertedToBase64 = null;
 
@@ -89,20 +83,16 @@ export default class OutputPresentation extends Component {
       aboutMeImageConvertedToBase64 = await getBase64AppletImage(ABOUTME_IMAGE);
     }
 
-    
-//    console.log(aboutMeImageConvertedToBase64);
+    //    console.log(aboutMeImageConvertedToBase64);
 
-    let spouseSwitched=null;
-    if(this.props.dataInput.Clients.length>1)
+    let spouseSwitched = null;
+    if (this.props.dataInput.Clients.length > 1)
       spouseSwitched = await this.getSpouseINA(this.props);
     this.setState({
       barConvertedToBase64: barConvertedToBase64,
       aboutMeImageConvertedToBase64: aboutMeImageConvertedToBase64,
       spouseSwitched: spouseSwitched,
-    },
-    
-    
-    );
+    });
 
     const cssInline = extractPageCSS();
     let pdfSections = [];
@@ -110,7 +100,6 @@ export default class OutputPresentation extends Component {
 
     const noPages = this.pages.length;
     for (let i = 0; i < noPages; i++) {
-      console.log(this.refPage[i].innerHTML)
       htmls.push(this.refPage[i].innerHTML);
       pdfSections.push({
         html: htmls[i],
@@ -118,11 +107,17 @@ export default class OutputPresentation extends Component {
       });
     }
 
-    return({
-      sections:pdfSections,
-      css:cssInline
-    })
+    return {
+      sections: pdfSections,
+      css: cssInline,
+    };
+  };
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      barConvertedToBase64: null,
+      aboutMeImageConvertedToBase64: null,
+    });
   }
 
   doPDF3 = async () => {
@@ -130,13 +125,13 @@ export default class OutputPresentation extends Component {
       return;
     }
     this.setState({ pdfLoaded: false });
-    
-    const PDF= await this.setUpPDF();
-    
+
+    const PDF = await this.setUpPDF();
+
     let blobRes = await handleFetchHtmlToPDF2(PDF.sections, PDF.css);
     let blob = new Blob([blobRes], { type: "application/pdf" });
-    saveAs(blob, `INAPDF`+Date.now());
-    
+    saveAs(blob, `INAPDF` + Date.now());
+
     this.setState({ pdfLoaded: true });
   };
 
@@ -145,23 +140,24 @@ export default class OutputPresentation extends Component {
       return;
     }
     this.setState({ pdfLoaded: false });
-    
-    const PDF= await this.setUpPDF();
 
-     for (let i = 0; i < this.pages.length; i++) {
-      PDF.sections[i].css= PDF.css
+    const PDF = await this.setUpPDF();
+
+    for (let i = 0; i < this.pages.length; i++) {
+      PDF.sections[i].css = PDF.css;
     }
-    
-    let blobRes = await handleFetchEditPres(
-      PDF.sections, PDF.css,
-      this.props.dataInput.Presentations[0].language
-    );
- //   await async function () {
-    this.setState({ customizeMsg: true });
-      this.editPresBlob=new Blob([blobRes], { type: "text/html" });
-    
-    this.setState({ pdfLoaded: true });
 
+    let blobRes = await handleFetchEditPres(
+      PDF.sections,
+      PDF.css,
+      this.props.dataInput.Presentations[0].language,
+      "INA"
+    );
+    //   await async function () {
+    this.setState({ customizeMsg: true });
+    this.editPresBlob = new Blob([blobRes], { type: "text/html" });
+
+    this.setState({ pdfLoaded: true });
   };
 
   doLIFO = async () => {
@@ -194,30 +190,27 @@ export default class OutputPresentation extends Component {
     );
   };
 
-  respondToEPMsg=()=>{
-    {  this.setState({showToEPMsg:false})
-
-  }}
-
-  doEP = async (hasTaxSavings) => {
-    
-    if(hasTaxSavings)
-    {  this.setState({showToEPMsg:true})
-      
-  }
-  else{
-    await window.parent.postMessage(
-      "EP_" +
-        this.props.dataInput.Presentations[0].language +
-        "_" +
-        this.props.encryptedInputLife1AndSpouse,
-      "*"
-    );
-    // send notif to remove spinner
-    window.parent.postMessage("FRAME_LOADED", "*");
+  respondToEPMsg = () => {
+    {
+      this.setState({ showToEPMsg: false });
     }
   };
 
+  doEP = async (hasTaxSavings) => {
+    if (hasTaxSavings) {
+      this.setState({ showToEPMsg: true });
+    } else {
+      await window.parent.postMessage(
+        "EP_" +
+          this.props.dataInput.Presentations[0].language +
+          "_" +
+          this.props.encryptedInputLife1AndSpouse,
+        "*"
+      );
+      // send notif to remove spinner
+      window.parent.postMessage("FRAME_LOADED", "*");
+    }
+  };
 
   getSpouseINA = async (props) => {
     let data;
@@ -236,15 +229,12 @@ export default class OutputPresentation extends Component {
   };
 
   restoreCover = () => {
-    const img = COVER_IMAGE_BASE64_INA// getDefaultImages().appletImage.image;
-    console.log(img);
-    this.updateImageApplet(img)
-    
-  }
+    const img = COVER_IMAGE_BASE64_INA; // getDefaultImages().appletImage.image;
+    //console.log(img);
+    this.updateImageApplet(img);
+  };
 
-
-
-  updateImageApplet =(image) => {
+  updateImageApplet = (image) => {
     this.setState({ appletImage: image });
     const img = {
       image: image,
@@ -256,14 +246,13 @@ export default class OutputPresentation extends Component {
       default: true,
     };
     this.props.imageAdjust(img, IMAGE_APPLET_INA);
-    
   };
 
   updateImageLogo = (image, size) => {
     this.setState({ logoImage: image });
 
     this.firstPageLogoWidth = size;
-    console.log(image, size);
+    //console.log(image, size);
   };
 
   toggleCheckbox = (include) => {
@@ -276,26 +265,20 @@ export default class OutputPresentation extends Component {
       var a = document.createElement("a");
       a.href = window.URL.createObjectURL(this.editPresBlob);
       a.target = "_blank";
-      
-      
+
       a.click();
     }
   };
 
-  updateAboutMe=(aboutMe)=>{
-    console.log(this.state.aboutMe);
-    this.setState({aboutMe: aboutMe}, console.log(this.state.aboutMe))
-
-  }
+  updateAboutMe = (aboutMe) => {
+    //console.log(this.state.aboutMe);
+    this.setState({ aboutMe: aboutMe }, console.log(this.state.aboutMe));
+  };
 
   render() {
-
-
-    console.log(this.state.aboutMe)
-    
     // presentation output shared with pdf
 
-   // let output = getOutputValues(this.props);
+    // let output = getOutputValues(this.props);
 
     const lang = this.props.dataInput.Presentations[0].language;
     const labelsBilingual = OUTPUTTEXT[lang];
@@ -313,22 +296,23 @@ export default class OutputPresentation extends Component {
     const singleFamily = isSingleFamily(clients);
     const noSurvivor = singlePerson && versionDetails().versionNumeric <= 10014;
 
-    const TC=this.props.dataInput.Sources.filter(
-      (item) => (item.name===INCOMESOURCES.TAX_CREDIT.value.en||item.name===INCOMESOURCES.TAX_CREDIT.value.fr) && item.value>0
+    const TC = this.props.dataInput.Sources.filter(
+      (item) =>
+        (item.name === INCOMESOURCES.TAX_CREDIT.value.en ||
+          item.name === INCOMESOURCES.TAX_CREDIT.value.fr) &&
+        item.value > 0
     );
- 
 
-     // spouse ins
-     let spouseInsRet;
-     let spouseInsLE;
-     let LEIfClientisSurvivor;
-     
+    // spouse ins
+    let spouseInsRet;
+    let spouseInsLE;
+    let LEIfClientisSurvivor;
+
     if (!singleFamily && this.state.spouseSwitched !== null) {
       spouseInsRet = cleanFormat(this.state.spouseSwitched.spouseInsRet, lang);
       spouseInsLE = cleanFormat(this.state.spouseSwitched.spouseInsLE, lang);
       LEIfClientisSurvivor = this.state.spouseSwitched.LEIfClientisSurvivor;
     }
-
 
     const needTo = this.props.insNeedLine;
     const images = getLogoAndAppletImage(
@@ -339,17 +323,31 @@ export default class OutputPresentation extends Component {
       this.updateImageLogo
     );
 
-
     const posGrid = singleFamily || singlePerson ? "-80px" : "-30px";
 
+    let outputPages = getINAPages(
+      this.props,
+      this.state.spouseSwitched,
+      this.state.appletImage,
+      this.state.aboutMe,
+      this.state.includeAboutMe,
+      this.state.barConvertedToBase64,
+      this.state.aboutMeImageConvertedToBase64,
+      this.firstPageLogoWidth
+    );
+    this.pages = outputPages.allPages;
+    this.refPage = outputPages.refPage;
 
-  let outputPages=getINAPages(this.props, this.state.spouseSwitched,this.state.appletImage,this.state.aboutMe,this.state.includeAboutMe,this.state.barConvertedToBase64, this.state.aboutMeImageConvertedToBase64,this.firstPageLogoWidth )
-  this.pages = outputPages.allPages;
-  this.refPage=outputPages.refPage
+    //console.log(this.refPage, outputPages.refPage);
+    const gridData = {
+      insuranceNeedRet: this.props.insuranceNeedRet,
+      insuranceNeedLE: this.props.insuranceNeedLE,
+      insuranceNeedEAge: this.props.insuranceNeedEAge,
+      projYears: projYears,
+      yrsCoverageIfCashAll: this.props.yrsCoverageIfCashAll,
+    };
 
-  console.log(this.refPage, outputPages.refPage)
-    const gridData={insuranceNeedRet:this.props.insuranceNeedRet,insuranceNeedLE:this.props.insuranceNeedLE,insuranceNeedEAge:this.props.insuranceNeedEAge,projYears:projYears,yrsCoverageIfCashAll:this.props.yrsCoverageIfCashAll}  
-
+    //console.log(this.props.dataInput.Presentations[0].appletImage.default);
     if (noSurvivor) {
       return (
         <div>
@@ -368,23 +366,25 @@ export default class OutputPresentation extends Component {
             aboutMe={this.state.aboutMe}
             toggleCheckbox={this.toggleCheckbox}
             updateImageLogo={this.updateImageLogo}
-            defaltCover={this.props.dataInput.Presentations[0].appletImage.default}
+            defaltCover={
+              this.props.dataInput.Presentations[0].appletImage.default
+            }
             restoreCover={this.restoreCover}
-            editPres = {this.doEditPres}
+            editPres={this.doEditPres}
             token={this.props.token}
             updateAboutMe={this.updateAboutMe}
           />
           <div style={{ height: "0px" }}>
-              <PopupUserinputDialog
-                openDialog={this.state.customizeMsg}
-                title={labelsBilingual.customizeAlertTitle}
-                mainMessage={labelsBilingual.customizeAlert}
-                severity={"warning"}
-                language={lang}
-                respondToInput={this.respondToCustomizeMsg}
-              />
-            </div>
             <PopupUserinputDialog
+              openDialog={this.state.customizeMsg}
+              title={labelsBilingual.customizeAlertTitle}
+              mainMessage={labelsBilingual.customizeAlert}
+              severity={"warning"}
+              language={lang}
+              respondToInput={this.respondToCustomizeMsg}
+            />
+          </div>
+          <PopupUserinputDialog
             openDialog={this.state.showToEPMsg}
             //title={labelsBilingual.customizeAlertTitle}
             mainMessage={labelsBilingual.taxSavingToEP}
@@ -402,14 +402,19 @@ export default class OutputPresentation extends Component {
           >
             <h3 className="ppi1" style={{ paddingLeft: "5px" }}>
               {needTo}
-              <Info infoIcon={getInfoINA(lang)}
- />
+              <Info infoIcon={getInfoINA(lang)} />
             </h3>
 
             <div className="row" style={{ marginTop: posGrid }}>
               {singleFamily === false && singlePerson === false && (
                 <div className="column">
-                 <OutputInfoGrid gridData={gridData} lang={lang} periodOption={this.props.dataInput.Presentations[0].periodOption}/>
+                  <OutputInfoGrid
+                    gridData={gridData}
+                    lang={lang}
+                    periodOption={
+                      this.props.dataInput.Presentations[0].periodOption
+                    }
+                  />
                 </div>
               )}
 
@@ -421,8 +426,17 @@ export default class OutputPresentation extends Component {
                   float: "right",
                 }}
               >
-                <OutputExportGrid doEP={this.doEP} doLIFO={this.doLIFO} doWL={this.doWL} doCA={this.doCA} lang={lang} insuranceNeed={this.props.insuranceNeed}
-                    pres={this.props.dataInput.Presentations[0]} client={this.props.dataInput.Clients[0]} TC={TC.length}/>
+                <OutputExportGrid
+                  doEP={this.doEP}
+                  doLIFO={this.doLIFO}
+                  doWL={this.doWL}
+                  doCA={this.doCA}
+                  lang={lang}
+                  insuranceNeed={this.props.insuranceNeed}
+                  pres={this.props.dataInput.Presentations[0]}
+                  client={this.props.dataInput.Clients[0]}
+                  TC={TC.length}
+                />
               </div>
             </div>
           </div>

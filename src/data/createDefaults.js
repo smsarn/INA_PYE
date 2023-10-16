@@ -223,11 +223,9 @@ export function createDefaultPres(id, tax) {
 
 export function getDefaultData(){
   let dataInput;
- 
   if(localStorage.getItem(DEFAULT_QUOTE)===null)
   {
     dataInput= getDefaultCase()
-
     }
     else
 {

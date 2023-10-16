@@ -17,7 +17,8 @@ import {
   ASSET_API_OUTPUT_Withdrawals,
   ASSET_API_OUTPUT_RRIF,
   ASSET_API_OUTPUT_TaxPayableonIncome,
-  ASSET_API_OUTPUT_DispositionAmount,appSiteAPI,
+  ASSET_API_OUTPUT_DispositionAmount,
+  appSiteAPI,
   ASSETS,
   ASSET_TAX,
 } from "../definitions/generalDefinitions";
@@ -61,7 +62,7 @@ function fetchAP(dataNA, assetID) {
             dataAsset.asset.contributionStartYr= 1;
             dataAsset.asset.contributionDur= 20;  */
 
-   return fetch(url, {
+  return fetch(url, {
     method: "POST",
     //			redirect: 'follow',
     //			credentials: 'same-origin',
@@ -79,7 +80,7 @@ function fetchAP(dataNA, assetID) {
     })
     .then((response) => response.json())
     .then((data) => {
-     // console.log(data,JSON.stringify(dataAsset))
+      // console.log(data,JSON.stringify(dataAsset))
       return data;
     })
     .catch((error) => {
@@ -124,7 +125,6 @@ function fetchMCC(dataNA, insNeed) {
       // this.setState({failedAPI: true});
     });
 }
-
 
 //async function fetchTaxRate1(appSiteAPI, type, province) {
 export async function getTaxRate(type, province) {
@@ -229,7 +229,7 @@ export async function handleFetchInsuranceNeeds(dataNA, dataP) {
     });
 
     let data = await insuranceNeeds.json();
-   
+
     return data;
   } catch (error) {
     console.log("handleFetchInsuranceNeeds failed: ", error);
@@ -322,7 +322,7 @@ async function asyncAPICall(dataNA, assetID) {
 }
  */
 export async function fetchAssetProjectionAPI(dataNA, assetID) {
-   let dataProjection = {
+  let dataProjection = {
     dataColTitles: [],
     dataValues: [],
   };
@@ -332,7 +332,6 @@ export async function fetchAssetProjectionAPI(dataNA, assetID) {
   let data = await asyncAPICall(dataNA, assetID);
 
   return data;
-
 }
 
 export async function fetchAssetFMVandTaxLiab(dataNA, assetID) {
@@ -359,6 +358,7 @@ export async function handleFetchInsuranceNeedsNew(dataNA, dataInput) {
   try {
     let url = appSiteAPI + "/api/NA_InsuranceNeeds/";
 
+    //console.log(JSON.stringify(dataNA));
     let data = await fetch(url, {
       method: "POST",
       headers: {
@@ -369,7 +369,7 @@ export async function handleFetchInsuranceNeedsNew(dataNA, dataInput) {
     });
 
     let dataINA = await data.json();
-    //console.log(JSON.stringify(dataNA))
+    //console.log(dataINA, JSON.stringify(dataNA));
 
     let dataDetails = await fetchInsuranceNeedsData(
       dataNA,
@@ -377,8 +377,8 @@ export async function handleFetchInsuranceNeedsNew(dataNA, dataInput) {
     );
 
     if (dataINA !== undefined && dataDetails !== undefined) {
-       console.log("POST: NA_OutputAll success");
-       return {
+      console.log("POST: NA_OutputAll success");
+      return {
         dataInsuranceNeeds: dataINA,
         dataNAAges: dataDetails.ages,
         dataCashFlowGov: dataDetails.govCF,
@@ -389,7 +389,7 @@ export async function handleFetchInsuranceNeedsNew(dataNA, dataInput) {
         cppDB: dataDetails.cppDB,
         orphan: dataDetails.orphan,
         probate: dataDetails.probate,
-        yrsCoverageIfCashAll:dataDetails.yrsCoverageIfCashAll,
+        yrsCoverageIfCashAll: dataDetails.yrsCoverageIfCashAll,
         lifeExp: dataDetails.lifeExp,
         lifeExpClient: dataDetails.lifeExpClient,
         lifeExpJLTD: dataDetails.lifeExpJLTD,
@@ -438,7 +438,6 @@ export async function handleFetchQueryStringSave(dataNA) {
 }
 
 export async function handleFetchLoadFromQueryString(contentsFile) {
-
   fetch(appSiteAPI + "/api/NA_QS?QS=" + contentsFile)
     .then((response) => {
       if (response.ok === false) {
@@ -448,7 +447,6 @@ export async function handleFetchLoadFromQueryString(contentsFile) {
     })
     .then((response) => response.json())
     .then(async (data) => {
-    
       return data;
     })
     .catch((error) => {
@@ -459,11 +457,11 @@ export async function handleFetchLoadFromQueryString(contentsFile) {
 export async function handleFetchINADataFromQueryString(savedINA) {
   try {
     let url = appSiteAPI + "/api/NA_QS?QS=" + savedINA;
-    
+
     try {
       let savedData = await fetch(url);
       let data = await savedData.json();
-      
+
       return data;
     } catch (error) {
       console.log("error, handleFetchINADataFromQueryString failed", error);
@@ -473,9 +471,7 @@ export async function handleFetchINADataFromQueryString(savedINA) {
   }
 }
 
-
-export async function handleFetchQueryString2(dataNA){
-
+export async function handleFetchQueryString2(dataNA) {
   //const lang=this.state.dataInput.Presentations[0].language
   /* console.log(
     this.state.dataOutput.dataInsuranceNeeds[
@@ -520,75 +516,72 @@ export async function handleFetchQueryString2(dataNA){
         + appSiteParent + ["applet=EP","QS=" + this.dataQS].join('&')
 */
 
-      //  const ft=appSiteParent + "/?" + ["applet="+appletMode , "QS="+this.dataQS].join('&')
+        //  const ft=appSiteParent + "/?" + ["applet="+appletMode , "QS="+this.dataQS].join('&')
         /* url="mailto: ?subject= Needs Analysis Quote &body= The following link takes you to the landing page of Toolkit Direct. Once there, click on Insurance Needs Analysis to open up the attached quote.%0D%0A" +
         encodeURIComponent(ft) */
-       // url="mailto: ?subject= " +  (appletMode==="INA"?TITLES[lang].appletINA:TITLES[lang].appletEP) + " &body= " + EMAIL[lang].body+ ".%0D%0A"  + encodeURIComponent(ft)
+        // url="mailto: ?subject= " +  (appletMode==="INA"?TITLES[lang].appletINA:TITLES[lang].appletEP) + " &body= " + EMAIL[lang].body+ ".%0D%0A"  + encodeURIComponent(ft)
 
         //return url;
-       // console.log(url)
+        // console.log(url)
         //  window.location.href = url; */
-        }
       }
-    )
+    })
     .catch((error) => {
       console.log("handleFetchQueryString failed: " + error);
       // this.setState({failedAPI: true});
       return "";
     });
-};
+}
 
-export async function handleFetchQueryString(dataNA){
-
+export async function handleFetchQueryString(dataNA) {
   try {
     const url = appSiteAPI + "/api/NA_QS/";
-  let fetchData = await fetch(url, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(dataNA),
-  })
-  let data = await fetchData.json();
-  if (data !== undefined)
-        return data;
- } catch (error) {
+    let fetchData = await fetch(url, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataNA),
+    });
+    let data = await fetchData.json();
+    if (data !== undefined) return data;
+  } catch (error) {
     console.log("handleFetchQueryString", error);
   }
 }
 
-export async function handleFetchPDF(){
-
+export async function handleFetchPDF() {
   try {
-    const dataNA={
-      Html:"<span>goh</span>",
-      Css:".canvas-containerWeb {Height: 20vh;}"
-      
-      }
+    const dataNA = {
+      Html: "<span>goh</span>",
+      Css: ".canvas-containerWeb {Height: 20vh;}",
+    };
 
-     // console.log( JSON.stringify(dataNA))
+    // console.log( JSON.stringify(dataNA))
     const url = appSiteAPI + "/api/TKD_PDFGenerator/";
-  let fetchData = await fetch(url, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(dataNA),
-  })
-  let data = await fetchData.json();
-  if (data !== undefined){
-    //    console.log(data)
-        return data;}
- } catch (error) {
+    let fetchData = await fetch(url, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataNA),
+    });
+    let data = await fetchData.json();
+    if (data !== undefined) {
+      //    console.log(data)
+      return data;
+    }
+  } catch (error) {
     console.log("handleFetchQueryString", error);
   }
 }
 
-
-export async function fetchValidateTokenGetAgentEmailRecordAppletLogin(authToken, applet){
-   
+export async function fetchValidateTokenGetAgentEmailRecordAppletLogin(
+  authToken,
+  applet
+) {
   /* try {
     const url = appSiteAPI + "/api/TKD_ValidateJWT?authToken=" + authToken;
     console.log(url)
@@ -599,41 +592,36 @@ export async function fetchValidateTokenGetAgentEmailRecordAppletLogin(authToken
   } catch (error) {
     console.log("error, fetchGetAgentEmailFromDB failed", error);
   } */
- 
 
   try {
-    const url = appSiteAPI + "/api/TKD_ValidateJWT";//?authToken=";
-    let jwt = {"authToken": authToken, "applet":applet} 
+    const url = appSiteAPI + "/api/TKD_ValidateJWT"; //?authToken=";
+    let jwt = { authToken: authToken, applet: applet };
 
     let fetchData = await fetch(url, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(jwt)
-  })
-   let data = await fetchData.json();
-  if (data !== undefined)
-  {
-    console.log(data,JSON.stringify(jwt))
-    return data;
-  }
- } catch (error) {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(jwt),
+    });
+    let data = await fetchData.json();
+    if (data !== undefined) {
+      //console.log(data, JSON.stringify(jwt));
+      return data;
+    }
+  } catch (error) {
     console.log("fetchValidateTokenGetAgentEmailRecordAppletLogin", error);
   }
 }
 
+export async function fetchAppletNamesAndCodes() {
+  let applets = [];
+  applets.push({ name: "INA", code: "INA" });
+  applets.push({ name: "PYE", code: "EP" });
 
-
-
-    export async function fetchAppletNamesAndCodes(){
-      let applets=[]
-      applets.push({name:"INA", code:"INA"})
-      applets.push({name:"PYE", code:"EP"})
-
-      return applets
-      /* try {
+  return applets;
+  /* try {
         const url = appSiteAPI + "/api/TKD_ValidateJWT";//?authToken=";
         let jwt = {"authToken": authToken, "applet":applet} 
     
@@ -654,134 +642,122 @@ export async function fetchValidateTokenGetAgentEmailRecordAppletLogin(authToken
      } catch (error) {
         console.log("fetchValidateTokenGetAgentEmailRecordAppletLogin", error);
       } */
-    }
+}
 
+export async function fetchAppletDetails() {
+  try {
+    let AppletDetails = await fetch(appSiteAPI + "/api/TKD_AppletDetails");
+    let data = await AppletDetails.json();
+    //console.log(data)
 
-    
-
-    export async function fetchAppletDetails() {
-      try {
-        let AppletDetails = await fetch(
-          appSiteAPI + "/api/TKD_AppletDetails"
-        );
-        let data = await AppletDetails.json();
-        //console.log(data)
-
-        return data;
-      } catch (error) {
-        console.log("error, AppletDetails API failed", error);
-      }
-    }
-    
-    export async function fetchSaveComment(fb_json){
-      try {
-        const url = appSiteAPI + "/api/TKD_AddFeedback";//?authToken=";
-        //console.log(fb_json)
-         
-          let fetchData = await fetch(url, {
-          method: "POST",
-          headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          },
-          body: JSON.stringify(fb_json)
-      })
-      let data = await fetchData.json();
-      if (data !== undefined)
-      {
-         // console.log(data, fb_json)
-          return data;
-      }
-      } catch (error) {
-      console.log("fetchSaveComment", error);
-    }
+    return data;
+  } catch (error) {
+    console.log("error, AppletDetails API failed", error);
   }
-  
+}
 
-  /* export async function handleFetchHtmlToPDF (html,css, footer, hasHeader,width, orientation){ */
-    export async function handleFetchHtmlToPDF (pdfSections){
-      try {
-      
-      /* let pdfSections=[]
+export async function fetchSaveComment(fb_json) {
+  try {
+    const url = appSiteAPI + "/api/TKD_AddFeedback"; //?authToken=";
+    //console.log(fb_json)
+
+    let fetchData = await fetch(url, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(fb_json),
+    });
+    let data = await fetchData.json();
+    if (data !== undefined) {
+      // console.log(data, fb_json)
+      return data;
+    }
+  } catch (error) {
+    console.log("fetchSaveComment", error);
+  }
+}
+
+/* export async function handleFetchHtmlToPDF (html,css, footer, hasHeader,width, orientation){ */
+export async function handleFetchHtmlToPDF(pdfSections) {
+  try {
+    /* let pdfSections=[]
       let pdfSection={html:html,css:css, footer:footer, hasHeader:hasHeader,width:width, orientation:orientation}
       pdfSections.push(pdfSection)
       pdfSection={html:html,css:css, footer:footer, hasHeader:hasHeader,width:width, orientation:"landscape"}
       pdfSections.push(pdfSection)
        */
-      let mergeItems=[]      
-      for(let i=0;i<pdfSections.length;i++)
-        mergeItems.push({"html": pdfSections[i].html, "css": null, APIOptionItems:
-        {
-          footerText:pdfSections[i].footer,
-          TopMargin:pdfSections[i].hasHeader?10:10,
-         // HtmlViewerWidth: 1024,    
-          X:50,
-          Width :pdfSections[i].width, 
-          footerHeight:60,
+    let mergeItems = [];
+    for (let i = 0; i < pdfSections.length; i++)
+      mergeItems.push({
+        html: pdfSections[i].html,
+        css: null,
+        APIOptionItems: {
+          footerText: pdfSections[i].footer,
+          TopMargin: pdfSections[i].hasHeader ? 10 : 10,
+          // HtmlViewerWidth: 1024,
+          X: 50,
+          Width: pdfSections[i].width,
+          footerHeight: 60,
           PageBreakBeforeHtmlElementsSelectors: "pagebreak",
-          MediaTypePrint :true,
-         // HtmlViewerZoom : pdfSections[i].hasHeader?200:180, 
+          MediaTypePrint: true,
+          // HtmlViewerZoom : pdfSections[i].hasHeader?200:180,
         },
-        HtmlViewerWidth:window.screen.width/window.innerWidth,
-        PdfPageOrientation :pdfSections[i].orientation
-        })
+        HtmlViewerWidth: window.screen.width / window.innerWidth,
+        PdfPageOrientation: pdfSections[i].orientation,
+      });
 
-        console.log(mergeItems)
-      const url = appSiteAPI + "/api/TKD_PDFGenerator";//?authToken=";
-      let js = { MergeItems:mergeItems, css:pdfSections[0].css}
+    //console.log(mergeItems);
+    const url = appSiteAPI + "/api/TKD_PDFGenerator"; //?authToken=";
+    let js = { MergeItems: mergeItems, css: pdfSections[0].css };
 
-
-      return fetch(url, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          "Referrer-Policy": "no-referrer",
-        },
-        body: JSON.stringify(js)
-       
-      })
-        .then(handleResponseBuffer)
-    } catch (error) {
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "Referrer-Policy": "no-referrer",
+      },
+      body: JSON.stringify(js),
+    }).then(handleResponseBuffer);
+  } catch (error) {
     console.log("handleFetchHtmlToPDF", error);
   }
 }
 
-export async function handleFetchHtmlToPDF2 (pdfSections,cssInline){
+export async function handleFetchHtmlToPDF2(pdfSections, cssInline) {
   try {
-  
-  let mergeItems=[]      
-  for(let i=0;i<pdfSections.length;i++)
-    mergeItems.push({"html": pdfSections[i].html, "css": null, APIOptionItems: null,
-    HtmlViewerWidth:null,
-    PdfPageOrientation :pdfSections[i].orientation
-    })
+    let mergeItems = [];
+    for (let i = 0; i < pdfSections.length; i++)
+      mergeItems.push({
+        html: pdfSections[i].html,
+        css: null,
+        APIOptionItems: null,
+        HtmlViewerWidth: null,
+        PdfPageOrientation: pdfSections[i].orientation,
+      });
 
-  const url = appSiteAPI + "/api/TKD_PDFGenerator";//?authToken=";
-  let js = { MergeItems:mergeItems, css:cssInline}
+    const url = appSiteAPI + "/api/TKD_PDFGenerator"; //?authToken=";
+    let js = { MergeItems: mergeItems, css: cssInline };
 
-
-  return fetch(url, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      "Referrer-Policy": "no-referrer",
-    },
-    body: JSON.stringify(js)
-   
-  })
-    .then(handleResponseBuffer)
-} catch (error) {
-console.log("handleFetchHtmlToPDF", error);
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "Referrer-Policy": "no-referrer",
+      },
+      body: JSON.stringify(js),
+    }).then(handleResponseBuffer);
+  } catch (error) {
+    console.log("handleFetchHtmlToPDF", error);
+  }
 }
-}
 
-
-export async function handleFetchEditPres(pdfSections,css, lang){
+export async function handleFetchEditPres(pdfSections, css, lang, appletName) {
   try {
-  
-  /* let mergeItems=[]      
+    /* let mergeItems=[]      
   for(let i=0;i<pdfSections.length;i++)
     mergeItems.push({"html": pdfSections[i].html, "css": pdfSections[0].css, APIOptionItems: {
       footerText:"",
@@ -799,72 +775,87 @@ export async function handleFetchEditPres(pdfSections,css, lang){
     })
 
  */
-let mergeItems=[]      
-  for(let i=0;i<pdfSections.length;i++)
-    mergeItems.push({"html": pdfSections[i].html , APIOptionItems: {},
-    HtmlViewerWidth:null,
-    PdfPageOrientation :pdfSections[i].orientation
-    })
+    let mergeItems = [];
+    for (let i = 0; i < pdfSections.length; i++)
+      mergeItems.push({
+        html: pdfSections[i].html,
+        APIOptionItems: {},
+        HtmlViewerWidth: null,
+        PdfPageOrientation: pdfSections[i].orientation,
+      });
 
-  const url = appSiteAPI + "/api/TKD_PresentationEditor";//?authToken=";
-  let js = {appletName:"INA", mergeItems: mergeItems,html:"", css: css, language:lang}
+    const url = appSiteAPI + "/api/TKD_PresentationEditor"; //?authToken=";
+    let js = {
+      appletName: appletName,
+      mergeItems: mergeItems,
+      html: "",
+      css: css,
+      language: lang,
+    };
 
-
-  return fetch(url, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      "Referrer-Policy": "no-referrer",
-    },
-    body: JSON.stringify(js)
-   
-  })
-    .then(handleResponseBuffer)
-} catch (error) {
-console.log("handleFetchHtmlToPDF", error);
-}
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "Referrer-Policy": "no-referrer",
+      },
+      body: JSON.stringify(js),
+    }).then(handleResponseBuffer);
+  } catch (error) {
+    console.log("handleFetchHtmlToPDF", error);
+  }
 }
 
 export function handleFetchAdvisorPortfolio4(email) {
   var myHeaders = new Headers();
-myHeaders.append("Content-Type", "application/json");
-myHeaders.append("Accept", "application/json");
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append("Accept", "application/json");
 
-//email="bruce.ewart@gmail.com";//bruce.ewart@gmail.com";//bruce.ewart@gmail.com";//sjoseph@ppi.ca";//msamiei@telus.net"
-  
-var raw = "";
-var requestOptions = {
-  method: 'GET',
-  headers: myHeaders,
-};
+  //email="bruce.ewart@gmail.com";//bruce.ewart@gmail.com";//bruce.ewart@gmail.com";//sjoseph@ppi.ca";//msamiei@telus.net"
 
-fetch(appSiteAPI + "/api/AdvisorPortfolio?email=" + email, requestOptions)
-  .then(response => response.json())
-  .then(result => {console.log(result);  
-    alert("Email: " + email + "  -   ".concat(result.lastname === undefined?"No YLB" : "YLB last name: " + result.lastname));
-  return result;})
-  .catch(error => console.log('error', error));
+  var raw = "";
+  var requestOptions = {
+    method: "GET",
+    headers: myHeaders,
+  };
 
+  fetch(appSiteAPI + "/api/AdvisorPortfolio?email=" + email, requestOptions)
+    .then((response) => response.json())
+    .then((result) => {
+      console.log(result);
+      alert(
+        "Email: " +
+          email +
+          "  -   ".concat(
+            result.lastname === undefined
+              ? "No YLB"
+              : "YLB last name: " + result.lastname
+          )
+      );
+      return result;
+    })
+    .catch((error) => console.log("error", error));
 }
 
 export async function handleFetchAdvisorPortfolio(token) {
   try {
     var myHeaders = new Headers();
-myHeaders.append("Content-Type", "application/json");
-myHeaders.append("Accept", "application/json");
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Accept", "application/json");
     //email="msamiei@telus.net";//bruce.ewart@gmail.com";//sjoseph@ppi.ca";//msamiei@telus.net"
 
     var requestOptions = {
-      method: 'GET',
+      method: "GET",
       headers: myHeaders,
     };
 
-
     let aboutMe = await fetch(
-      appSiteAPI + "/api/AdvisorPortfolio?tkdtkn=" + token, requestOptions)
-    
-      let jsonData= await aboutMe.json();//parseXmlToJson(data)
+      appSiteAPI + "/api/AdvisorPortfolio?tkdtkn=" + token,
+      requestOptions
+    );
+
+    let jsonData = await aboutMe.json(); //parseXmlToJson(data)
     return jsonData;
   } catch (error) {
     console.log("error, AboutMe API failed", error);

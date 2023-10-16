@@ -35,7 +35,9 @@ export class OutputGraphStacked extends React.Component {
         }
       }, */
       elements: { point: { radius: 0 } },
-      responsive: true,
+      responsive:true,
+      maintainAspectRatio: false,
+      devicePixelRatio: 4,
       animation: {
         onComplete: async ()=> {
            this.props.graphStackedDone()
@@ -45,15 +47,15 @@ export class OutputGraphStacked extends React.Component {
         display: true,
         position: "top",
         text: OUTPUTTEXTEP[lang].pg4GT,
-        fontSize: 16, //8,
-        fontColor: "#111",
+        fontSize: 12, //8,
+        fontColor:"#455560",
       },
       legend: {
         display: true,
         position: "bottom",
         labels: {
           fontColor: "#333",
-          fontSize: 12, //16
+          fontSize: 8, //16
         },
       },
       scales: {
@@ -61,7 +63,7 @@ export class OutputGraphStacked extends React.Component {
           {
             stacked: true,
             ticks: {
-              fontSize: 12,
+              fontSize: 8,
               beginAtZero: true,
               callback: function (value, index, values) {
                 let result =
@@ -82,7 +84,7 @@ export class OutputGraphStacked extends React.Component {
           {
             stacked: true,
             ticks: {
-              fontSize: 12,
+              fontSize: 8,
               beginAtZero: true,
             },
           },
@@ -153,32 +155,36 @@ export class OutputGraphStacked extends React.Component {
       datasets: dataAssetnEstateLiabProj,
     };
 
+    
+    
     return (
-      <div style={{ width: "90%" }}>
+      <div style={{ width: "100%" }}>
         <div>
           {this.props.useNewPDFMethod && (
             <div >
               {this.props.stackedChartConvertedToBase64 !== null && (
-                <img src={this.props.stackedChartConvertedToBase64} />
+              <>  <img className="no-print" style={{width:"800px"}}src={this.props.stackedChartConvertedToBase64} />
+                <img className="printOnly" style={{width:"600px"}}src={this.props.stackedChartConvertedToBase64} /></>
               )}
             </div>
           )}
-          {(this.props.stackedChartConvertedToBase64===undefined || this.props.stackedChartConvertedToBase64 === null) && <article
+          {(this.props.stackedChartConvertedToBase64===undefined || this.props.stackedChartConvertedToBase64 === null) && 
+          <div
+          style={{
+            width: "90%",
+            visibility:this.props.useNewPDFMethod && "hidden",
+          }}
+        >
+          <article
             id="stackedChart"
             className="canvas-containerWeb"
-            style={{ marginLeft: "25px"}}
+            style={{ marginLeft: "25px", height: "260px"}} 
           >
-            <div
-              style={{
-                overflow: "hidden",
-                float: "left",
-                width: "100%",
-                visibility:this.props.useNewPDFMethod && "hidden"
-              }}
-            >
               <Bar data={dataEstate} options={optionsEstate} />
-            </div>
-          </article>}
+           
+          </article>
+          
+          </div>}
         </div>
       </div>
     );

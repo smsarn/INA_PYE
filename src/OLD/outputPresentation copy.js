@@ -22,6 +22,7 @@ import {
   IMAGE_APPLET_INA,
   IMAGE_APPLET_EP,
   COVER_IMAGE_BASE64_INA,
+  COVER_IMAGE_BASE64_EP,
   INCOMESOURCES
 } from "../definitions/generalDefinitions";
 
@@ -320,7 +321,7 @@ export default class OutputPresentation extends Component {
 
   restoreCover = () => {
     const img = COVER_IMAGE_BASE64_INA// getDefaultImages().appletImage.image;
-    console.log(img);
+    
     this.updateImageApplet(img)
     
   }
@@ -346,7 +347,7 @@ export default class OutputPresentation extends Component {
     this.setState({ logoImage: image });
 
     this.firstPageLogoWidth = size;
-    console.log(image, size);
+    //console.log(image, size);
   };
 
   toggleCheckbox = (include) => {
@@ -366,7 +367,7 @@ export default class OutputPresentation extends Component {
   };
 
   updateAboutMe=(aboutMe)=>{
-    console.log(this.state.aboutMe);
+   
     this.setState({aboutMe: aboutMe}, console.log(this.state.aboutMe))
 
   }
@@ -1581,7 +1582,6 @@ export default class OutputPresentation extends Component {
     this.pages = [];
     /* cover page */
 
-    console.log(aboutMeSpecs, this.state.includeAboutMe)
     this.pages.push(pageCover);
     /* AboutMe page if requested */
     {

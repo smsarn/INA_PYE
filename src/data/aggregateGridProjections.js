@@ -284,7 +284,7 @@ function getSurvivorsNonGovNonAssetLiabIncomeProjections(
           adjustedInflation=element.growthRate;
           
       for (yr = 0; yr < noYrs; yr++) {
-        console.log(element)
+      //  console.log(element)
         totalIncome[yr] +=
           yr >= element.startYear &&
           yr < parseInt(element.startYear) + parseInt(element.duration)
@@ -552,6 +552,8 @@ export async function getEPGridData(noProjectYrs, input, nonTaxLiability) {
   let excelDataInfoSection;
   let gridIcons;
 
+  try
+  {
   // spreadsheet
   const language = input.Presentations[0].language;
 
@@ -583,7 +585,9 @@ export async function getEPGridData(noProjectYrs, input, nonTaxLiability) {
   });
   const decimalChar = language === "en" ? "." : ",";
   const thousands = language === "en" ? "," : " ";
-
+} catch (error) {
+  console.log(error)
+}
 
   return {
     gridTitle: dataTitle,
@@ -608,7 +612,7 @@ export function getAssetLiabProjections(props) {
   // add liab and tax liab
   const input = props.dataInput;
   const assetProjections = props.assetProjections;
-  //console.log(assetProjections)
+ // console.log(assetProjections)
   const lang = input.Presentations[0].language;
   // const formatFr = lang === "fr" ? true : false;
   const clients = input.Clients;
@@ -647,6 +651,7 @@ export function getAssetLiabProjections(props) {
       //console.log(assetProjections);
       //console.log(assetProjections[element.id - 1]);
 
+      //(assetProjections[element.id - 1])
       const grid = assetProjections[element.id - 1].grid;
       tmpGrids.push(grid);
       FMVCol = 2;

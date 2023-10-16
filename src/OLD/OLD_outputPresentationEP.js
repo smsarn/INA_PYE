@@ -3,6 +3,10 @@ import "./Output.css";
 import { Table } from "react-bootstrap";
 import Spinner from "./Spinner";
 import { PopupUserinputDialog } from "./PopupUserInput";
+import OutputInfoGridEP from "./OutputInfoGridEP"
+import OutputExportGridEP from "./OutputExportGridEP"
+import {getEPPages
+} from "../utils/outputPresentationSections";
 
 import {
   ASSETS,
@@ -72,7 +76,7 @@ import OutputPage from "./outputPage.js";
 const ABOUTME_IMAGE = "aboutMeImage";
 const EP_LANDSCAPE_PAGE = 6;
 
-export default class OutputPresentationEP extends Component {
+export default class OLD_OutputPresentationEP extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -99,6 +103,7 @@ export default class OutputPresentationEP extends Component {
     this.showLogo = "none";
     this.showAppletImage = "none";
     this.refPage = [];
+   
   }
 
   doINA = async () => {
@@ -296,7 +301,7 @@ export default class OutputPresentationEP extends Component {
     let blobRes = await handleFetchHtmlToPDF(pdfSections);
 
     let blob = new Blob([blobRes], { type: "application/pdf" });
-    saveAs(blob, `PYEPDF`);
+    saveAs(blob, `PYEPDF`+Date.now());
   };
 
   doPDF3 = async () => {
@@ -354,7 +359,7 @@ export default class OutputPresentationEP extends Component {
     let blobRes = await handleFetchHtmlToPDF2(PDF.sections, PDF.css);
 
     let blob = new Blob([blobRes], { type: "application/pdf" });
-    saveAs(blob, `testPDF`);
+    saveAs(blob, `PYEPDF`+Date.now());
     this.setState({ pdfLoaded: true });
   };
 
@@ -412,7 +417,7 @@ export default class OutputPresentationEP extends Component {
 
    restoreCover = () => {
     const img = COVER_IMAGE_BASE64_EP// getDefaultImages().appletImage.image;
-    console.log(img);
+    //console.log(img);
     this.updateImageApplet(img)
     
   }
@@ -460,6 +465,8 @@ export default class OutputPresentationEP extends Component {
 
 
   render() {
+    
+
     this.AssetLiabProjs = getAssetLiabProjections(this.props);
 
     this.output = getOutputValues(this.props);
@@ -529,14 +536,34 @@ export default class OutputPresentationEP extends Component {
 
     const styleAmtCell = { textAlign: "right", height: "1px" };
 
-    console.log(this.props.aggregateGrid, this.props.dataInput);
+    //(this.props.aggregateGrid, this.props.dataInput);
 
     // build simple agg grid:
 
+    //console.log(this.props.aggregateGrid);
     const aggGrid = buildSimpleAggregateGridEP(this.props.aggregateGrid);
-    console.log(aggGrid);
+   // console.log(aggGrid);
 
     const ABOUTME_IMAGE = "aboutMeImage";
+
+    const estateLiabsCompareText = labelsBilingual.pg4P3
+    .replace(
+      "G1",
+      this.AssetLiabProjs.EstateLiabsByTypeTotal<this.AssetLiabProjs.EstateLiabsByTypeLE3Total?
+      (lang==="en"?"grows":"passe"):(lang==="en"?"changes":"passe")
+    )
+    .replace(
+      "X1",
+      formatMoney2(this.AssetLiabProjs.EstateLiabsByTypeTotal, 0, lang)
+    )
+    .replace(
+      "X2",
+      formatMoney2(
+        this.AssetLiabProjs.EstateLiabsByTypeLE3Total,
+        0,
+        lang
+      )
+    )
 
     this.pages = [];
     /* cover page */
@@ -1154,19 +1181,7 @@ export default class OutputPresentationEP extends Component {
             float: "left",
           }}
         >
-          {labelsBilingual.pg4P3
-            .replace(
-              "X1",
-              formatMoney2(this.AssetLiabProjs.EstateLiabsByTypeTotal, 0, lang)
-            )
-            .replace(
-              "X2",
-              formatMoney2(
-                this.AssetLiabProjs.EstateLiabsByTypeLE3Total,
-                0,
-                lang
-              )
-            )}
+          { estateLiabsCompareText}
         </p>
         <div>
           <OutputGraphsEPLeakage
@@ -1370,7 +1385,7 @@ export default class OutputPresentationEP extends Component {
         );
       }
 
-      console.log(grid.dataProjection, rows);
+      //console.log(grid.dataProjection, rows);
 
       return this.pages.push(
         <div className="newPage" id={"assets Page".concat(j)}>
@@ -1515,6 +1530,18 @@ export default class OutputPresentationEP extends Component {
         </div>
       );
 
+
+      let outputPages=getEPPages(this.props, this.state.appletImage,this.state.aboutMe,this.state.includeAboutMe, 
+        this.state.aboutMeImageConvertedToBase64,
+        this.state.stackedChartConvertedToBase64,
+        this.state.pieEstateLeakageConvertedToBase64,
+        this.state.pieEstateLeakage2ConvertedToBase64,
+        this.firstPageLogoWidth,this.state.showGrids,
+        this.graphEstateLeakageDone,this.graphEstateLeakageLEDone,this.graphStackedDone, this.clickMultiButton )
+      this.pages = outputPages.allPages;
+      this.refPage=outputPages.refPage
+    
+
     return (
       <div>
         {this.state.pdfLoaded === false && <Spinner />}
@@ -1530,7 +1557,7 @@ export default class OutputPresentationEP extends Component {
             defaltCover={this.props.dataInput.Presentations[0].appletImage.default}
             restoreCover={this.restoreCover}
             editPres = {this.doEditPres}
-            email={this.props.email}
+            token={this.props.token}
             updateAboutMe={this.updateAboutMe}
           />
           <div style={{ height: "0px" }}>
@@ -1585,7 +1612,7 @@ export default class OutputPresentationEP extends Component {
         <div style={{ width: "100%", paddingTop: "10px" }}>
           <div className="row">
             <div className="column">
-              <table
+              {/* <table
                 className="NeedsTable"
                 style={{
                   paddingLeft: "10px",
@@ -1672,7 +1699,9 @@ export default class OutputPresentationEP extends Component {
                     </td>
                   </tr>
                 </tbody>
-              </table>
+              </table> */}
+                <OutputInfoGridEP taxLiability={this.props.taxLiability} lang={lang} dataEstateLiability={this.props.dataEstateLiability} LE={this.props.LE}/>
+               
             </div>
             <div
               className="column"
@@ -1682,7 +1711,9 @@ export default class OutputPresentationEP extends Component {
                 float: "right",
               }}
             >
-              <table
+              <OutputExportGridEP doEP={this.doEP} doLIFO={this.doLIFO} doCA={this.doCA} doEB={this.doEB} lang={lang}/>
+        
+              {/* <table
                 className="EP"
                 style={{ paddingLeft: "10px", width: "100%" }}
               >
@@ -1788,7 +1819,7 @@ export default class OutputPresentationEP extends Component {
                     </td>
                   </tr>
                 </tbody>
-              </table>
+              </table> */}
             </div>
           </div>
         </div>
@@ -2474,23 +2505,7 @@ export default class OutputPresentationEP extends Component {
                     float: "left",
                   }}
                 >
-                  {labelsBilingual.pg4P3
-                    .replace(
-                      "X1",
-                      formatMoney2(
-                        this.AssetLiabProjs.EstateLiabsByTypeTotal,
-                        0,
-                        lang
-                      )
-                    )
-                    .replace(
-                      "X2",
-                      formatMoney2(
-                        this.AssetLiabProjs.EstateLiabsByTypeLE3Total,
-                        0,
-                        lang
-                      )
-                    )}
+                  { estateLiabsCompareText}
                 </p>
                 <div>
                   <OutputGraphsEPLeakage
@@ -2725,7 +2740,7 @@ export default class OutputPresentationEP extends Component {
                               }
                             }
 
-                            console.log(cell);
+                            //console.log(cell);
                             rows.push(
                               <tr key={i} id={rowID}>
                                 {cell}
@@ -2733,7 +2748,7 @@ export default class OutputPresentationEP extends Component {
                             );
                           }
 
-                          console.log(grid.dataProjection, rows);
+                          //console.log(grid.dataProjection, rows);
 
                           return (
                             <div
@@ -2839,7 +2854,7 @@ export default class OutputPresentationEP extends Component {
           /* className="presentationPrint" */
           /* o */
         >
-          {allPages}
+          {this.pages}
         </div>
       </div>
     );

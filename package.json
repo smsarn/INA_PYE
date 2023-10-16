@@ -1,7 +1,7 @@
 {
   "name": "toolkitdirect",
-  "version": "1.0.26",
-  "buildMode": 2,
+  "version": "1.0.28",
+  "buildMode": 1,
   "comments": {
     "buildModeGuide": "0 is for local, 1 for test-tkdirect, 2 for production toolkitdirect  1 or 2 both work as proxy takes care",
     "proxyGuide": "for test-tkdirect use https://test-tkdirectapi.ppi.ca, for production toolkitdirect use https://privateapi.ppi.ca/ToolkitDirect",

@@ -73,7 +73,7 @@ export default class OutputPresentationEP extends Component {
       pieEstateLeakage2ConvertedToBase64: null,
     };
     this.AssetLiabProjs = null;
-    this.useNewPDFMethod = true;
+    this.useNewPDFMethod = false;//true;
   }
 
   doINA = async () => {
@@ -931,7 +931,7 @@ export default class OutputPresentationEP extends Component {
                     >
                       <tbody>
                         <tr>
-                          <th className="tableTitleEP" colSpan="2">
+                          <th colSpan="2">
                             {labelsBilingual.pg3TabT}
                           </th>
                         </tr>
@@ -1004,7 +1004,7 @@ export default class OutputPresentationEP extends Component {
                     >
                       <tbody>
                         <tr>
-                          <th className="tableTitleEP" colSpan="2">
+                          <th colSpan="2">
                             {labelsBilingual.pg3Tab2T}
                           </th>
                         </tr>
@@ -1082,16 +1082,16 @@ export default class OutputPresentationEP extends Component {
                   >
                     <tbody>
                       <tr>
-                        <th className="tableTitleEP" style={{ width: "30%" }}>
+                        <th style={{ width: "30%" }}>
                           {labelsBilingual.pg3Tab3R1C1}
                         </th>
-                        <th className="tableTitleEP" style={{ width: "20%" }}>
+                        <th style={{ width: "20%" }}>
                           {labelsBilingual.pg3Tab3R1C2}
                         </th>
-                        <th className="tableTitleEP" style={{ width: "20%" }}>
+                        <th style={{ width: "20%" }}>
                           {labelsBilingual.pg3Tab3R1C3}
                         </th>
-                        <th className="tableTitleEP" style={{ width: "20%" }}>
+                        <th style={{ width: "20%" }}>
                           {labelsBilingual.pg3Tab3R1C4}
                         </th>
                       </tr>
@@ -1687,12 +1687,10 @@ let upTo=25
                       }
 
 
-                      
-                      console.log(cell)
                       rows.push(<tr key={i} id={rowID}>{cell}</tr>)
                     }
                   
-                    console.log(grid.dataProjection,rows)
+//                    console.log(grid.dataProjection,rows)
 
                     return (
                       <div className="newPage" id={"assets Page".concat(j)}>

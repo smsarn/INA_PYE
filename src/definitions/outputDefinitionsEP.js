@@ -93,7 +93,7 @@ export const OUTPUTTEXTEP = {
     pg4GT:"Estate Value & Tax Liability",
     pg4P2: " * Life Expectancy is slightly shaded in the bar graph (year: ",
     pg4P3:
-      "Your future tax liability grows from $X1 today to $X2 at life expectancy plus 3 years, and will need to be funded upon death.",
+      "Your future tax liability G1 from $X1 today to $X2 at life expectancy plus 3 years, and will need to be funded upon death.",
 
     pg5T: "Estate Protection Alternatives",
     pg5Paragraphs: [
@@ -137,6 +137,7 @@ export const OUTPUTTEXTEP = {
     pg8T: "Appendix",
     pg8P1:
       "Detailed tax liability projections for all asset categories",
+      pg8PAgg: "Aggregate",
     pg8P2: "Detailed tax liability projections by individual asset category:",
     pg8O1: "Hide",
     pg8O2: "Show",
@@ -175,6 +176,9 @@ export const OUTPUTTEXTEP = {
       EPSummaryTableC31: "to cover All Liabilities",
       EPSummaryTableC24: "A permanent life insurance policy can be custom designed to include the Face + Fund option, a short premium payment period, and a death benefit that covers the need today and grows over time to match the need at Life Expectancy. Note the Insurance Need at Life Expectancy, and use trial and error in ",
       exportData: "Export Data to:",
+      customizeAlert:"This client presentation has been designed to comply with industry regulations and includes a page with Some Important Notes for your protection. Responsibility for use of this document, whether or not it is edited, is solely yours.",
+      customizeAlertTitle:"Customize Presentation",
+    
 
       
   },
@@ -265,7 +269,7 @@ export const OUTPUTTEXTEP = {
     pg4GT:"Valeur du patrimoine et obligation fiscale",
     pg4P2: " * L'espérance de vie est légèrement ombragée dans le graphique à barres (année: ",
     pg4P3:
-      "Votre obligation fiscale future passe de X1 $ aujourd'hui à X2 $ à l'espérance de vie plus 3 ans, et devra être financée au décès.",
+      "Votre obligation fiscale future G1 de X1 $ aujourd'hui à X2 $ à l'espérance de vie plus 3 ans, et devra être financée au décès.",
 
     pg5T: "Options de protection du patrimoine",
     pg5Paragraphs: [
@@ -309,6 +313,7 @@ export const OUTPUTTEXTEP = {
     pg8T: "Annexe",
     pg8P1:
       "Projections détaillées de l'obligation fiscale pour toutes les catégories d'actifs combinées",
+    pg8PAgg: "Agrégat",
     pg8P2: "Projections détaillées de l'obligation fiscale par catégorie d'actifs :",
     pg8O1: "Cacher",
     pg8O2: "Montrer",
@@ -347,6 +352,9 @@ export const OUTPUTTEXTEP = {
       EPSummaryTableC31: "pour couvrir toutes les obligations :",
       EPSummaryTableC24: "Une police d'assurance-vie permanente peut être conçue sur mesure pour inclure l'option Montant d'assurance + fonds, une courte période de paiement des primes et une prestation de décès qui couvre le besoin aujourd'hui et qui augmente avec le temps pour correspondre au besoin à l'espérance de vie. Notez le besoin d'assurance à l'espérance de vie et faites des essais et erreurs dans  ",
       exportData: "Exporter des données vers:",
+      customizeAlert:"Cette présentation client a été conçue pour être conforme aux réglementations du secteur et comprend une page contenant des Notes Importantes pour votre protection. La responsabilité de l'utilisation de ce document, qu'il soit édité ou non, vous incombe exclusivement.",
+      customizeAlertTitle:"Personnaliser la présentation",
+      
 
   },
 

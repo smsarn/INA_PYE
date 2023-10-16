@@ -7,7 +7,7 @@ import {
   APPLET_INA,
   PROVINCE,
   SEX,
-  SMOKING
+  SMOKING,
 } from "../definitions/generalDefinitions";
 // import XLSX from "xlsx";
 import React from "react";
@@ -34,13 +34,12 @@ import {
   IMAGE_APPLET_EP,
   TITLES,
   MAX_LOGO_HEIGHT,
-  PAGE_HEIGHT
+  PAGE_HEIGHT,
 } from "../definitions/generalDefinitions";
 import { AdjustibleImage } from "../components/AdjustibleImage";
 
 // copy instead re lazyloading
 //import { MAX_LOGO_HEIGHT, PAGE_HEIGHT } from "../components/PDF";
-
 
 global.langFr =
   (
@@ -50,6 +49,8 @@ global.langFr =
   )
     .toString()
     .indexOf("fr") >= 0;
+
+const PAGE_SPLIT_ROWS = 25;
 
 export function cleanFormat(value, lang) {
   if (value !== null) {
@@ -913,7 +914,6 @@ export function familyProjectionYears(
         noProjectYrsRet = noProjectYrs;
         noProjectYrsLE = noProjectYrs;
         noProjectYrs100 = noProjectYrs;
-    
       } // jltd
       else {
         const minAge = Math.min(
@@ -927,10 +927,8 @@ export function familyProjectionYears(
         noProjectYrsRet = noProjectYrs;
         noProjectYrsLE = noProjectYrs;
         noProjectYrs100 = noProjectYrs;
-    
       }
-    } 
-    else if (clients.length > 1) {
+    } else if (clients.length > 1) {
       // survivorExists or EP
       projectEnd =
         periodOption === DISPLAY_RETIREMENT
@@ -942,11 +940,10 @@ export function familyProjectionYears(
           : 100;
       noProjectYrs = projectEnd - clients[survIdx].Age;
 
-        noProjectYrsRet = clients[survIdx].retirementAge - clients[survIdx].Age;
-        noProjectYrsLE = LE.spouse;
-        noProjectYrs100 = 100- clients[survIdx].Age;
-    
-      
+      noProjectYrsRet = clients[survIdx].retirementAge - clients[survIdx].Age;
+      noProjectYrsLE = LE.spouse;
+      noProjectYrs100 = 100 - clients[survIdx].Age;
+
       survAge = clients[survIdx].Age;
     } else {
       survAge = clients[QUOTE_CLIENT].Age;
@@ -955,9 +952,9 @@ export function familyProjectionYears(
     return {
       projectionEnd: projectEnd,
       noProjectionYrs: noProjectYrs,
-      noProjectYrsRet:noProjectYrsRet,
-        noProjectYrsLE:noProjectYrsLE,
-        noProjectYrs100:noProjectYrs100,
+      noProjectYrsRet: noProjectYrsRet,
+      noProjectYrsLE: noProjectYrsLE,
+      noProjectYrs100: noProjectYrs100,
       survivorAge: survAge,
       insuranceNeed: insNeed,
       insuranceNeedToRet: insNeedRet,
@@ -996,7 +993,8 @@ export function getInsNeedLine(
       ? labelsBilingual.insNeeds100
       : labelsBilingual.insNeedsRetLE;
 
-  if (false && numSurvivor === 0) // treat as 0 insurance need 
+  if (false && numSurvivor === 0)
+    // treat as 0 insurance need
     needTo = labelsBilingual.addSurvivor;
   else if (singleFamily)
     needTo +=
@@ -1024,13 +1022,7 @@ export function getInsNeedLine(
   return needTo;
 }
 
-export function getInsNeedLineEP(
-  taxOnly,
-  atLE,
-  lang,
-  insuranceNeed,
-  name
-) {
+export function getInsNeedLineEP(taxOnly, atLE, lang, insuranceNeed, name) {
   const labelsBilingual = OUTPUTTEXT[lang];
   const decimalChar = lang === "en" ? "." : ",";
   const thousands = lang === "en" ? "," : " ";
@@ -1038,14 +1030,19 @@ export function getInsNeedLineEP(
   const dollarEn = lang === "fr" ? "" : "$";
   const dollarFr = lang === "fr" ? "$" : "";
 
-  let needTo = (taxOnly ?(atLE?"Insurance Needs to cover Tax Liabilities at Life Expectancy":"Insurance Needs to cover Tax Liabilities Today"):
-  (atLE?"Insurance Needs to cover All Liabilities at Life Expectancy":"Insurance Needs to cover All Liabilities Today"))
+  let needTo = taxOnly
+    ? atLE
+      ? "Insurance Needs to cover Tax Liabilities at Life Expectancy"
+      : "Insurance Needs to cover Tax Liabilities Today"
+    : atLE
+    ? "Insurance Needs to cover All Liabilities at Life Expectancy"
+    : "Insurance Needs to cover All Liabilities Today";
 
-    needTo += ": " 
-      +
-      dollarEn +
-      formatMoney(cleanFormat(insuranceNeed, lang), 0, decimalChar, thousands) +
-      dollarFr;
+  needTo +=
+    ": " +
+    dollarEn +
+    formatMoney(cleanFormat(insuranceNeed, lang), 0, decimalChar, thousands) +
+    dollarFr;
   if (name !== "" && name !== undefined && name !== TITLES[lang].insured)
     needTo += "  (" + name + ")";
   return needTo;
@@ -1087,6 +1084,7 @@ export function getLeakageGraphs(
   const optionsPie = {
     responsive: true,
     maintainAspectRatio: true,
+    devicePixelRatio: 4,
     title: {
       display: true,
       position: "top",
@@ -1118,15 +1116,12 @@ export function getLeakageGraphs(
   //optionsPieEstateLeakage.legend.labels.boxWidth = 20;
   //optionsPieEstateLeakage.plugins.display = true;
 
- 
-
-
   let optionsPieEstateLeakageLE = JSON.parse(JSON.stringify(optionsPie));
   optionsPieEstateLeakageLE.title.text =
     OUTPUTTEXTEP[lang].graphsLeakageT3 + space; // needTo += +this.props.projectEnd + ")";
   // optionsPieEstateLeakageLE.legend.labels.boxWidth = 20;
   //optionsPieEstateLeakageLE.plugins.display = true;
-  
+
   // asset info
   let assetsTotalNow = 0;
   let assetsTotalLE3 = 0;
@@ -1245,7 +1240,13 @@ export function getLeakageGraphs(
   };
 }
 
-export function getLogoAndAppletImage(dataInput, imageRemove, imageAdjust, updateImageApplet, updateImageLogo) {
+export function getLogoAndAppletImage(
+  dataInput,
+  imageRemove,
+  imageAdjust,
+  updateImageApplet,
+  updateImageLogo
+) {
   const lang = dataInput.Presentations[0].language;
   const allPages =
     dataInput.Presentations[0].adviserLogo.image !== null &&
@@ -1267,7 +1268,6 @@ export function getLogoAndAppletImage(dataInput, imageRemove, imageAdjust, updat
     )
   );
 
-
   const logoLeft =
     dataInput.Presentations[0].adviserLogo.size / 2 +
     dataInput.Presentations[0].adviserLogo.left -
@@ -1279,22 +1279,30 @@ export function getLogoAndAppletImage(dataInput, imageRemove, imageAdjust, updat
       size={logoSize}
       imageLeft={logoLeft}
       ID={IMAGE_LOGO_OTHERPAGES}
-      imagePackageID= "imagePackageIDLogoAll"
+      imagePackageID="imagePackageIDLogoAll"
     />
   );
   const top = dataInput.Presentations[0].adviserLogo.top;
   /* const logoTop = dataInput.Presentations[0].adviserLogo.top && logo
   const logoBottom = !dataInput.Presentations[0].adviserLogo.top && logo
    */
-  let log1stPageLeft=dataInput.Presentations[0].adviserLogo.left
+  let log1stPageLeft = dataInput.Presentations[0].adviserLogo.left;
   var logoDiv = document.getElementById(LOGO_IMAGE_WITH_CTRLS);
- 
-  if(logoDiv!==null && log1stPageLeft*logoDiv.clientWidth/100+dataInput.Presentations[0].adviserLogo.size>logoDiv.clientWidth-25)
-   {   
-     log1stPageLeft=(logoDiv.clientWidth-25-dataInput.Presentations[0].adviserLogo.size)*100/logoDiv.clientWidth
 
+  if (
+    logoDiv !== null &&
+    (log1stPageLeft * logoDiv.clientWidth) / 100 +
+      dataInput.Presentations[0].adviserLogo.size >
+      logoDiv.clientWidth - 25
+  ) {
+    log1stPageLeft =
+      ((logoDiv.clientWidth -
+        25 -
+        dataInput.Presentations[0].adviserLogo.size) *
+        100) /
+      logoDiv.clientWidth;
   }
-  console.log(log1stPageLeft, dataInput.Presentations[0].adviserLogo.left)
+  //console.log(log1stPageLeft, dataInput.Presentations[0].adviserLogo.left)
   const logo1stPage = dataInput.Presentations[0].adviserLogo.image !==
     undefined && ( // from older files not null but undefined
     <AdjustibleImage
@@ -1309,7 +1317,7 @@ export function getLogoAndAppletImage(dataInput, imageRemove, imageAdjust, updat
       buttonText={lang === "en" ? "Add/Edit logo" : "Ajouter/modifier le logo"}
       ID={IMAGE_LOGO}
       language={lang}
-      imagePackageID= {LOGO_IMAGE_WITH_CTRLS}
+      imagePackageID={LOGO_IMAGE_WITH_CTRLS}
       updateImage={updateImageLogo}
     />
   );
@@ -1333,52 +1341,76 @@ export function getLogoAndAppletImage(dataInput, imageRemove, imageAdjust, updat
         nonBase64={true}
         ID={APPLET_INA ? IMAGE_APPLET_INA : IMAGE_APPLET_EP}
         undoImage={appletImage}
-        imagePackageID= "imagePackageIDApplet"
+        imagePackageID="imagePackageIDApplet"
         updateImage={updateImageApplet}
-
       />
-    </div>)
+    </div>
+  );
 
-const appletImageOnly = (
-  <div>
-    <AdjustibleImage
-      image={appletImage}
-      showDetails={false}
-      size={OUTPUT_WIDTH_PCT}
-      imageLeft={0}
-      imageAdjust={imageAdjust}
-      //newImagethis.props.loadImage
-      buttonText=""
-      language={lang}
-      top={true}
-      nonBase64={true}
-      ID={APPLET_INA ? IMAGE_APPLET_INA : IMAGE_APPLET_EP}
-      key={"cover"}
-      imagePackageID= "imagePackageIDAppletOnly"
-
-    />
-  </div>
-
+  const appletImageOnly = (
+    <div>
+      <AdjustibleImage
+        image={appletImage}
+        showDetails={false}
+        size={OUTPUT_WIDTH_PCT}
+        imageLeft={0}
+        imageAdjust={imageAdjust}
+        //newImagethis.props.loadImage
+        buttonText=""
+        language={lang}
+        top={true}
+        nonBase64={true}
+        ID={APPLET_INA ? IMAGE_APPLET_INA : IMAGE_APPLET_EP}
+        key={"cover"}
+        imagePackageID="imagePackageIDAppletOnly"
+      />
+    </div>
   );
 
   var img = document.getElementById(IMAGE_LOGO);
-    let smallLogoAdj=0;  
-    let marginLeft1stPg=dataInput.Presentations[0].adviserLogo.left
+  let smallLogoAdj = 0;
+  let marginLeft1stPg = dataInput.Presentations[0].adviserLogo.left;
 
-    let logoOnly =""
-    let logoFirstPg1=""
-    
-    if(img!==null && logoDiv!==null)
-    {
-      smallLogoAdj=0;//dataInput.Presentations[0].adviserLogo.left===0?0:(img.width/2)/logoDiv.clientWidth
-      marginLeft1stPg= log1stPageLeft;//Math.min(dataInput.Presentations[0].adviserLogo.left, 100*(logoDiv.clientWidth-img.width)/logoDiv.clientWidth)
-      
-      if(logoDiv.clientWidth>0 && img.width>0 && 100*img.width/logoDiv.clientWidth+ dataInput.Presentations[0].adviserLogo.left>100)
-          smallLogoAdj=0//.92-dataInput.Presentations[0].adviserLogo.left/100
-        logoOnly =<div style={{float:"left",marginLeft:parseFloat(100*smallLogoAdj+dataInput.Presentations[0].adviserLogo.left)  + "%"}}><img className="logo" src={dataInput.Presentations[0].adviserLogo.image} /></div>;
-        logoFirstPg1 = <div style={{marginLeft:marginLeft1stPg + "%"}}><img width={img.width} src={dataInput.Presentations[0].adviserLogo.image} /></div>;
-    } 
+  let logoOnly = "";
+  let logoFirstPg1 = "";
 
+  if (img !== null && logoDiv !== null) {
+    smallLogoAdj = 0; //dataInput.Presentations[0].adviserLogo.left===0?0:(img.width/2)/logoDiv.clientWidth
+    marginLeft1stPg = log1stPageLeft; //Math.min(dataInput.Presentations[0].adviserLogo.left, 100*(logoDiv.clientWidth-img.width)/logoDiv.clientWidth)
+
+    if (
+      logoDiv.clientWidth > 0 &&
+      img.width > 0 &&
+      (100 * img.width) / logoDiv.clientWidth +
+        dataInput.Presentations[0].adviserLogo.left >
+        100
+    )
+      smallLogoAdj = 0; //.92-dataInput.Presentations[0].adviserLogo.left/100
+    logoOnly = (
+      <div
+        style={{
+          float: "left",
+          marginLeft:
+            parseFloat(
+              100 * smallLogoAdj + dataInput.Presentations[0].adviserLogo.left
+            ) + "%",
+        }}
+      >
+        <img
+          className="logo"
+          src={dataInput.Presentations[0].adviserLogo.image}
+        />
+      </div>
+    );
+    logoFirstPg1 = (
+      <div style={{ marginLeft: marginLeft1stPg + "%" }}>
+        <img
+          width={img.width}
+          src={dataInput.Presentations[0].adviserLogo.image}
+        />
+      </div>
+    );
+  }
 
   return {
     //appletImage: appletImage,
@@ -1390,15 +1422,14 @@ const appletImageOnly = (
     logoBottom: !top ? logo : "",
     logo1stPage: logo1stPage,
     logo1stPage1: logoFirstPg1,
-    logoAllPages:allPages,
+    logoAllPages: allPages,
     applet: applet,
     appletImageOnly: appletImageOnly,
     imagePackageIDLogo: "imagePackageIDLogo",
-    imagePackageIDApplet: "imagePackageIDApplet" ,
-    defaultCover:{appletImage}
+    imagePackageIDApplet: "imagePackageIDApplet",
+    defaultCover: { appletImage },
   };
 }
-
 
 export function doCompuLife(
   lang,
@@ -1474,78 +1505,62 @@ export function doCompuLife(
   } catch (e) {} */
 }
 
-
 export async function chartToBase64Image(containerID) {
   const CANVAS_CLASS_NAME = "chartjs-render-monitor";
 
   let containerElement = document.getElementById(containerID);
- 
+
   let canvasElement = null;
 
   if (containerElement !== null)
-    if (
-      containerElement.getElementsByClassName(CANVAS_CLASS_NAME).length === 1
-    )
-      canvasElement = containerElement.getElementsByClassName(
-        CANVAS_CLASS_NAME
-      )[0];
+    if (containerElement.getElementsByClassName(CANVAS_CLASS_NAME).length === 1)
+      canvasElement =
+        containerElement.getElementsByClassName(CANVAS_CLASS_NAME)[0];
 
-  let dataUrl = canvasElement===null?null:canvasElement.toDataURL();
+  let dataUrl = canvasElement === null ? null : canvasElement.toDataURL();
 
   return dataUrl;
-};
-
-
-export async function getBase64AppletImage(imageID)
-{
-  var c = document.createElement('canvas');
-  var img = document.getElementById(imageID);
-  if (img!==null){
-    c.height = img.naturalHeight;
-    c.width = img.naturalWidth;
-    var ctx = c.getContext('2d');
-  
-    ctx.drawImage(img, 0, 0, c.width, c.height);
-    return c.toDataURL();
-  }
-  else
-   return ""
-
 }
 
+export async function getBase64AppletImage(imageID) {
+  var c = document.createElement("canvas");
+  var img = document.getElementById(imageID);
+  if (img !== null) {
+    c.height = img.naturalHeight;
+    c.width = img.naturalWidth;
+    var ctx = c.getContext("2d");
 
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    return c.toDataURL();
+  } else return "";
+}
 
-
-export function extractPageCSS(){
-    var css = [];
-    for (var i = 0; i < document.styleSheets.length; i++) {
-      var sheet = document.styleSheets[i];
-      var rules = "cssRules" in sheet ? sheet.cssRules : sheet.rules;
-      if (rules) {
-        css.push(
-          "\n/* Stylesheet : " + (sheet.href || "[inline styles]") + " */"
-        );
-        for (var j = 0; j < rules.length; j++) {
-          var rule = rules[j];
-          if ("cssText" in rule) css.push(rule.cssText);
-          else
-            css.push(
-              rule.selectorText + " {\n" + rule.style.cssText + "\n}\n"
-            );
-        }
+export function extractPageCSS() {
+  var css = [];
+  for (var i = 0; i < document.styleSheets.length; i++) {
+    var sheet = document.styleSheets[i];
+    var rules = "cssRules" in sheet ? sheet.cssRules : sheet.rules;
+    if (rules) {
+      css.push(
+        "\n/* Stylesheet : " + (sheet.href || "[inline styles]") + " */"
+      );
+      for (var j = 0; j < rules.length; j++) {
+        var rule = rules[j];
+        if ("cssText" in rule) css.push(rule.cssText);
+        else
+          css.push(rule.selectorText + " {\n" + rule.style.cssText + "\n}\n");
       }
     }
-    var cssInline = css.join("\n") + "\n";
-    return cssInline;
   }
+  var cssInline = css.join("\n") + "\n";
+  return cssInline;
+}
 
-
-  export function buildSimpleAggregateGridEP(aggGrid)
-  
-  {
-    let rows = [];
-    let title=[];
-    for (var idx = 0; idx < aggGrid.dataColTitles.length; idx++){
+export function buildSimpleAggregateGridEP(aggGrid) {
+  let rows = [];
+  let pageSplits = [];
+  let title = [];
+  /* for (var idx = 0; idx < aggGrid.dataColTitles.length; idx++){
       let tID = `cell${i}-${idx}`
       title.push(<td key={tID} id={tID}>{aggGrid.dataColTitles[idx]}</td>)
     }
@@ -1553,7 +1568,7 @@ export function extractPageCSS(){
   for (var i = 0; i <aggGrid.dataProjection[0].length; i++){
     let rowID = `row${i}`
     let cell = []
-let upTo=25
+let upTo=20
     if (i>upTo)
     {
       if(i%5===0)
@@ -1569,15 +1584,96 @@ let upTo=25
         cell.push(<td key={cellID} id={cellID}>{aggGrid.dataProjection[idx][i]}</td>)
       }
     }
-    console.log(cell)
+    
     rows.push(<tr key={i} id={rowID}>{cell}</tr>)
+  } */
+
+  for (var idx = 0; idx < aggGrid.dataColTitles.length; idx++) {
+    let tID = `cell${i}-${idx}`;
+    title.push(
+      <td key={tID} id={tID}>
+        {aggGrid.dataColTitles[idx]}
+      </td>
+    );
   }
 
-      
-  console.log(aggGrid.dataProjection,rows,aggGrid.dataProjection[0].length )
+  for (
+    var i = 0;
+    i < Math.min(PAGE_SPLIT_ROWS, aggGrid.dataProjection[0].length);
+    i++
+  ) {
+    let rowID = `row${i}`;
+    let cell = [];
+    for (var idx = 0; idx < aggGrid.dataColTitles.length; idx++) {
+      let cellID = `cell${i}-${idx}`;
+      cell.push(
+        <td key={cellID} id={cellID}>
+          {aggGrid.dataProjection[idx][i]}
+        </td>
+      );
+    }
 
-  return ({title:aggGrid.gridTitle, colTitles:title, rows:rows})
-  
+    rows.push(
+      <tr key={i} id={rowID}>
+        {cell}
+      </tr>
+    );
   }
-  
-  
+  pageSplits.push({ title: aggGrid.gridTitle, colTitles: title, rows: rows });
+
+  rows = [];
+  for (
+    var i = Math.min(PAGE_SPLIT_ROWS, aggGrid.dataProjection[0].length);
+    i < Math.min(2 * PAGE_SPLIT_ROWS, aggGrid.dataProjection[0].length);
+    i++
+  ) {
+    let rowID = `row${i}`;
+    let cell = [];
+    for (var idx = 0; idx < aggGrid.dataColTitles.length; idx++) {
+      let cellID = `cell${i}-${idx}`;
+      cell.push(
+        <td key={cellID} id={cellID}>
+          {aggGrid.dataProjection[idx][i]}
+        </td>
+      );
+    }
+
+    rows.push(
+      <tr key={i} id={rowID}>
+        {cell}
+      </tr>
+    );
+  }
+  if (aggGrid.dataProjection[0].length > PAGE_SPLIT_ROWS)
+    pageSplits.push({ title: aggGrid.gridTitle, colTitles: title, rows: rows });
+
+  rows = [];
+  for (
+    var i = Math.min(2 * PAGE_SPLIT_ROWS, aggGrid.dataProjection[0].length);
+    i < Math.min(3 * PAGE_SPLIT_ROWS, aggGrid.dataProjection[0].length);
+    i++
+  ) {
+    let rowID = `row${i}`;
+    let cell = [];
+    for (var idx = 0; idx < aggGrid.dataColTitles.length; idx++) {
+      let cellID = `cell${i}-${idx}`;
+      cell.push(
+        <td key={cellID} id={cellID}>
+          {aggGrid.dataProjection[idx][i]}
+        </td>
+      );
+    }
+
+    rows.push(
+      <tr key={i} id={rowID}>
+        {cell}
+      </tr>
+    );
+  }
+  if (aggGrid.dataProjection[0].length > 2 * PAGE_SPLIT_ROWS)
+    pageSplits.push({ title: aggGrid.gridTitle, colTitles: title, rows: rows });
+
+  //console.log(aggGrid.dataProjection,rows,aggGrid.dataProjection[0].length )
+
+  return pageSplits;
+}
