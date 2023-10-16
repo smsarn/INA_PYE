@@ -1,11 +1,5 @@
 ﻿import React, { Component, Suspense } from "react";
 import { Client } from "./Client";
-//import { defaults } from "react-chartjs-2";
-//import { Asset } from "./Asset";
-//import  Liability  from "./Liability";
-//import { Source } from "./Source";
-//import { Need } from "./Need";
-//import Presentation  from "./Presentation";
 import { Header, hideRecover } from "./Header";
 import { PopupUserinputDialog } from "./PopupUserInput";
 import { PopupMessage } from "./PopupMessage";
