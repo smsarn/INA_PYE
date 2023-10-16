@@ -1,6 +1,6 @@
 {
   "name": "toolkitdirect",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "buildMode": 2,
   "comments": {
     "buildModeGuide": "0 is for local, 1 for test-tkdirect, 2 for production toolkitdirect  1 or 2 both work as proxy takes care",

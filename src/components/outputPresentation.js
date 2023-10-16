@@ -67,7 +67,6 @@ export default class OutputPresentation extends Component {
       showToEPMsg:false
     };
 
-    
     this.dateApplet = "";
     this.useNewPDFMethod = true;
     this.pages = [];
@@ -290,6 +289,10 @@ export default class OutputPresentation extends Component {
   }
 
   render() {
+
+
+    console.log(this.state.aboutMe)
+    
     // presentation output shared with pdf
 
    // let output = getOutputValues(this.props);

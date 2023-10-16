@@ -862,7 +862,7 @@ myHeaders.append("Accept", "application/json");
 
 
     let aboutMe = await fetch(
-      appSiteAPI + "/api/AdvisorPortfolio?authToken=" + token, requestOptions)
+      appSiteAPI + "/api/AdvisorPortfolio?tkdtkn=" + token, requestOptions)
     
       let jsonData= await aboutMe.json();//parseXmlToJson(data)
     return jsonData;

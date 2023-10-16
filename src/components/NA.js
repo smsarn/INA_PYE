@@ -479,6 +479,10 @@ export class NA extends Component {
 
     this.aboutMe = await handleFetchAdvisorPortfolio(this.token);
 
+    
+
+
+
     console.log(this.aboutMe, this.userEmail);
 
     // agent access re colour or else
